@@ -29,14 +29,15 @@ class Tabs extends Field
     /**
      * @param $title 标题
      * @param $content 内容
-     * @return TabPane
+     * @return $this
      */
     public function pane($title, $content)
     {
         $tabPane = new TabPane();
         $tabPane->content($title, 'label');
         $tabPane->content($content);
+        $tabPane->lazy();
         $this->content($tabPane);
-        return $tabPane;
+        return $this;
     }
 }
