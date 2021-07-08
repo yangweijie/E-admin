@@ -16,12 +16,16 @@
         emits: ['update:modelValue'],
         setup(props,ctx){
             const value = ref(false)
-            watch(() => props.modelValue, val => {
-                value.value = val
-            })
             if(props.modelValue == ctx.attrs.activeValue) {
                 value.value = true
             }
+            watch(() => props.modelValue, val => {
+                if(val == ctx.attrs.activeValue) {
+                    value.value = true
+                }else{
+                    value.value = false
+                }
+            })
             function changeHandel(val) {
                 if(props.url){
                     let failValue
@@ -48,7 +52,11 @@
                         ctx.emit('update:modelValue',failValue)
                     })
                 }else{
-                    ctx.emit('update:modelValue',val)
+                    if(val){
+                        ctx.emit('update:modelValue',ctx.attrs.activeValue)
+                    }else{
+                        ctx.emit('update:modelValue',ctx.attrs.inactiveValue)
+                    }
                 }
             }
             return {

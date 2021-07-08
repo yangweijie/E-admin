@@ -33,6 +33,9 @@
 .el-button.is-plain{
   box-shadow: 0 3px 1px -2px rgba(0,0,0,.03),0 2px 2px 0 rgba(0,0,0,.03),0 1px 5px 1px rgba(0,0,0,.01);
 }
+.el-button--text{
+  box-shadow:none;
+}
 .el-button--primary{
   border-color: #b3d8ff;
 }
@@ -75,4 +78,8 @@
 }
 .el-card{
   overflow: visible;
+}
+
+.dialogTableClass .el-dialog__body {
+  padding: 0!important;
 }

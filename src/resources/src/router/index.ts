@@ -6,13 +6,19 @@ import md5 from 'js-md5'
 import Layout from '@/layout/index.vue'
 import Login from '@/layout/login.vue'
 import Im from '@/components/im/index.vue'
+import Generate from '@/components/generate/index.vue'
 import {refresh} from '@/utils'
 import app from "@/app";
+import {nextTick} from "q";
 let asyncCmponent:any
 const routes = [
     {
         path: '/admin/login',
         component: Login,
+    },
+    {
+        path: '/generate',
+        component: Generate,
     },
     {
         path: '/im',
@@ -31,6 +37,9 @@ const router = createRouter({
 var formRoute:RouteLocationNormalized
 router.beforeEach( async(to:RouteLocationNormalized, from:RouteLocationNormalized,next:NavigationGuardNext) => {
     formRoute = from
+    if(to.path == '/generate'){
+        return next()
+    }
     if(!localStorage.getItem('eadmin_token') && to.path !== '/admin/login'){
         return next('/admin/login?redirect='+to.fullPath)
     }
