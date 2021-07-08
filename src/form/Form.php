@@ -414,9 +414,15 @@ class Form extends Component
         return $value;
     }
 
-    public function steps()
+    /**
+     * 表单步骤条
+     * @param int $current 初始步数
+     * @return FormSteps
+     */
+    public function steps($current = 0)
     {
         $this->steps = new FormSteps($this);
+        $this->steps->bindAttValue('current', $current);
         $prop = $this->steps->bindAttr('current');
         $this->except([$prop]);
         $this->push($this->steps);
