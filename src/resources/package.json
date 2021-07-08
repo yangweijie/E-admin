@@ -20,7 +20,8 @@
     "style-loader": "^2.0.0",
     "vue": "^3.0.11",
     "vue-class-component": "^8.0.0-0",
-    "vue-router": "^4.0.0-0"
+    "vue-router": "^4.0.0-0",
+    "vuedraggable": "^4.0.3"
   },
   "devDependencies": {
     "@tinymce/tinymce-vue": "^4.0.0",

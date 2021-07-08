@@ -242,3 +242,14 @@ export function debounce(fun, delay) {
         }
     }
 }
+//生成随机字母
+export function randomCoding(length){
+    //创建26个字母数组
+    var arr = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    var idvalue ='';
+    for(var i=0;i<length;i++){
+        idvalue+=arr[Math.floor(Math.random()*26)];
+    }
+    return idvalue;
+}
+
