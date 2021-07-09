@@ -79,8 +79,10 @@
                 <template #renderItem="{ item }">
                     <a-list-item>
                         <render :data="item.custom" :slot-props="grid"></render>
-                        <div v-if="item.EadminAction" style="margin-top: 10px">
-                            <render :data="item.EadminAction" :slot-props="grid"></render>
+                        <div class="customEadminAction" v-if="!hideSelection || item.EadminAction">
+                            <el-checkbox v-model="item.checkbox" :checked="selectIds.indexOf(item.eadmin_id) > -1" v-if="!hideSelection && selectionType=='checkbox'" @change="e=>changeSelect(item.eadmin_id,e)" :label="item.eadmin_id"><span></span></el-checkbox>
+                            <el-radio v-if="!hideSelection && selectionType=='radio'" v-model="selectRadio" @change="changeSelect"  :label="item.eadmin_id"><span></span></el-radio>
+                            <render v-if="item.EadminAction" :data="item.EadminAction" :slot-props="grid"></render>
                         </div>
                     </a-list-item>
                 </template>
@@ -209,7 +211,10 @@
             const dragTable = ref('')
             const grid = {grid:ctx.attrs.eadmin_grid, gridParam:ctx.attrs.eadmin_grid_param}
             const {loading,http} = useHttp()
-
+            const selectRadio = ref(false)
+            if(props.selection.length > 0){
+                selectRadio.value = props.selection[0]
+            }
             const filterShow = ref(props.expandFilter)
             const quickSearch = ref('')
             const selectIds = ref(props.selection || [])
@@ -623,6 +628,20 @@
             function visibleFilter() {
                 filterShow.value = !filterShow.value
             }
+            //自定义视图单选框切换
+            function changeSelect(value,bool) {
+                if(props.selectionType=='checkbox'){
+                    if(bool){
+                        selectIds.value.push(value)
+                        selectIds.value = unique(selectIds.value)
+                    }else{
+                        deleteArr(selectIds.value,value)
+                    }
+                }else{
+                    selectIds.value = [value]
+                }
+                ctx.emit('update:selection',selectIds.value)
+            }
             return {
                 isMobile,
                 grid,
@@ -661,6 +680,8 @@
                 header,
                 tools,
                 excel,
+                selectRadio,
+                changeSelect,
                 excelVisibleClose,
             }
         }
@@ -709,5 +730,13 @@
     }
     .filterCustom{
         margin-bottom: 10px;
+    }
+    .customEadminAction{
+        margin-top: 10px;
+        display: flex;align-items: center;
+        justify-content: space-between;
+    }
+    .customEadminAction .el-radio{
+        margin-right: 0;
     }
 </style>

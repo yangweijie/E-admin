@@ -299,6 +299,7 @@
 <style scoped>
 .el-dialog__body .form{
     padding:0;
+    padding-top: 10px;
 }
 .form{
     background: rgb(255, 255, 255);

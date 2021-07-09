@@ -698,8 +698,8 @@ class Form extends Component
                 if ($name == 'dateRange' || $name == 'datetimeRange' || $name == 'timeRange') {
                     $component = $class::create();
                     $component->rangeField($field, $arguments[1]);
-                    $component->startPlaceholder('请选择开始' . $label . '时间');
-                    $component->endPlaceholder('请选择结束' . $label . '时间');
+                    $component->startPlaceholder('请选择开始时间');
+                    $component->endPlaceholder('请选择结束时间');
                     $this->except([$component->bindAttr('timeValue')]);
                 }
                 $prop = $component->bindAttr('modelValue');
@@ -885,7 +885,7 @@ class Form extends Component
     {
         return $this->formItem($name, $arguments);
     }
-
+   
     public function popItem()
     {
         $item = array_pop($this->formItem);

@@ -34,7 +34,7 @@ class Field extends Column
     protected $data = null;
     protected $closure = null;
 
-    public function __construct($label, $content, $data)
+    public function __construct($label, $content, $data,$width)
     {
         $this->attr('style', [
             'fontSize'     => '14px',
@@ -43,7 +43,8 @@ class Field extends Column
             'display'=>'flex'
         ]);
         if (!empty($label)) {
-            $label = Html::create($label . ':')->tag('div')->attr('style', ['color' => '#888888', 'marginRight' => '5px']);
+            $label = Html::create($label . ':')->tag('div')
+                ->attr('style', ['color' => '#888888', 'marginRight' => '5px','width'=>$width.'px','textAlign'=>'right']);
             $this->content($label);
         }
         $this->value = $content;

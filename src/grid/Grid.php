@@ -670,6 +670,7 @@ class Grid extends Component
                 'total' => $this->pagination->attr('total')
             ];
         } else {
+
             $params = (array)$this->attr('params');
             $this->params(array_merge($params, $this->getCallMethod()));
             $this->attr('columns', array_column($this->column, 'attribute'));

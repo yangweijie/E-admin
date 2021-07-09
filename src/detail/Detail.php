@@ -31,6 +31,7 @@ class Detail extends Component
     protected $row;
     protected $fields = [];
     protected $name = 'html';
+    protected $labelWidth = 100;
     public function __construct($data, $id = null)
     {
 
@@ -43,6 +44,13 @@ class Detail extends Component
         $this->attr('class','eadmin-detail');
     }
 
+    /**
+     * 设置标签宽度
+     * @param $number
+     */
+    public function labelWidth($number){
+        $this->labelWidth = $number;
+    }
     public static function create($data, $id, \Closure $closure)
     {
         $self = new self($data, $id);
@@ -151,7 +159,7 @@ class Detail extends Component
 
     public function field($field, $label = '')
     {
-        $field = new Field($label, $this->getData($field), $this->data);
+        $field = new Field($label, $this->getData($field), $this->data,$this->labelWidth);
         $this->push($field);
         return $field;
     }

@@ -70,14 +70,26 @@ class SelectTable extends Field
         $this->params(array_merge($from->getCallMethod(),$params));
         return $this;
     }
-
-    public function options(\Closure $closure)
-    {
+    protected function selectRequest(\Closure $closure,\Closure $custom){
         $params = json_encode($this->attr('params'));
         if (Request::has('eadminSelectTable') &&
             Request::get('eadmin_field') == $this->bindAttr('modelValue') &&
-            Request::get('eadmin_params') == $params) {
+            Request::get('eadmin_params') == $params && Request::has('eadmin_id')) {
             $datas = call_user_func($closure, Request::get('eadmin_id', []));
+            call_user_func($custom,$datas);
+        }
+        $this->remoteParams(['eadmin_params' => $params, 'eadmin_field' => $this->bindAttr('modelValue')] + $this->formItem->form()->getCallMethod());
+        return $this;
+    }
+    public function display(\Closure $closure){
+        $this->attr('custom',true);
+        $this->selectRequest($closure,function ($datas){
+            $this->successCode($datas);
+        });
+    }
+    public function options(\Closure $closure)
+    {
+        $this->selectRequest($closure,function ($datas){
             $options = [];
             foreach ($datas as $key => $value) {
                 $options[] = [
@@ -86,8 +98,7 @@ class SelectTable extends Field
                 ];
             }
             $this->successCode($options);
-        }
-        $this->remoteParams(['eadmin_params' => $params, 'eadmin_field' => $this->bindAttr('modelValue')] + $this->formItem->form()->getCallMethod());
+        });
         return $this;
     }
 }

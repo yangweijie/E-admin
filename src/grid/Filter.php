@@ -9,6 +9,7 @@
 namespace Eadmin\grid;
 
 use Eadmin\component\form\FormAction;
+use Eadmin\component\layout\Row;
 use Eadmin\form\Form;
 use think\db\Query;
 use think\facade\Db;
@@ -33,7 +34,7 @@ class Filter
     protected $ifWhere = true;
     protected $relationLastDb = null;
     protected $relationLastMethod = '';
-
+    protected $columnNum = 0;
     public function __construct($model)
     {
         if ($model instanceof Model) {
@@ -57,6 +58,13 @@ class Filter
         });
     }
 
+    /**
+     * 布局列数
+     * @param $num
+     */
+    public function column($num){
+        $this->columnNum = $num;
+    }
     /**
      * 模糊查询
      * @param string $field 字段
@@ -510,6 +518,7 @@ class Filter
                     }
                     $fieldData[$field] = $value;
                     $res               = json_decode($fieldData[$field], true);
+
                     if (!is_null($res)) {
                         $fieldData[$field] = $res;
                     }
@@ -711,6 +720,20 @@ class Filter
      */
     public function render()
     {
+        if($this->columnNum > 0){
+            $formItems = [];
+            do{
+                $formItem = $this->form->popItem();
+                if($formItem){
+                    array_unshift($formItems,$formItem);
+                }
+            }while ($formItem);
+            $row = new Row();
+            foreach ($formItems as $item){
+                $row->column($item,24 / $this->columnNum );
+            }
+            $this->form->content($row);
+        }
         return $this->form;
     }
 }

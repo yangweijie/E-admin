@@ -1,6 +1,7 @@
 <template>
-    <div style="display: flex;align-items: center">
-        <el-select style="flex: 1" v-bind="$attrs" v-model="value" :multiple="multiple" @focus="focus" @click="focus" ref="select" value-key="id" v-loading="selectLoading">
+    <div class="flex">
+        <render v-if="custom" :data="customRender"></render>
+        <el-select v-else style="flex: 1" v-bind="$attrs" v-model="value" :multiple="multiple" @focus="focus" @click="focus" ref="select" value-key="id" v-loading="selectLoading">
             <el-option
                     v-for="item in options"
                     :key="item.id"
@@ -9,9 +10,9 @@
             </el-option>
         </el-select>
         <el-button icon="el-icon-plus" type="primary" plain style="margin-left: 5px;height: 36px" @click="open"></el-button>
-        <el-dialog v-model="visible" :append-to-body="true" width="70%" destroy-on-close>
+        <el-dialog top="50px" v-model="visible" :append-to-body="true" width="80%" destroy-on-close>
             <div v-loading="loading">
-                <render  :data="content" v-model:selection="selection" :scroll="height" :add-params="params"
+                <render :data="content" v-model:selection="selection" :scroll="height" :add-params="params"
                         :selection-type="multiple ? 'checkbox':'radio'" style="overflow-x:auto"></render>
             </div>
             <template #footer>
@@ -38,7 +39,8 @@
             modelValue: [String, Array, Number],
             params: Object,
             remoteParams: Object,
-            multiple: Boolean
+            custom: Boolean,
+            multiple: Boolean,
         },
         inheritAttrs: false,
         emits: ['update:modelValue'],
@@ -48,6 +50,7 @@
             const value = ref(props.modelValue)
             const visible = ref(false)
             const options = ref([])
+            const customRender = ref(null)
             const selection = ref(props.modelValue || [])
             const content = ref('')
             if(!Array.isArray(selection.value)){
@@ -90,7 +93,11 @@
                     url: '/eadmin.rest',
                     params: Object.assign(props.remoteParams, {eadminSelectTable: true, eadmin_id: selection.value}),
                 }).then(res => {
-                    options.value = res.data
+                    if(props.custom){
+                        customRender.value = res.data
+                    }else{
+                        options.value = res.data
+                    }
                     visible.value = false
                     const selects = []
                     selection.value.forEach(item => {
@@ -103,7 +110,9 @@
                         if(typeof(val) !== 'undefined'){
                             value.value = val
                         }
-                        select.value.focus()
+                        if(!props.custom){
+                            select.value.focus()
+                        }
                     }
                 }).finally(()=>{
                     selectLoading.value = false
@@ -124,13 +133,19 @@
                 selection,
                 visible,
                 select,
-                height
+                height,
+                customRender
             }
         }
     })
 </script>
 
 <style scoped>
+    .flex{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
     .footer{
         display: flex;
         align-items: center;
