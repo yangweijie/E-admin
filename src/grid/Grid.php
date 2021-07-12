@@ -801,29 +801,23 @@ EOF;
                 $relationName = $relation;
                 $relationTableFields = $db->getTableFields();
                 if (isset($relationWhereFields[$relationName])) {
-                    $relationWhereFields[$relationName] = array_intersect($relationWhereFields[$relationName], $relationTableFields);
-//                    $fields = implode('|', $relationWhereFields[$relationName]);
-                    $fields = $relationWhereFields[$relationName];
-                    $relationWhereCondtion = $relationWhereOr[$relationName] ?? [];
-                    $db->where(function ($q) use ($fields, $keyword, $relationWhereCondtion) {
-                        foreach ($relationWhereCondtion as $field => $value) {
-                            $q->whereOr($field, $value);
-                        }
-                        //修复模糊查询，兼容mysql5.5以上
-//                        $q->whereLike($fields, "%{$keyword}%", 'OR');
-                        foreach ($fields as $field) {
-                            if ($field == 'like') continue;
-                            $q->whereOr("{$field} like binary '%{$keyword}%'");
-                        }
-                    });
-                    $filter->paseFilter(null, $relationFilter . '.');
-                    $wheres = $filter->db()->getOptions('where');
-                    foreach ($wheres['AND'] as $where){
-                        if($where[1] == 'EXISTS'){
-                            $relationWhereSqls[]  = $where[2];
-                            break;
-                        }
-                    }
+					$relationWhereFields[$relationName] = array_intersect($relationWhereFields[$relationName], $relationTableFields);
+					$fields = implode('|', $relationWhereFields[$relationName]);
+					$relationWhereCondtion = $relationWhereOr[$relationName] ?? [];
+					$db->where(function ($q) use ($fields, $keyword, $relationWhereCondtion) {
+						foreach ($relationWhereCondtion as $field => $value) {
+							$q->whereOr($field, $value);
+						}
+						$q->whereLike($fields, "%{$keyword}%", 'OR');
+					});
+					$filter->paseFilter(null, $relationFilter . '.');
+					$wheres = $filter->db()->getOptions('where');
+					foreach ($wheres['AND'] as $where){
+						if($where[1] == 'EXISTS'){
+							$relationWhereSqls[]  = $where[2];
+							break;
+						}
+					}
                 }
             }
             $fields = implode('|', $whereFields);
