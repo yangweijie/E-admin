@@ -823,10 +823,8 @@ EOF;
             $fields = implode('|', $whereFields);
             $this->db->where(function ($q) use ($relationWhereSqls,$whereFields, $fields, $keyword, $whereOr) {
                 //修复模糊查询，兼容mysql5.5以上
-//                $q->whereLike($fields, "%{$keyword}%", 'OR');（废弃）
                 foreach ($whereFields as $field) {
-                    if ($field == 'like') continue;
-                    $q->whereOr("{$field} like binary '%{$keyword}%'");
+					$q->whereLike($field, "%{$keyword}%", 'OR');
                 }
                 foreach ($whereOr as $field => $value) {
                     $q->whereOr($field, $value);
