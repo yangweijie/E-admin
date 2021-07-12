@@ -1,63 +1,130 @@
 import app from  './app'
-import form from './components/form/form.vue'
-import manyItem from './components/form/manyItem.vue'
-import dialog from './components/dialog.vue'
-import tinymce from './components/tinymce.vue'
-import upload from './components/upload.vue'
-import drawer from './components/drawer.vue'
-import switchs from './components/switchs.vue'
-import tree from './components/tree.vue'
-import button from './components/button.vue'
-import grid from './components/grid/grid.vue'
-import icon from './components/icon.vue'
-import batchAction from './components/grid/batchAction.vue'
-import confirm from './components/confirm.vue'
-import eadminErrorPage from './components/EadminErrorPage.vue'
+import { defineAsyncComponent } from 'vue'
 import render from './components/render.vue'
-import DropdownItem from './components/dropdown/DropdownItem.vue'
-import dropdown from './components/dropdown/dropdown.vue'
-import video from './components/video.vue'
-import downloadFile from './components/downloadFile.vue'
-import debugLog from './components/debugLog.vue'
-import echart from './components/echart/echart.vue'
-import echartCard from './components/echart/echartCard.vue'
-import EadminAmap from './components/EadminAmap.vue'
-import filesystem from './components/filesystem.vue'
-import selectTable from './components/selectTable.vue'
-import select from './components/select.vue'
-import EadminTag from './components/EadminTag.vue'
-import spec from './components/spec.vue'
-import display from './components/display.vue'
-import im from './components/im/index.vue'
-
-app.component(form.name,form)
-app.component(manyItem.name,manyItem)
-app.component(dialog.name,dialog)
-app.component(drawer.name,drawer)
-app.component(switchs.name,switchs)
-app.component(grid.name,grid)
-app.component(tree.name,tree)
-app.component(button.name,button)
-app.component(confirm.name,confirm)
-app.component(upload.name,upload)
-app.component(icon.name,icon)
 app.component(render.name,render)
-app.component(tinymce.name,tinymce)
-app.component(downloadFile.name,downloadFile)
-app.component(debugLog.name,debugLog)
-app.component(video.name,video)
-app.component(DropdownItem.name,DropdownItem)
-app.component(dropdown.name,dropdown)
-app.component(selectTable.name,selectTable)
-app.component(echart.name,echart)
-app.component(echartCard.name,echartCard)
-app.component(batchAction.name,batchAction)
-app.component(EadminAmap.name,EadminAmap)
-app.component(filesystem.name,filesystem)
-app.component(select.name,select)
-app.component(EadminTag.name,EadminTag)
-app.component(spec.name,spec)
-app.component(display.name,display)
+const form = defineAsyncComponent(() =>
+    import('./components/form/form.vue')
+)
+const manyItem = defineAsyncComponent(() =>
+    import('./components/form/manyItem.vue')
+)
+const dialog = defineAsyncComponent(() =>
+    import('./components/dialog.vue')
+)
+const tinymce = defineAsyncComponent(() =>
+    import('./components/tinymce.vue')
+)
+
+const upload = defineAsyncComponent(() =>
+    import('./components/upload.vue')
+)
+const drawer = defineAsyncComponent(() =>
+    import('./components/drawer.vue')
+)
+const switchs = defineAsyncComponent(() =>
+    import('./components/switchs.vue')
+)
+const tree = defineAsyncComponent(() =>
+    import('./components/tree.vue')
+)
+const button = defineAsyncComponent(() =>
+    import('./components/button.vue')
+)
+const grid = defineAsyncComponent(() =>
+    import('./components/grid/grid.vue')
+)
+
+import icon from './components/icon.vue'
+const batchAction = defineAsyncComponent(() =>
+    import('./components/grid/batchAction.vue')
+)
+const confirm = defineAsyncComponent(() =>
+    import('./components/confirm.vue')
+)
+
+import eadminErrorPage from './components/EadminErrorPage.vue'
+
+const DropdownItem = defineAsyncComponent(() =>
+    import('./components/dropdown/DropdownItem.vue')
+)
+const dropdown = defineAsyncComponent(() =>
+    import('./components/dropdown/dropdown.vue')
+)
+
+const video = defineAsyncComponent(() =>
+    import('./components/video.vue')
+)
+
+const downloadFile = defineAsyncComponent(() =>
+    import('./components/downloadFile.vue')
+)
+
+const debugLog = defineAsyncComponent(() =>
+    import('./components/debugLog.vue')
+)
+
+const echart = defineAsyncComponent(() =>
+    import('./components/echart/echart.vue')
+)
+
+const echartCard = defineAsyncComponent(() =>
+    import('./components/echart/echartCard.vue')
+)
+const EadminAmap = defineAsyncComponent(() =>
+    import('./components/EadminAmap.vue')
+)
+
+const filesystem = defineAsyncComponent(() =>
+    import('./components/filesystem.vue')
+)
+const selectTable = defineAsyncComponent(() =>
+    import('./components/selectTable.vue')
+)
+const select = defineAsyncComponent(() =>
+    import('./components/select.vue')
+)
+const EadminTag = defineAsyncComponent(() =>
+    import('./components/EadminTag.vue')
+)
+const spec = defineAsyncComponent(() =>
+    import('./components/spec.vue')
+)
+const display = defineAsyncComponent(() =>
+    import('./components/display.vue')
+)
+const im = defineAsyncComponent(() =>
+    import('./components/im/index.vue')
+)
+
+
+app.component('EadminForm',form)
+app.component('EadminManyItem',manyItem)
+app.component('EadminDialog',dialog)
+app.component('EadminDrawer',drawer)
+app.component('EadminSwitch',switchs)
+app.component('EadminGrid',grid)
+app.component('EadminTree',tree)
+app.component('EadminButton',button)
+app.component('EadminConfirm',confirm)
+app.component('EadminUpload',upload)
+app.component('EadminIcon',icon)
+app.component('EadminEditor',tinymce)
+app.component('EadminDownloadFile',downloadFile)
+app.component('EadminLog',debugLog)
+app.component('EadminVideo',video)
+app.component('EadminDropdownItem',DropdownItem)
+app.component('EadminDropdown',dropdown)
+app.component('EadminSelectTable',selectTable)
+app.component('EadminChart',echart)
+app.component('EadminEchartCard',echartCard)
+app.component('BatchAction',batchAction)
+app.component('EadminAmap',EadminAmap)
+app.component('EadminFileSystem',filesystem)
+app.component('EadminSelect',select)
+app.component('EadminTag',EadminTag)
+app.component('EadminSpec',spec)
+app.component('EadminDisplay',display)
+app.component('EadminIm',im)
 app.component(eadminErrorPage.name,eadminErrorPage)
-app.component(im.name,im)
+
 
