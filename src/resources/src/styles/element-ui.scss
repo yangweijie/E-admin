@@ -79,6 +79,9 @@
 .el-card{
   overflow: visible;
 }
+.el-dialog__body {
+  padding: 15px 20px 0 10px;
+}
 .dialogTableClass .el-dialog__body {
   padding: 0!important;
 }
