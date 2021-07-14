@@ -22,7 +22,7 @@
     import {link, findTree} from '@/utils'
     import Logo from '../logo.vue'
     import menuItem from './menuItem.vue'
-    import {defineComponent, inject, computed} from 'vue'
+    import {defineComponent, inject, computed,watchEffect,ref} from 'vue'
     import {store, action} from '@/store'
 
     export default defineComponent({
@@ -35,15 +35,6 @@
             const route = useRoute()
             const state = inject(store)
             const sidebar = state.sidebar
-            //当前激活菜单
-            const activeIndex = computed(() => {
-                let menu = findTree(state.menus, route.fullPath.substr(1), 'url')
-                if (menu) {
-                    return menu.id + ''
-                } else {
-                    return ''
-                }
-            })
             //侧边栏菜单渲染
             const menus = computed(() => {
                 let menu = null
@@ -58,7 +49,15 @@
                 }
                 return menu
             })
-
+            //当前激活菜单
+            const activeIndex = computed(() => {
+                let menu = findTree(state.menus, route.fullPath.substr(1), 'url')
+                if (menu) {
+                    return menu.id + ''
+                } else {
+                    return ''
+                }
+            })
             //选择菜单
             function select(id, index) {
                 if(state.device === 'mobile'){
@@ -78,7 +77,7 @@
                 select,
                 menus,
                 sidebar,
-                activeIndex
+                activeIndex,
             }
         }
     })

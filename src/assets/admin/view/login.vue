@@ -122,7 +122,10 @@
         watch: {
             $route: {
                 handler: function(route) {
-                    this.redirect = route.query && route.query.redirect
+                    if(route.query && route.query.redirect){
+                        const index = route.fullPath.indexOf('?redirect=')
+                        this.redirect = route.fullPath.substr(index+10)
+                    }
                 },
                 immediate: true
             }

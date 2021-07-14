@@ -14,9 +14,9 @@
 <script>
     import {computed, defineComponent, watch} from "vue";
     import {useVisible, useHttp} from '@/hooks'
+    import {ElMessage} from "element-plus";
     export default defineComponent({
         name: "EadminDrawer",
-
         inheritAttrs: false,
         props: {
             modelValue: {
@@ -25,6 +25,12 @@
             },
             url: String,
             params:Object,
+            gridBatch:Boolean,
+            addParams:{
+                type:Object,
+                default:{}
+            },
+            reRender:Boolean,
             //请求method
             method: {
                 type: String,
@@ -32,11 +38,20 @@
             },
             slotProps:Object
         },
-        emits:['update:modelValue','update:show'],
+        emits:['update:modelValue','update:show','update:reRender'],
         setup(props,ctx){
+            if(ctx.attrs.eadmin_popup){
+                props.slotProps.eadmin_popup = ctx.attrs.eadmin_popup
+            }
             const {visible,hide,useHttp} = useVisible(props,ctx)
             const {content,http} = useHttp()
             let init = false
+            watch(()=>props.reRender,value=>{
+                if(value){
+                    http(props,false)
+                    ctx.emit('update:reRender',false)
+                }
+            })
             watch(()=>props.modelValue,(value)=>{
                 if(visible.value && !value){
                     hide()
@@ -48,6 +63,10 @@
                 }
             })
             function open(){
+                if(props.gridBatch && props.addParams.eadmin_ids.length == 0){
+                    return ElMessage('请勾选操作数据')
+                }
+                init = true
                 http(props)
             }
             const drawer = computed(()=>{

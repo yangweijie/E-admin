@@ -93,7 +93,7 @@ abstract class Field extends Component
         return $this;
     }
 
-    public function setFormItem($formItem)
+    public function setFormItem(FormItem $formItem)
     {
         $this->formItem = $formItem;
     }

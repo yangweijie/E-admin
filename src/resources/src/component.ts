@@ -101,6 +101,7 @@ const EadminCheckboxGroup = defineAsyncComponent(() =>
 const EadminStep = defineAsyncComponent(() =>
     import('./components/step.vue')
 )
+
 app.component('EadminStep',EadminStep)
 app.component('EadminCheckboxGroup',EadminCheckboxGroup)
 app.component('highlight',highlight)

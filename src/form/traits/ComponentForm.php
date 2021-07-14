@@ -26,6 +26,7 @@ use Eadmin\component\form\field\SelectTable;
 use Eadmin\component\form\field\Slider;
 use Eadmin\component\form\field\Spec;
 use Eadmin\component\form\field\Switchs;
+use Eadmin\component\form\field\Table;
 use Eadmin\component\form\field\TimePicker;
 use Eadmin\component\form\field\Transfer;
 use Eadmin\component\form\field\Tree;

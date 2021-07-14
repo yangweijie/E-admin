@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import {defineComponent,ref} from "vue";
+    import {defineComponent} from "vue";
     export default defineComponent({
         name: "EadminTree",
         props: {
@@ -18,6 +18,7 @@
                     checked(item,ctx.attrs.data,defaultChecked)
                 })
             }
+
             function checked(id,data,newArr){
                 data.forEach(item => {
                     if(item.id == id){
@@ -35,7 +36,7 @@
                 ctx.emit('update:modelValue',checkedKeys.concat(halfCheckedKeys))
             }
             function handelClick(data) {
-                if(!ctx.showCheckbox){
+                if(!ctx.attrs.showCheckbox){
                     ctx.emit('update:modelValue',data.id)
                 }
             }

@@ -9,7 +9,7 @@
                     :value="item.id">
             </el-option>
         </el-select>
-        <el-button icon="el-icon-plus" type="primary" plain style="margin-left: 5px;height: 36px" @click="open"></el-button>
+        <el-button icon="el-icon-plus" type="primary" plain style="margin-left: 5px;height: 36px" @click="open" :disabled="$attrs.disabled"></el-button>
         <el-dialog top="50px" v-model="visible" :append-to-body="true" width="80%" destroy-on-close>
             <div v-loading="loading">
                 <render :data="content" v-model:selection="selection" :scroll="height" :add-params="params"

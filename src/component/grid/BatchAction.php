@@ -10,6 +10,7 @@ namespace Eadmin\component\grid;
 
 
 use Eadmin\component\basic\Confirm;
+use Eadmin\component\basic\Dialog;
 use Eadmin\component\Component;
 
 /**
@@ -25,6 +26,7 @@ class BatchAction extends Component
 
     public function __construct($content)
     {
+        $this->attr('gridBatch',true);
         $this->event('gridRefresh',[]);
         $this->content($content);
     }
@@ -52,5 +54,14 @@ class BatchAction extends Component
     public static function create($content)
     {
         return new self($content);
+    }
+    /**
+     * 模态对话框
+     * @return Dialog
+     */
+    public function dialog()
+    {
+        $dialog = Dialog::create($this);
+        return $dialog;
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <component :is="dialog" v-model="visible" v-bind="$attrs">
+    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog">
                     <template #title>
                         <slot name="title"></slot>
                     </template>
@@ -14,6 +14,7 @@
 <script>
     import {defineComponent, watch,computed} from "vue";
     import {useVisible} from '@/hooks'
+    import {ElMessage} from "element-plus";
 
     export default defineComponent({
         name: "EadminDialog",
@@ -24,8 +25,14 @@
                 default: false,
             },
             show:Boolean,
+            gridBatch:Boolean,
             url: String,
             params:Object,
+            reRender:Boolean,
+            addParams:{
+                type:Object,
+                default:{}
+            },
             //请求method
             method: {
                 type: String,
@@ -33,11 +40,20 @@
             },
             slotProps:Object,
         },
-        emits: ['update:modelValue','update:show'],
+        emits: ['update:modelValue','update:show','update:reRender'],
         setup(props, ctx) {
+            if(ctx.attrs.eadmin_popup){
+                props.slotProps.eadmin_popup = ctx.attrs.eadmin_popup
+            }
             const {visible,hide,useHttp} = useVisible(props,ctx)
             const {content,http} = useHttp()
             let init = false
+            watch(()=>props.reRender,value=>{
+                if(value){
+                    http(props,false)
+                    ctx.emit('update:reRender',false)
+                }
+            })
             watch(()=>props.modelValue,(value)=>{
                if(visible.value && !value){
                    hide()
@@ -50,6 +66,9 @@
                 ctx.emit('update:show',value)
             })
             function open(){
+                if(props.gridBatch  && props.addParams.eadmin_ids.length == 0){
+                    return ElMessage('请勾选操作数据')
+                }
                 init = true
                 http(props)
             }
@@ -71,6 +90,15 @@
     })
 </script>
 
-<style scoped>
-
+<style>
+    .eadmin-dialog{
+        display: flex;
+        flex-direction: column;
+        margin-top: 4vh !important;
+        max-height: 90vh !important;
+        overflow: hidden;
+    }
+    .eadmin-dialog .el-dialog__body{
+        overflow: auto;
+    }
 </style>

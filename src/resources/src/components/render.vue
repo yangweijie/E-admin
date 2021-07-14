@@ -137,9 +137,14 @@
                 }
                 //事件绑定
                 for (let event in data.event) {
-
                     let eventBind = data.event[event]
-                    if(event === 'GridRefresh' && slotProps && slotProps.grid){
+
+                    //弹窗刷新
+                    if(event === 'PopupRefresh' && slotProps && slotProps.eadmin_popup){
+                        data.attribute.onPopupRefresh = (e)=>{
+                            modelValue[slotProps.eadmin_popup] = true
+                        }
+                    }else if(event === 'GridRefresh' && slotProps && slotProps.grid){
                         //grid刷新事件绑定
                         data.attribute.onGridRefresh = (e)=>{
                             modelValue[slotProps.grid] = true

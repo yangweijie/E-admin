@@ -484,9 +484,9 @@ class Grid extends Component
 
         $tableData = [];
         //解析行数据
-        foreach ($datas as $data) {
+        foreach ($datas as $key=>$data) {
             //主键
-            $row = ['eadmin_id' => $data[$this->drive->getPk()]];
+            $row = ['eadmin_id' => $data[$this->drive->getPk()] ?? $key ];
             if(is_null($this->customClosure)){
                 //树形父级pid
                 if ($this->isTree) {

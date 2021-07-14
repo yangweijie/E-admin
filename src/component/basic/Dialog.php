@@ -36,12 +36,18 @@ use think\helper\Str;
  * @method $this url(string $value) 异步加载数据url
  * @method $this method(string $value) ajax请求method get / post /put / delete
  * @method $this params(array $value)  异步附加请求数据
+ * @method $this gridBatch(bool $value = true)  grid批量操作
  */
 class Dialog extends Field
 {
     protected $setcion;
     protected $name = 'EadminDialog';
-
+    public function __construct($field = null, $value = '')
+    {
+        parent::__construct($field, $value);
+        $this->bindAttValue('reRender',false,true);
+        $this->attr('eadmin_popup', $this->bindAttr('reRender'));
+    }
     public static function create($content = null, $field = '')
     {
         $self = new self($field, false);

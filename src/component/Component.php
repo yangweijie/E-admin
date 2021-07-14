@@ -178,7 +178,14 @@ abstract class Component implements \JsonSerializable
         $this->directive[] = ['name' => $name, 'argument' => $argument, 'value' => $value];
         return $this;
     }
-
+    /**
+     * 移除事件
+     * @param $name
+     */
+    public function removeEvent($name){
+        $name = ucfirst($name);
+        unset($this->event[$name]);
+    }
     public function event($name, array $value)
     {
         $name = ucfirst($name);
@@ -235,7 +242,7 @@ abstract class Component implements \JsonSerializable
         } else {
             if (!($content instanceof Component)) {
                 $content = Admin::dispatch($content);
-                
+
             }
             if ($content instanceof Form && ($this instanceof Dialog || $this instanceof Drawer)) {
                 $field = $this->bindAttr('modelValue');
@@ -252,7 +259,7 @@ abstract class Component implements \JsonSerializable
         return $this;
     }
 
-   
+
 
     /**
      * 条件执行

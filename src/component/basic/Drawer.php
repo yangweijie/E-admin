@@ -35,6 +35,12 @@ class Drawer extends Field
 {
     protected $setcion;
     protected $name = 'EadminDrawer';
+    public function __construct($field = null, $value = '')
+    {
+        parent::__construct($field, $value);
+        $this->bindAttValue('reRender',false,true);
+        $this->attr('eadmin_popup', $this->bindAttr('reRender'));
+    }
 
     public static function create($content = null, $field = '')
     {
@@ -74,6 +80,6 @@ class Drawer extends Field
      */
     public function title($content)
     {
-        return $this->content($content, 'title');
+        return $this->content(Html::create($content), 'title');
     }
 }

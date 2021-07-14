@@ -17,6 +17,7 @@ use Eadmin\component\form\Field;
  * @link https://element-plus.gitee.io/#/zh-CN/component/form
  * @package Eadmin\component\form\field
  * @property Form $form
+ * @method $this table(bool $value=true) 表格模式
  */
 class FormMany extends Field
 {

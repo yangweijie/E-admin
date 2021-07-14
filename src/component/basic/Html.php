@@ -9,9 +9,9 @@ use Eadmin\component\Component;
 /**
  * Class Html
  * @package Eadmin\component\basic
- * @method Html p() p标签
- * @method Html div() div标签
- * @method Html strong() div标签
+ * @method static Html p() p标签
+ * @method static Html div() div标签
+ * @method static Html strong() div标签
  */
 class Html extends Component
 {

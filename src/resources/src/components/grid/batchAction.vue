@@ -1,5 +1,5 @@
 <template>
-    <span @click="clickHandel">
+    <span @click.stop="clickHandel">
         <slot></slot>
     </span>
 </template>

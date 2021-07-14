@@ -14,7 +14,7 @@
                             </el-breadcrumb>
                         </div>
                         <el-button icon="el-icon-refresh" size="mini" @click="loading = true"></el-button>
-                        <render :data="upload" multiple :accept="accept" :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
+                        <render :data="upload" multiple :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
                         <el-button  size="mini" @click="mkdir">新建文件夹</el-button>
                         <el-button  size="mini" type="danger" v-if="selectPaths.length > 0" @click="delSelect">删除选中</el-button>
                     </el-button-group>

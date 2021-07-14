@@ -20,7 +20,7 @@ use Eadmin\form\ValidatorForm;
  * @package Eadmin\component\form\field
  * @method $this size(string $value) 尺寸 medium / small / mini
  * @method $this prop(string $value) 表单域 model 字段
- * @method $this label(string $value) 标签文本
+
  * @method $this labelWidth(string $value) 表单域标签的的宽度，例如 '50px'。支持 auto
  * @method $this error(string $value) 表单域验证错误信息, 设置该值会使表单验证状态变为error，并显示该错误信息
  * @method $this showMessage(bool $value = true) 是否显示校验错误信息
@@ -39,6 +39,15 @@ class FormItem extends Field
         $this->form = $form;
     }
 
+    /**
+     * 标签
+     * @param $value
+     * @return $this
+     */
+    public function label($value){
+        $this->content['label'] = [];
+        return $this->content($value,'label');
+    }
     /**
      * 设置验证规则
      * @param array $rule

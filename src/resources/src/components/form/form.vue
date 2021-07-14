@@ -1,5 +1,5 @@
 <template>
-    <el-main class='form' :style="$attrs.style">
+    <el-main class='eadmin-form' :style="$attrs.style">
         <el-form ref="eadminForm" :label-position="labelPosition" v-bind="$attrs" @submit.native.prevent>
             <slot></slot>
             <render :data="stepResult"></render>
@@ -50,7 +50,7 @@
             },
             proxyData:Object,
         },
-        emits: ['success','gridRefresh','update:submit','update:reset','update:validate','update:step','update:eadminForm'],
+        emits: ['success','gridRefresh','PopupRefresh','update:submit','update:reset','update:validate','update:step','update:eadminForm'],
         setup(props,ctx){
             const eadminForm = ref(null)
             const stepResult = ref(null)
@@ -225,6 +225,7 @@
                                         ctx.emit('update:step',++props.step)
                                     }
                                     ctx.emit('success')
+                                    ctx.emit('PopupRefresh')
                                     ctx.emit('gridRefresh')
                                 }
                             })
@@ -297,11 +298,18 @@
 </script>
 
 <style scoped>
-.el-dialog__body .form{
-    padding:0;
-    padding-top: 10px;
+.eadmin-dialog .el-form-item:last-child{
+   margin-bottom: 0;
 }
-.form{
+.eadmin-dialog .footer{
+    position: absolute;
+    bottom: 0;
+    background: #ffffff;
+    width: 100%;
+    margin-bottom: 0;
+    padding-bottom:10px;
+}
+.eadmin-form{
     background: rgb(255, 255, 255);
     border-radius: 4px;
     white-space:normal;

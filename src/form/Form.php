@@ -82,7 +82,7 @@ use think\Model;
  * @method \Eadmin\component\form\field\DynamicTag tag($field, $label = '') 动态标签
  * @method \Eadmin\component\form\field\Spec spec($field, $label = '') 规格
  * @method \Eadmin\component\form\field\Display display($field, $label = '') 显示
- */
+*/
 class Form extends Component
 {
     use CallProvide, ComponentForm, WatchForm;
@@ -355,8 +355,9 @@ class Form extends Component
             $value = $this->drive->getData($field, $data);
             $defaultValue = $component->getDefault();
             $componentValue = $component->getValue();
+
             //设置default缺省值
-            if (empty($value) && $value !== 0 && !is_null($defaultValue)) {
+            if (empty($value) && $value !== '0' && $value !== 0 && !is_null($defaultValue)) {
                 $value = $this->getPickerValue($component, $field, $defaultValue);
             }
 
@@ -380,8 +381,14 @@ class Form extends Component
             if ($component instanceof DatePicker || $component instanceof TimePicker) {
                 $value = empty($value) ? null : $value;
                 $this->setData($field, $value);
+            }elseif ($component instanceof Cascader && $attr != 'modelValue'){
+                if(is_array($value)) {
+                    $val = array_shift($value);
+                    $this->setData($field, $val);
+                    $component->default($value);
+                    $component->value($value);
+                }
             } else {
-
                 $this->setData($field, $value ?? '');
             }
             if (is_null($data)) {
@@ -651,8 +658,17 @@ class Form extends Component
         $manyItem->value($manyData);
         $this->itemComponent = $originItemComponent;
         foreach ($formItems as $item) {
+            $formItem = clone $item;
+            $columns[] = [
+                'title'=>$formItem->attr('label'),
+                'dataIndex'=>$formItem->attr('prop'),
+                'prop'=>$formItem->attr('prop'),
+                'component'=>$formItem
+            ];
+            $formItem->removeAttr('label');
             $manyItem->content($item);
         }
+        $manyItem->attr('columns',$columns);
         $this->push($manyItem);
         return $manyItem;
     }
@@ -885,7 +901,15 @@ class Form extends Component
     {
         return $this->formItem($name, $arguments);
     }
-   
+
+    /**
+     * @return FormItem
+     */
+    public function getLastItem()
+    {
+        $item = end($this->formItem);
+        return $item;
+    }
     public function popItem()
     {
         $item = array_pop($this->formItem);
