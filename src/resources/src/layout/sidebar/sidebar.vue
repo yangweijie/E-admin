@@ -5,10 +5,10 @@
             <el-menu :default-active="activeIndex"
                      text-color="#FFFFFF"
                      :collapse="!sidebar.opend"
-                     :collapse-transition="true"
                      mode="vertical"
                      background-color="#000000"
                      @select="select"
+                     :default-openeds="defaultOpeneds"
             >
                 <menu-item v-for="item in menus" :menu="item" :key="item.id"></menu-item>
             </el-menu>
@@ -35,6 +35,15 @@
             const route = useRoute()
             const state = inject(store)
             const sidebar = state.sidebar
+            const defaultOpeneds = ref([])
+            //默认展开子菜单
+            state.menus.forEach(res => {
+                if(res.children){
+                    res.children.forEach(item=>{
+                        defaultOpeneds.value.push(item.id+'')
+                    })
+                }
+            })
             //侧边栏菜单渲染
             const menus = computed(() => {
                 let menu = null
@@ -72,6 +81,7 @@
                 action.sidebarOpen(!sidebar.opend)
             }
             return {
+                defaultOpeneds,
                 collapse,
                 state,
                 select,

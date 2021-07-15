@@ -1,5 +1,5 @@
 <template>
-    <el-dropdown trigger="click" @visible-change="noticeShow" :style="['line-height: 1',noticeCount > 0 ? 'margin-right: 5px':'']">
+    <el-dropdown placement="bottom" trigger="click" @visible-change="noticeShow" :style="['line-height: 1',noticeCount > 0 ? 'margin-right: 5px':'']">
         <div class="right-menu-item hover-effect">
             <i class="el-icon-bell hover-effect" style="font-size: 16px" v-if="noticeCount === 0"/>
             <el-badge :value="noticeCount" :max="99" type="danger" v-else>

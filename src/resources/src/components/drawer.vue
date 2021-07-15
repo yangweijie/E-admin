@@ -36,7 +36,10 @@
                 type: String,
                 default: 'get'
             },
-            slotProps:Object
+            slotProps:{
+                type:Object,
+                default:{},
+            },
         },
         emits:['update:modelValue','update:show','update:reRender'],
         setup(props,ctx){
