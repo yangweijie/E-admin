@@ -25,7 +25,7 @@ const useVisible = function(props:object,ctx:any){
                 if (props.url) {
                     request({
                         url: props.url,
-                        params:props.params,
+                        params:Object.assign(props.params,props.addParams),
                         method:props.method
                     }).then((res:any)=> {
                         resolve(res)

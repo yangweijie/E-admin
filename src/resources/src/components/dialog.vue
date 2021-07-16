@@ -15,7 +15,7 @@
     import {defineComponent, watch,computed} from "vue";
     import render from '@/components/render.vue'
     import {useVisible} from '@/hooks'
-
+    import {ElMessage} from "element-plus";
     export default defineComponent({
         name: "EadminDialog",
         components: {
@@ -30,6 +30,11 @@
             show:Boolean,
             url: String,
             params:Object,
+            addParams:{
+                type:Object,
+                default:{}
+            },
+            gridBatch:Boolean,
             //请求method
             method: {
                 type: String,
@@ -39,6 +44,10 @@
         },
         emits: ['update:modelValue','update:show'],
         setup(props, ctx) {
+            if(ctx.attrs.eadmin_popup){
+                props.slotProps.eadmin_popup = ctx.attrs.eadmin_popup
+            }
+
             const {visible,hide,useHttp} = useVisible(props,ctx)
             const {content,http} = useHttp()
             watch(()=>props.modelValue,(value)=>{
@@ -53,6 +62,10 @@
                 ctx.emit('update:show',value)
             })
             function open(){
+                if(props.gridBatch  && props.addParams.eadmin_ids.length == 0){
+                    return ElMessage('请勾选操作数据')
+                }
+
                 http(props)
             }
             const dialog = computed(()=>{

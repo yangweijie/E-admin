@@ -29,7 +29,7 @@
                     <el-button plain size="small" icon="el-icon-help" v-if="trashed && selectIds.length > 0" @click="recoverySelect">恢复选中</el-button>
                     <el-button type="danger" size="small" icon="el-icon-delete" v-if="!hideDeleteButton" @click="deleteAll()">{{trashed && !hideTrashed?'清空回收站':'清空数据'}}</el-button>
                     <el-button v-if="filter" type="primary" size="small" icon="el-icon-zoom-in" @click="visibleFilter">筛选</el-button>
-                    <render v-for="tool in tools" :data="tool" :ids="selectIds" :grid-params="params" :slot-props="grid"></render>
+                    <render v-for="tool in tools" :data="tool" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params" :slot-props="grid"></render>
                 </el-col>
                 <el-col :md="4" >
                     <div style="float: right;margin-right: 15px">

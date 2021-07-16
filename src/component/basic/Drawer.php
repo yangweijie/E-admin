@@ -30,6 +30,7 @@ use think\helper\Str;
  * @method $this url(string $value) 异步加载数据url
  * @method $this params(array $value)  异步附加请求数据
  * @method $this method(string $value) ajax请求method get / post /put / delete
+ * @method $this gridBatch(bool $value = true)  grid批量操作
  */
 class Drawer extends Field
 {
