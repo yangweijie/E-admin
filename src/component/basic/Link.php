@@ -21,7 +21,7 @@ class Link extends Component
     protected $name = 'ElLink';
     public function __construct($content)
     {
-        $this->content("<span>{$content}</span>");
+        $this->content(Html::create($content));
     }
 
 	/**
