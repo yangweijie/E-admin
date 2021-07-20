@@ -252,18 +252,19 @@ class Model implements GridInterface
     {
         $action = isset($data['action']) ? $data['action'] : '';
         if ($action == 'eadmin_sort') {
-            $field   = "id,(@rownum := @rownum+1),case when @rownum = {$data['sort']} then @rownum := @rownum+1 else @rownum := @rownum end AS rownum";
+            $pk = $this->model->getPk();
+            $field   = "{$pk},(@rownum := @rownum+1),case when @rownum = {$data['sort']} then @rownum := @rownum+1 else @rownum := @rownum end AS rownum";
             $sortSql = $this->db->table("(SELECT @rownum := -1) r," . $this->model->getTable())
                 ->fieldRaw($field)
                 ->removeOption('order')
                 ->order($this->sortField)
-                ->where('id', '<>', $data['id'])
+                ->where($pk, '<>', $data['id'])
                 ->buildSql();
-            $this->model->where($this->model->getPk(), $data['id'])->update([$this->sortField => $data['sort']]);
-            $res = Db::execute("update {$this->model->getTable()} inner join {$sortSql} a on a.id={$this->model->getTable()}.id set {$this->sortField}=a.rownum");
+            $this->model->where($pk, $data['id'])->update([$this->sortField => $data['sort']]);
+            $res = Db::execute("update {$this->model->getTable()} inner join {$sortSql} a on a.{$pk}={$this->model->getTable()}.{$pk} set {$this->sortField}=a.rownum");
             admin_success('操作完成', '排序成功');
         } else {
-            $res = $this->model->removeWhereField($this->softDeleteField)->strict(false)->whereIn($this->model->getPk(), $ids)->update($data);
+            $res = $this->model->removeWhereField($this->softDeleteField)->strict(false)->whereIn($pk, $ids)->update($data);
             if ($res) {
                 return true;
             } else {

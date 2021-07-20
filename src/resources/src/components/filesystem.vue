@@ -1,4 +1,5 @@
 <template>
+    <div ref="filesystem">
     <el-card class="filesystem" shadow="never">
         <template #header>
             <el-row style="display: flex;align-items: center;justify-content: space-between">
@@ -14,7 +15,7 @@
                             </el-breadcrumb>
                         </div>
                         <el-button icon="el-icon-refresh" size="mini" @click="loading = true"></el-button>
-                        <render :data="upload" multiple :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
+                        <render :data="upload" :drop-element="filesystem" :is-uniqidmd5="isUniqidmd5" multiple :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
                         <el-button  size="mini" @click="mkdir">新建文件夹</el-button>
                         <el-button  size="mini" type="danger" v-if="selectPaths.length > 0" @click="delSelect">删除选中</el-button>
                     </el-button-group>
@@ -101,10 +102,11 @@
             </el-pagination>
         </div>
     </el-card>
+    </div>
 </template>
 
 <script>
-    import {computed, defineComponent, reactive, toRefs, onActivated, watch} from "vue";
+    import {computed, defineComponent, reactive, toRefs, onActivated, watch,ref} from "vue";
     import {deleteArr, fileIcon, unique,link} from '@/utils'
     import {useHttp} from "@/hooks";
     import {ElMessageBox,ElLoading} from 'element-plus';
@@ -116,6 +118,10 @@
             initPath: String,
             upload:Object,
             total:Number,
+            isUniqidmd5: {
+                type: Boolean,
+                default: false
+            },
             multiple:{
                 type:Boolean,
                 default: true
@@ -143,6 +149,8 @@
                 loadData()
             })
             const {loading, http} = useHttp()
+            const filesystem = ref('')
+
             const state = reactive({
                 tableColumns: [
                     {
@@ -449,7 +457,8 @@
                 rowSelection,
                 fileIcon,
                 savePath,
-                ...toRefs(state)
+                ...toRefs(state),
+                filesystem
             }
         }
     })

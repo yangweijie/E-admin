@@ -99,6 +99,31 @@ class Upload extends Field
         $this->help("建议上传图片尺寸 $width * $height");
         return $this;
     }
+
+    /**
+     * 限制文件上传大小
+     * @param $value
+     * @return $this
+     */
+    public function fileSize($value){
+        $this->attr('fileSizeText',$value);
+        $value = str_replace('b','',strtolower($value));
+        $pow = 1;
+        if(strpos($value,'k')){
+            $pow =  pow(1024,1);
+        }elseif (strpos($value,'m')){
+            $pow =  pow(1024,2);
+        }elseif (strpos($value,'g')){
+            $pow =  pow(1024,3);
+        }elseif (strpos($value,'t')){
+            $pow =  pow(1024,4);
+        }
+        $value = str_replace(['k','m','g','t'],'',$value);
+        //字节
+        $value = $value * $pow;
+        $this->attr('fileSize',$value);
+        return $this;
+    }
     /**
      * 限制上传类型
      * @param string|array $val

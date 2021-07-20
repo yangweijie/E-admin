@@ -86,7 +86,7 @@
     </span>
     <el-dialog title="资源库" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
       <keep-alive>
-        <render :data="finder" :accept="accept" :multiple="multiple" display="menu" :height="finderHeight" v-model:selection="selection"></render>
+        <render :data="finder" :accept="accept" :is-uniqidmd5="isUniqidmd5" :multiple="multiple" display="menu" :height="finderHeight" v-model:selection="selection"></render>
       </keep-alive>
       <template #footer>
         <div :class="multiple && selection.length > 0 ? 'footer':''">
@@ -199,6 +199,11 @@ export default defineComponent({
       type: Boolean,
       default: true
     },
+    dropElement:String,
+    fileSize: {
+      type: Number,
+      default: 0
+    },
   },
   emits: ['success','update:modelValue'],
   setup(props,ctx){
@@ -292,14 +297,26 @@ export default defineComponent({
       uploader.opts.query.saveDir = value
     })
     nextTick(() => {
-      if(!props.finder){
+      if(props.dropElement){
+        uploader.assignDrop(props.dropElement)
+      }else{
         uploader.assignDrop(btn.value)
+      }
+      if(!props.finder){
         uploader.assignBrowse(btn.value, false, !props.multiple, {
           accept: props.accept
         })
       }
     })
     uploader.on('fileAdded', function(file, event) {
+      if(props.fileSize > 0 && file.size > props.fileSize){
+        ElMessage({
+          type: 'error',
+          message: '上传文件超出限制大小'+ctx.attrs.fileSizeText
+        })
+        uploader.cancel()
+        return false
+      }
       if (checkExt(file)) {
         if (props.upType == 'oss') {
           ossMultipartUpload(file)
