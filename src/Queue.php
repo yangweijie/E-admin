@@ -118,7 +118,8 @@ abstract class Queue
                 $this->error('<b style="color: red">任务失败</b>');
             }
         } catch (\Throwable $exception) {
-            $this->error('<b style="color: red">任务失败</b>：' . $exception->getMessage());
+            $this->error('<b style="color: red">任务失败错误信息</b>：' . $exception->getMessage());
+            $this->error('<b style="color: red">任务失败追踪错误</b>：' . $exception->getTraceAsString());
         }
     }
 }

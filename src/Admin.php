@@ -231,6 +231,7 @@ class Admin
      */
     public static function getDispatch($url)
     {
+
         $dispatch = null;
         try {
             if (strpos($url, '/') !== false) {
@@ -247,7 +248,7 @@ class Admin
                     $dispatch = Route::url($url);
                 }
             }
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
 
         }
         return $dispatch;
