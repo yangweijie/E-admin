@@ -117,6 +117,7 @@
                         url: props.setAction,
                         method: props.setActionMethod,
                         data: {
+                            formField:ctx.attrs.formField,
                             field:field,
                             newValue:newValue,
                             oldValue:oldValue,
@@ -142,6 +143,9 @@
                                 }
                             }else if(f != field && ctx.attrs.model[f] != formData[f]){
                                 if(isReactive(ctx.attrs.model[f])){
+                                    if(Array.isArray(ctx.attrs.model[f])){
+                                        ctx.attrs.model[f] = []
+                                    }
                                     Object.assign(ctx.attrs.model[f],formData[f])
                                 }else{
                                     ctx.attrs.model[f] = formData[f]

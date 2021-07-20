@@ -31,6 +31,7 @@ class CheckboxGroup extends Field
         if (empty($value)) {
             $value = [];
         }
+        $this->default = $value;
         parent::__construct($field, $value);
     }
 

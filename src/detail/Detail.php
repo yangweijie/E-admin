@@ -34,7 +34,7 @@ class Detail extends Component
     protected $labelWidth = 100;
     public function __construct($data, $id = null)
     {
-
+        $this->attr('data-tag','div');
         $this->data = $data;
         $this->id = $id;
         $this->parseCallMethod();

@@ -18,6 +18,7 @@ use Eadmin\component\form\Field;
  * @package Eadmin\component\form\field
  * @property Form $form
  * @method $this table(bool $value=true) 表格模式
+ * @method $this limit(int $value) 限制数量
  */
 class FormMany extends Field
 {

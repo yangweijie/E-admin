@@ -454,7 +454,7 @@ class Grid extends Component
      * @param string $label 显示的标题
      * @return Column
      */
-    public function column(string $field = '', string $label = '')
+    public function column(string $field = '',$label = '')
     {
         $column = new Column($field, $label, $this);
         $this->column[] = $column;

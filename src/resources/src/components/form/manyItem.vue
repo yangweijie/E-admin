@@ -17,13 +17,13 @@
                  </template>
             </a-table-column>
         </a-table>
-        <el-button size="mini" type='primary' plain @click="add">新增</el-button>
+        <el-button size="mini" type='primary' plain @click="add" v-if="limit == 0 || limit > value.length">新增</el-button>
     </el-form-item>
     <div v-else>
         <div v-for="(item,index) in value">
             <slot :row="item" :$index="index" :prop-field="field" :validator="$attrs.validator"></slot>
             <el-form-item v-if="!disabled">
-                <el-button size="mini" v-if="value.length - 1 == index" type='primary' plain @click="add">新增</el-button>
+                <el-button size="mini" v-if="value.length - 1 == index && (limit == 0 || limit > value.length)" type='primary' plain @click="add">新增</el-button>
                 <el-button size="mini" type='danger' v-show='value.length > 0' @click="remove(index)">移除</el-button>
                 <el-button size="mini" @click="handleUp(index)" v-show='value.length > 1 && index > 0'>上移</el-button>
                 <el-button size="mini" v-show='value.length > 1 && index < value.length-1' @click="handleDown(index)">下移</el-button>
@@ -40,10 +40,15 @@
     import {defineComponent,reactive,watch,ref} from "vue";
     export default defineComponent({
         name: "EadminManyItem",
+        inheritAttrs:false,
         props: {
             title:String,
             modelValue: Array,
             field:String,
+            limit:{
+                type:Number,
+                default:0,
+            },
             columns: Array,
             manyData:Object,
             disabled:Boolean,

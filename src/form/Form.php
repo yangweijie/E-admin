@@ -20,6 +20,7 @@ use Eadmin\component\basic\Tabs;
 use Eadmin\component\Component;
 use Eadmin\component\form\Field;
 use Eadmin\component\form\field\Cascader;
+use Eadmin\component\form\field\CheckboxGroup;
 use Eadmin\component\form\field\DatePicker;
 use Eadmin\component\form\field\Display;
 use Eadmin\component\form\field\Input;
@@ -130,6 +131,7 @@ class Form extends Component
         $field = Str::random(15, 3);
         $this->attr('exceptField', $this->exceptField);
         $this->bindAttr('model', $field);
+        $this->attr('formField',$field);
         $this->bindAttValue('submit', false, true);
         $this->bindAttValue('reset', false, true);
         $this->bindAttValue('validate', false, true);
@@ -355,7 +357,6 @@ class Form extends Component
             $value = $this->drive->getData($field, $data);
             $defaultValue = $component->getDefault();
             $componentValue = $component->getValue();
-
             //设置default缺省值
             if (empty($value) && $value !== '0' && $value !== 0 && !is_null($defaultValue)) {
                 $value = $this->getPickerValue($component, $field, $defaultValue);
@@ -389,6 +390,7 @@ class Form extends Component
                     $component->value($value);
                 }
             } else {
+
                 $this->setData($field, $value ?? '');
             }
             if (is_null($data)) {
@@ -550,7 +552,7 @@ class Form extends Component
             $column->setWhere($item->getWhere());
         }
         $this->push($row);
-        return $this;
+        return $row;
     }
 
     /**

@@ -24,6 +24,7 @@ use Eadmin\grid\Grid;
  * @package Eadmin\component\grid
  * @method $this dataIndex(string $value) 对应列内容的字段名
  * @method $this align(string $value)    left/center/right
+ * @method $this header(string $value)    自定义内容
  * @method $this headerAlign(string $value)    left/center/right
  * @method $this fixed(string $value) true, left, right
  * @method $this width(int $value) 对应列的宽度
@@ -239,10 +240,10 @@ class Column extends Component
     public function label(string $label)
     {
         $this->attr('label', $label);
-        $this->attr('header', Html::create()->content($label));
+        $this->header(Html::create()->content($label));
         return $this;
     }
-
+   
     /**
      * 隐藏
      * @return \Eadmin\grid\Column|$this
