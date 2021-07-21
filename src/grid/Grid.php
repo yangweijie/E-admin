@@ -660,7 +660,7 @@ class Grid extends Component
             $this->attr('data',$data);
         }
 
-        if (request()->has('ajax_request_data') && !$this->attr('static')) {
+        if (request()->has('ajax_request_data') && request()->get('eadmin_class') == $this->callClass && !$this->attr('static')) {
             $data = $this->parseData();
             return [
                 'code' => 200,
