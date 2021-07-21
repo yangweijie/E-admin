@@ -251,8 +251,8 @@ class Model implements GridInterface
     public function update(array $ids, array $data)
     {
         $action = isset($data['action']) ? $data['action'] : '';
+        $pk = $this->model->getPk();
         if ($action == 'eadmin_sort') {
-            $pk = $this->model->getPk();
             $field   = "{$pk},(@rownum := @rownum+1),case when @rownum = {$data['sort']} then @rownum := @rownum+1 else @rownum := @rownum end AS rownum";
             $sortSql = $this->db->table("(SELECT @rownum := -1) r," . $this->model->getTable())
                 ->fieldRaw($field)
