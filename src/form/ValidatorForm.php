@@ -145,7 +145,7 @@ class ValidatorForm
                     if (strstr($key, $field . '.')) {
                         list($relation,$f) = explode('.',$key);
                         //查找二维数组中存在的验证字段进行单独验证，并移除原先存在的验证规则
-                        if(array_key_exists($f,$current)){
+                        if(is_array($current) && array_key_exists($f,$current)){
                             $validateFields[]   = $key;
                             $removeFields[$key] = true;
                         }
