@@ -138,13 +138,21 @@ class ValidatorForm
                 $validateFields = [];
                 $removeFields   = [];
                 $manyValidate   = clone $validate;
+                $current = current($arr);
+                //循环验证规则
                 foreach ($rules as $key => $rule) {
+                    //查找带.的验证规则
                     if (strstr($key, $field . '.')) {
-                        $validateFields[]   = $key;
-                        $removeFields[$key] = true;
+                        list($relation,$f) = explode('.',$key);
+                        //查找二维数组中存在的验证字段进行单独验证，并移除原先存在的验证规则
+                        if(array_key_exists($f,$current)){
+                            $validateFields[]   = $key;
+                            $removeFields[$key] = true;
+                        }
                     }
                 }
                 if ($validateFields) {
+                    //二维数组中的验证字段进行单独验证
                     foreach ($arr as $index => $value) {
                         $validateData[$field] = $value;
                         $result               = $manyValidate->only($validateFields)->batch(true)->check($validateData);;
@@ -158,6 +166,7 @@ class ValidatorForm
                         }
                     }
                 }
+                //移除判定二维数组中的验证字段
                 $validate->remove($removeFields);
             }
         }
