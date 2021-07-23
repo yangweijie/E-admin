@@ -85,3 +85,11 @@
 .dialogTableClass .el-dialog__body {
   padding: 0!important;
 }
+.el-check-tag{
+  font-size: 12px;
+  line-height: 12px;
+}
+.el-check-tag.is-checked {
+  background-color: #53a8ff;
+  color: #ffffff;
+}

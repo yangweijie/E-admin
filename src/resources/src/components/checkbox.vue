@@ -14,6 +14,7 @@
             options: Array,
             checkAll:Boolean,
             onCheckAll:Boolean,
+            checkTag:Boolean,
         },
         emits: ['update:modelValue'],
         setup(props, ctx) {
@@ -29,6 +30,7 @@
             watch(value, value => {
                 ctx.emit('update:modelValue', value)
             })
+            //多选框全选
             function handleCheckAllChange(val) {
                 value.value = val ? props.options.map(item=>item.value) : []
                 isIndeterminate.value = false;
@@ -38,6 +40,7 @@
                 checkAll.value = checkedCount === props.options.length;
                 isIndeterminate.value = checkedCount > 0 && checkedCount < props.options.length;
             }
+
             return {
                 value,
                 isIndeterminate,

@@ -27,7 +27,10 @@
             show:Boolean,
             gridBatch:Boolean,
             url: String,
-            params:Object,
+            params:{
+                type:Object,
+                default:{}
+            },
             reRender:Boolean,
             addParams:{
                 type:Object,

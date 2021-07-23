@@ -24,7 +24,10 @@
                 default: false,
             },
             url: String,
-            params:Object,
+            params:{
+                type:Object,
+                default:{}
+            },
             gridBatch:Boolean,
             addParams:{
                 type:Object,

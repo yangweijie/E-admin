@@ -81,6 +81,7 @@ use think\Model;
  * @method \Eadmin\component\form\field\SelectTable selectTable($field, $label = '') 表格选择器  TODO
  * @method \Eadmin\component\form\field\Map maps($lng, $lat, $address, $label = '') 高德地图  TODO
  * @method \Eadmin\component\form\field\DynamicTag tag($field, $label = '') 动态标签
+ * @method \Eadmin\component\form\field\Checktag checkTag($field, $label = '') check标签
  * @method \Eadmin\component\form\field\Spec spec($field, $label = '') 规格
  * @method \Eadmin\component\form\field\Display display($field, $label = '') 显示
 */

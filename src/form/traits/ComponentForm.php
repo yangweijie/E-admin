@@ -7,6 +7,7 @@ namespace Eadmin\form\traits;
 use Eadmin\component\basic\Html;
 use Eadmin\component\form\field\Cascader;
 use Eadmin\component\form\field\CheckboxGroup;
+use Eadmin\component\form\field\Checktag;
 use Eadmin\component\form\field\Color;
 use Eadmin\component\form\field\DatePicker;
 use Eadmin\component\form\field\Display;
@@ -71,5 +72,6 @@ trait ComponentForm
         'spec' => Spec::class,
         'display' => Display::class,
         'money' => Money::class,
+        'checkTag' => Checktag::class,
     ];
 }
