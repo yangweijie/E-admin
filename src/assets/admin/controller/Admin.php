@@ -133,7 +133,7 @@ class Admin extends Controller
                 return $data;
             });
         });
-       
+
     }
 
     /**
@@ -188,7 +188,7 @@ class Admin extends Controller
                 'email' => '请输入正确的邮箱',
             ]);
             if ($form->getData('id') != config('admin.admin_auth_id')) {
-                $auths = SystemAuth::column('name', 'id');
+                $auths = SystemAuth::where('status',1)->column('name', 'id');
                 $form->checkbox('roles', '访问权限')->options($auths, true);
             }
         });

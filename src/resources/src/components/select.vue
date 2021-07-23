@@ -1,5 +1,9 @@
 <template>
-    <el-select v-model="value"><slot></slot></el-select>
+    <el-select v-model="value">
+        <slot></slot>
+        <template #empty><slot name="empty"></slot></template>
+        <template #prefix><slot name="prefix"></slot></template>
+    </el-select>
 </template>
 
 <script>
