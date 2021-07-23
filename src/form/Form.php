@@ -24,6 +24,7 @@ use Eadmin\component\form\field\CheckboxGroup;
 use Eadmin\component\form\field\DatePicker;
 use Eadmin\component\form\field\Display;
 use Eadmin\component\form\field\Input;
+use Eadmin\component\form\field\Map;
 use Eadmin\component\form\field\Select;
 use Eadmin\component\form\field\TimePicker;
 use Eadmin\component\form\FormAction;
@@ -383,15 +384,16 @@ class Form extends Component
             if ($component instanceof DatePicker || $component instanceof TimePicker) {
                 $value = empty($value) ? null : $value;
                 $this->setData($field, $value);
-            }elseif ($component instanceof Cascader && $attr != 'modelValue'){
+            }elseif (($component instanceof Cascader || $component instanceof Map) && $attr != 'modelValue'){
                 if(is_array($value)) {
                     $val = array_shift($value);
                     $this->setData($field, $val);
                     $component->default($value);
                     $component->value($value);
                 }
+            }elseif ($component instanceof Map && $attr == 'modelValue' && is_array($value)){
+                $this->setData($field, end($value));
             } else {
-
                 $this->setData($field, $value ?? '');
             }
             if (is_null($data)) {
