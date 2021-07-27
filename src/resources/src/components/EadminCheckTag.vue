@@ -16,7 +16,8 @@
         props: {
             modelValue: [Array,String,Number],
             options: Array,
-            multiple:Boolean
+            multiple:Boolean,
+            disabled:Boolean,
         },
         emits: ['update:modelValue'],
         setup(props,ctx){
@@ -49,6 +50,9 @@
             }
             //标签切换事件
             function handleChange(val,checked) {
+                if(props.disabled){
+                    return
+                }
                 if(props.multiple){
                     if(checked){
                         value.value.push(val)

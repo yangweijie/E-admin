@@ -52,14 +52,10 @@
 <style >
     .eadmin-tree .el-tree-node__content{
         margin-bottom:10px;
-    }
-    .eadmin-tree .el-tree-node__content span.levelname{
-        float:left;
 
     }
+
     .eadmin-tree .el-tree-node__children .el-tree-node__children .el-tree-node__content{
         float:left;
-
     }
-
 </style>

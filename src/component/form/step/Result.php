@@ -42,8 +42,8 @@ class Result
     }
     /**
      * 返回成功
-     * @param $title 标题
-     * @param $content 内容
+     * @param string $title 标题
+     * @param string  $content 内容
      * @return \Eadmin\component\basic\Result
      */
     public function sucess($title, $content)
@@ -53,8 +53,8 @@ class Result
 
     /**
      * 返回错误
-     * @param $title
-     * @param $content
+     * @param string $title
+     * @param string $content
      * @return \Eadmin\component\basic\Result
      */
     public function error($title, $content){
@@ -63,8 +63,8 @@ class Result
 
     /**
      * 返回警告
-     * @param $title
-     * @param $content
+     * @param string $title
+     * @param string $content
      * @return \Eadmin\component\basic\Result
      */
     public function warning($title, $content){
@@ -73,8 +73,8 @@ class Result
 
     /**
      * 返回信息
-     * @param $title
-     * @param $content
+     * @param string $title
+     * @param string $content
      * @return \Eadmin\component\basic\Result
      */
     public function info($title, $content){
@@ -82,9 +82,9 @@ class Result
     }
 
     /**
-     * @param $title
-     * @param $content
-     * @param $status
+     * @param string $title
+     * @param string $content
+     * @param string $status
      * @return \Eadmin\component\basic\Result
      */
     public function result($title, $content, $status)

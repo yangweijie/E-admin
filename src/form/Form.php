@@ -183,7 +183,11 @@ class Form extends Component
      */
     public function alignCenter(int $width = 1000)
     {
-        $this->attr('style', ['width' => $width . 'px', 'margin' => '0 auto']);
+        if(empty($width)){
+            $this->removeAttr('style');
+        }else{
+            $this->attr('style', ['width' => $width .'px', 'margin' => '0 auto']);
+        }
     }
 
     /**

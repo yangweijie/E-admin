@@ -1,5 +1,5 @@
 <template>
-    <el-main class='eadmin-form' :style="$attrs.style">
+    <el-main class='eadmin-form'>
         <el-form ref="eadminForm" :label-position="labelPosition" v-bind="$attrs" @submit.native.prevent>
             <slot></slot>
             <render :data="stepResult"></render>
