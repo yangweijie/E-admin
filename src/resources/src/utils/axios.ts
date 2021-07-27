@@ -44,11 +44,22 @@ service.interceptors.response.use(
         */
        response: { data: any }) => {
         const res = response.data
+        const token_expire = localStorage.getItem('eadmin_token_expire')
+        if(token_expire){
+            const timeNow = Math.round((new Date()).getTime() / 1000)
+            // @ts-ignore
+            const refreshTime = token_expire - timeNow
+            if (refreshTime > 0 && refreshTime < 1800) {
+                localStorage.removeItem('eadmin_token_expire')
+                action.refreshToken()
+            }
+        }
         // if the custom code is not 20000, it is judged as an error.
         if (res.code !== 200) {
             // 登陆验证token判断
             if (res.code === 40000 || res.code === 40001 || res.code === 40002 || res.code === 40003) {
                 localStorage.removeItem('eadmin_token')
+                localStorage.removeItem('eadmin_token_expire')
                 ElMessage({
                     message: res.message,
                     type: 'error',
@@ -59,9 +70,7 @@ service.interceptors.response.use(
                         }
                     }
                 })
-                // action.refreshToken().catch(result=>{
-                //
-                // })
+
             }else if(res.code == 44000){
                 ElMessage({
                     message: res.message || 'Error',

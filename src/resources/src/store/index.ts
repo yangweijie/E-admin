@@ -166,6 +166,7 @@ const action = {
             }).then((res: any) => {
                 if (res.data.token) {
                     localStorage.setItem('eadmin_token', res.data.token)
+                    localStorage.setItem('eadmin_token_expire', Math.round((new Date()).getTime() / 1000) + res.data.expire)
                     resolve(res)
                 } else {
                     localStorage.removeItem('eadmin_token')
@@ -204,6 +205,8 @@ const action = {
                 method: 'post',
                 data: data
             }).then((res: any) => {
+                localStorage.setItem('eadmin_token', res.data.token)
+                localStorage.setItem('eadmin_token_expire', Math.round((new Date()).getTime() / 1000) + res.data.expire)
                 states.menuModule = ''
                 states.mainComponent = []
                 resolve(res)
