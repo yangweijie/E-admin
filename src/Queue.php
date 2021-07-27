@@ -56,7 +56,7 @@ abstract class Queue
             if ($status == 2) {
                 $update['exec_time'] = date('Y-m-d H:i:s');
             }
-            if ($status == 4) {
+            if ($status == 4 || $status == 3) {
 
                 $update['task_time'] = microtime(true) - $this->time;
             }
