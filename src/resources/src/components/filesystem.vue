@@ -15,7 +15,7 @@
                             </el-breadcrumb>
                         </div>
                         <el-button icon="el-icon-refresh" size="mini" @click="loading = true"></el-button>
-                        <render :data="upload" :drop-element="filesystem" :is-uniqidmd5="isUniqidmd5" multiple :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
+                        <render :data="upload" :drop-element="filesystem"  :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
                         <el-button  size="mini" @click="mkdir">新建文件夹</el-button>
                         <el-button  size="mini" type="danger" v-if="selectPaths.length > 0" @click="delSelect">删除选中</el-button>
                     </el-button-group>
@@ -118,9 +118,9 @@
             initPath: String,
             upload:Object,
             total:Number,
-            isUniqidmd5: {
-                type: Boolean,
-                default: false
+            limit: {
+                type: Number,
+                default: 0
             },
             multiple:{
                 type:Boolean,
@@ -137,10 +137,6 @@
             display:{
                 type: String,
                 default: 'grid'
-            },
-            accept: {
-                type: String,
-                default: '*'
             },
         },
         emits: ['update:modelValue','update:selection'],
@@ -313,8 +309,12 @@
             }
             //选择
             function select(url) {
+
                 if(props.multiple){
                     if(state.selectIds.indexOf(url)  === -1){
+                        if(props.limit > 0 && state.selectIds.length >= props.limit){
+                            return false
+                        }
                         state.selectIds.push(url)
                     }else{
                         deleteArr(state.selectIds,url)
@@ -392,6 +392,9 @@
                             })
                             if (selected) {
                                 if(props.multiple){
+                                    if(props.limit > 0 && state.selectIds.length >= props.limit){
+                                        return false
+                                    }
                                     state.selectPaths =  unique(state.selectPaths.concat(paths))
                                     state.selectIds = unique(state.selectIds.concat(ids))
                                 }else{
@@ -413,6 +416,9 @@
                                 return item.path
                             })
                             if (selected) {
+                                if(props.limit > 0 && (state.selectIds.length+ids.length) >= props.limit){
+                                    return false
+                                }
                                 state.selectPaths = unique(state.selectPaths.concat(paths))
                                 state.selectIds = unique(state.selectIds.concat(ids))
                             } else {

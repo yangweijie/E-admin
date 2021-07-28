@@ -5,10 +5,12 @@ namespace Eadmin\component\form\field;
 
 
 use Eadmin\Admin;
+use Eadmin\component\basic\Button;
 use Eadmin\component\form\Field;
 
 use Overtrue\Flysystem\Qiniu\Plugins\UploadToken;
 use think\facade\Filesystem;
+use think\helper\Str;
 
 /**
  * 上传
@@ -18,6 +20,7 @@ use think\facade\Filesystem;
  * @method $this displayType(string $value) 上传显示方式 image图片, file文件
  * @method $this drag(bool $value = true) 是否启用拖拽上传
  * @method $this multiple(bool $id = true) 多文件上传
+ * @method $this limit(int $num) 最大允许上传个数
  * @method $this finder(bool $value = true) finer文件管理
  * @method $this chunk(bool $value = true) 本地分片上传
  * @method $this url(string $value) 上传url
@@ -31,7 +34,7 @@ class Upload extends Field
     public function __construct($field = null, string $value = '')
     {
         parent::__construct($field, $value);
-        $this->attr('url', '/eadmin/upload');
+        $this->attr('url', 'http://localhost/eadmin/upload');
         $this->attr('token', Admin::token()->get());
         $uploadType = config('admin.uploadDisks');
         $this->disk($uploadType);
@@ -143,7 +146,19 @@ class Upload extends Field
     public function jsonSerialize()
     {
         if($this->attr('upType') === 'local' && is_null($this->attr('finder'))){
-            $this->attr('finder',Admin::dispatch('/filesystem'));
+            $filesystem = Admin::dispatch('/filesystem');
+            $uploadButton = clone $this;
+            $uploadButton->finder(false)
+                ->attr('foreverShow', true)
+                ->disk('local')
+                ->content(
+                    Button::create('上传')
+                        ->icon('el-icon-upload')
+                        ->sizeMini()
+                );
+            $uploadButton->bindValue('', 'modelValue', null);
+            $filesystem->attr('upload',$uploadButton);
+            $this->attr('finder',$filesystem);
         }
         return parent::jsonSerialize();
     }

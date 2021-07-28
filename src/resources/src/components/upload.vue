@@ -1,5 +1,5 @@
 <template>
-    <span v-if="displayType=='image'">
+    <span v-if="displayType=='image' && !foreverShow">
       <div v-for="(file,index) in files" :key="index" class="imgContainer" :style="{height: styleHeight,width:styleWidth}">
         <el-image
                 class="image"
@@ -86,7 +86,7 @@
     </span>
     <el-dialog title="资源库" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
       <keep-alive>
-        <render :data="finder" :accept="accept" :is-uniqidmd5="isUniqidmd5" :multiple="multiple" display="menu" :height="finderHeight" v-model:selection="selection"></render>
+        <render :data="finder" :limit="limit" :multiple="multiple" display="menu" :height="finderHeight" v-model:selection="selection"></render>
       </keep-alive>
       <template #footer>
         <div :class="multiple && selection.length > 0 ? 'footer':''">
@@ -204,6 +204,10 @@ export default defineComponent({
       type: Number,
       default: 0
     },
+    limit: {
+      type: Number,
+      default: 0
+    },
   },
   emits: ['success','update:modelValue'],
   setup(props,ctx){
@@ -241,7 +245,9 @@ export default defineComponent({
     watch(()=>state.files,val=>{
       if (!props.multiple && val.length === 1) {
         state.showUploadBtn = false
-      } else if (val.length === 0) {
+      }else if(props.multiple && props.limit > 0 && val.length >= props.limit){
+        state.showUploadBtn = false
+      } else{
         state.showUploadBtn = true
       }
       state.selection = JSON.parse(JSON.stringify(val))
@@ -309,6 +315,7 @@ export default defineComponent({
       }
     })
     uploader.on('fileAdded', function(file, event) {
+
       if(props.fileSize > 0 && file.size > props.fileSize){
         ElMessage({
           type: 'error',
@@ -338,6 +345,14 @@ export default defineComponent({
     })
     // 文件已经加入到上传列表中，一般用来开始整个的上传。
     uploader.on('filesSubmitted', function(files, fileList) {
+      if(props.multiple && props.limit > 0 && (files.length+state.files.length) > props.limit){
+        ElMessage({
+          type: 'error',
+          message: '最大允许上传' + props.limit + '个文件'
+        })
+        uploader.cancel()
+        return false
+      }
       if (props.upType != 'oss' && props.upType != 'qiniu') {
         uploader.upload()
       }

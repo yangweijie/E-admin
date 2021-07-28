@@ -146,7 +146,9 @@ class FileService extends Service
 			$this->upType = $upType;
 		}
 		if ($isUniqidmd5) {
-			$saveName = Filesystem::disk($this->upType)->putFile($saveDir, $file);
+			$saveName = Filesystem::disk($this->upType)->putFile($saveDir, $file,function (){
+               return md5((string) microtime(true));
+            });
 		} elseif (empty($fileName)) {
 			$saveName = Filesystem::disk($this->upType)->putFileAs($saveDir, $file, $file->getOriginalName());
 		} else {
