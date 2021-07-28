@@ -34,7 +34,7 @@ class Upload extends Field
     public function __construct($field = null, string $value = '')
     {
         parent::__construct($field, $value);
-        $this->attr('url', 'http://localhost/eadmin/upload');
+        $this->attr('url', '/eadmin/upload');
         $this->attr('token', Admin::token()->get());
         $uploadType = config('admin.uploadDisks');
         $this->disk($uploadType);
