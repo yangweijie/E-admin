@@ -26,7 +26,10 @@ class ValidatorForm
         'rule' => [],
         'msg'  => [],
     ];
-
+    protected $tabFields = [];
+    public function setTabField($name,$field){
+        $this->tabFields[] = ['name'=>$name,'field'=>$field];
+    }
     /**
      * 表单新增更新验证规则
      * @Author: rocky
@@ -116,7 +119,15 @@ class ValidatorForm
         ];
         $this->setRules($resRule, $ruleMsg, $type);
     }
-
+    protected function getTabIndex($fields){
+        $fields = array_keys($fields);
+        foreach ($this->tabFields as $row){
+            if(in_array($row['field'], $fields)){
+                return $row['name'];
+            }
+        }
+        return null;
+    }
     /**
      * 验证表单规则
      * @param array $data
@@ -124,6 +135,7 @@ class ValidatorForm
      */
     public function check($data, $type)
     {
+
         if ($type == 1) {
             //新增
             $validate = Validate::rule($this->createRules['rule'])->message($this->createRules['msg']);
@@ -161,7 +173,8 @@ class ValidatorForm
                                 'code'    => 422,
                                 'message' => '表单验证失败',
                                 'data'    => $manyValidate->getError(),
-                                'index'   => (string)$index
+                                'index'   => (string)$index,
+                                'tabIndex'=>$this->getTabIndex($manyValidate->getError())
                             ]));
                         }
                     }
@@ -182,7 +195,8 @@ class ValidatorForm
             throw new HttpResponseException(json([
                 'code'    => 422,
                 'message' => '表单验证失败',
-                'data'    => $validate->getError()
+                'data'    => $validate->getError(),
+                'tabIndex'=>$this->getTabIndex($validate->getError())
             ]));
         }
     }

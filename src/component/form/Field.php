@@ -89,6 +89,7 @@ abstract class Field extends Component
      */
     public function required()
     {
+      
         $this->formItem->required();
         return $this;
     }

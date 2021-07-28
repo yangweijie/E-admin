@@ -38,7 +38,7 @@ class FormItem extends Field
         $this->label($label);
         $this->form = $form;
     }
-   
+
     /**
      * 标签
      * @param $value
@@ -63,6 +63,10 @@ class FormItem extends Field
         $field  = $this->form->manyRelation() ? $this->form->manyRelation() . '.' . $field : $field;
         $field = $this->form->bindAttr('model') . 'Error.' . $field;
         $this->bindAttr('error', $field);
+        if($this->form->tab){
+            $name = $this->form->tab->getContentCount();
+            $this->form->validator()->setTabField($name,$prop);
+        }
         if ($mode == 1) {
             $this->form->validator()->createRule($prop, $rule);
         } elseif ($mode == 2) {
@@ -87,6 +91,7 @@ class FormItem extends Field
     public function required()
     {
         $label = $this->attr('label') . '不能为空';
+        $this->rules(['require' => $label]);
         $this->attr('rules', [
                 'required' => true,
                 'trigger'  => ['change','blur'],

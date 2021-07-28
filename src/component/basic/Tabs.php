@@ -40,4 +40,11 @@ class Tabs extends Field
         $this->content($tabPane);
         return $this;
     }
+    public function getContentCount(){
+        if(isset($this->content['default'])){
+           return count($this->content['default'])+1;
+        }else{
+           return 1;
+        }
+    }
 }

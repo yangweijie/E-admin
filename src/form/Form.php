@@ -92,7 +92,7 @@ class Form extends Component
 
     protected $name = 'EadminForm';
     protected $actions;
-    protected $tab;
+    public $tab;
     protected $steps;
 
 
@@ -483,19 +483,22 @@ class Form extends Component
      * 选项卡布局
      * @param string $title 标题
      * @param \Closure $closure
+     * @param int $index 默认选项卡
      * @return $this
      */
-    public function tab($title, \Closure $closure)
+    public function tab($title, \Closure $closure,$index=1)
     {
         if (!$this->tab) {
-            $this->tab = Tabs::create();
+            $this->tab = Tabs::create()->default($index);
             $prop = $this->tab->bindAttr('modelValue');
+            $this->attr('tabField',$prop);
             $this->except([$prop]);
             $this->push($this->tab);
         }
         $formItems = $this->collectFields($closure);
         $tabPane = new TabPane();
-        $tabPane->label($title);
+        $name = $this->tab->getContentCount();
+        $tabPane->name($name)->label($title);
         foreach ($formItems as $item) {
             $tabPane->content($item);
         }
