@@ -90,8 +90,13 @@ class FormItem extends Field
      */
     public function required()
     {
+        if($this->form->tab){
+            $name = $this->form->tab->getContentCount();
+            $prop  = $this->attr('validateField');
+            $prop  = $this->form->manyRelation() ? $this->form->manyRelation() . '.' . $prop : $prop;
+            $this->form->validator()->setTabField($name,$prop);
+        }
         $label = $this->attr('label') . '不能为空';
-        $this->rules(['require' => $label]);
         $this->attr('rules', [
                 'required' => true,
                 'trigger'  => ['change','blur'],

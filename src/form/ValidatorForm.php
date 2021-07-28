@@ -30,6 +30,9 @@ class ValidatorForm
     public function setTabField($name,$field){
         $this->tabFields[] = ['name'=>$name,'field'=>$field];
     }
+    public function getTabField(){
+        return $this->tabFields;
+    }
     /**
      * 表单新增更新验证规则
      * @Author: rocky

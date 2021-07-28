@@ -495,13 +495,12 @@ class Form extends Component
             $this->except([$prop]);
             $this->push($this->tab);
         }
+        $prop = $this->tab->bindAttr('modelValue');
         $formItems = $this->collectFields($closure);
         $tabPane = new TabPane();
         $name = $this->tab->getContentCount();
         $tabPane->name($name)->label($title);
-        foreach ($formItems as $item) {
-            $tabPane->content($item);
-        }
+        $tabPane->content($formItems);
         $this->tab->content($tabPane);
         return $this;
     }
@@ -963,6 +962,9 @@ class Form extends Component
         }
         //将值绑定到form
         $this->bind($field, $this->data);
+        //tab验证字段
+      
+        $this->attr('tabValidateField',$this->validator->getTabField());
     }
 
     /**

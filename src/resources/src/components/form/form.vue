@@ -180,7 +180,7 @@
                 }
                 if(props.setAction){
                     clearValidator()
-                    eadminForm.value.validate(bool=>{
+                    eadminForm.value.validate((bool,validateFields)=>{
                         const submitData = JSON.parse(JSON.stringify(ctx.attrs.model))
                         forEach(submitData,function (val,key) {
                             if(props.exceptField.indexOf(key) > -1){
@@ -195,46 +195,68 @@
                                 })
                             }
                         })
-                        http({
-                            url: props.setAction,
-                            params:params,
-                            method: props.setActionMethod,
-                            data: submitData
-                        }).then(res=>{
-                            if(res.code === 422){
-                                for (let field in res.data){
-                                    if(res.index){
-                                        let fields = field.split('.')
-                                        let name = fields.shift()
-                                        let f = fields.shift()
-                                        if(!proxyData[ctx.attrs.validator][name]){
-                                            proxyData[ctx.attrs.validator][name] = []
+                        if(bool){
+                            http({
+                                url: props.setAction,
+                                params:params,
+                                method: props.setActionMethod,
+                                data: submitData
+                            }).then(res=>{
+                                if(res.code === 422){
+                                    for (let field in res.data){
+                                        if(res.index){
+                                            let fields = field.split('.')
+                                            let name = fields.shift()
+                                            let f = fields.shift()
+                                            if(!proxyData[ctx.attrs.validator][name]){
+                                                proxyData[ctx.attrs.validator][name] = []
+                                            }
+                                            if(!proxyData[ctx.attrs.validator][name][res.index]){
+                                                proxyData[ctx.attrs.validator][name][res.index] = {}
+                                            }
+                                            proxyData[ctx.attrs.validator][name][res.index][f] = res.data[field]
+                                        }else{
+                                            const validatorField = field.replace('.','_')
+                                            proxyData[ctx.attrs.validator][validatorField] = res.data[field]
                                         }
-                                        if(!proxyData[ctx.attrs.validator][name][res.index]){
-                                            proxyData[ctx.attrs.validator][name][res.index] = {}
-                                        }
-                                        proxyData[ctx.attrs.validator][name][res.index][f] = res.data[field]
-                                    }else{
-                                        const validatorField = field.replace('.','_')
-                                        proxyData[ctx.attrs.validator][validatorField] = res.data[field]
+                                    }
+                                    if(res.tabIndex){
+                                        ctx.attrs.model[ctx.attrs.tabField] = res.tabIndex
+                                    }
+                                    scrollIntoView()
+                                }else  if(res.code === 412){
+                                    validateStatus.value = true
+                                }else{
+                                    if(res.type == 'step'){
+                                        stepResult.value = res.data
+                                        ctx.emit('update:step',++props.step)
+                                    }
+                                    ctx.emit('success')
+                                    ctx.emit('PopupRefresh')
+                                    ctx.emit('gridRefresh')
+                                }
+                            })
+                        }else{
+                            if(ctx.attrs.tabField){
+                                //tab校验切换pane
+                                const fields = Object.keys(validateFields).map(item=>{
+                                    item = item.replace(/\.([0-9])\./,".")
+                                    return item
+                                })
+                                let tabIndex = ''
+                                for(let index in ctx.attrs.tabValidateField){
+                                    if(fields.indexOf(ctx.attrs.tabValidateField[index].field) > -1){
+                                        tabIndex = ctx.attrs.tabValidateField[index].name
+                                        break
                                     }
                                 }
-                                if(res.tabIndex){
-                                    ctx.attrs.model[ctx.attrs.tabField] = res.tabIndex
+                                if(tabIndex){
+                                    ctx.attrs.model[ctx.attrs.tabField] = tabIndex
                                 }
-                                scrollIntoView()
-                            }else  if(res.code === 412){
-                                validateStatus.value = true
-                            }else{
-                                if(res.type == 'step'){
-                                    stepResult.value = res.data
-                                    ctx.emit('update:step',++props.step)
-                                }
-                                ctx.emit('success')
-                                ctx.emit('PopupRefresh')
-                                ctx.emit('gridRefresh')
                             }
-                        })
+                            scrollIntoView()
+                            return false
+                        }
                     })
                 }else{
                     validateStatus.value = true
