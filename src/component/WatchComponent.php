@@ -21,7 +21,7 @@ abstract class WatchComponent implements \JsonSerializable
         $this->component = $this->component();
         $this->component->bindAttr('modelValue',request()->get('field',null),true);
         $this->watch = new Watch();
-        $this->watch->attr('params', ['eadmin_class' => static::class, 'eadmin_function' => 'watch']);
+        $this->watch->attr('params', ['eadmin_class' => static::class, 'eadmin_function' => 'watch','eadmin_app'=>app('http')->getName()]);
         $this->watch->attr('field', $this->component->bindAttr('modelValue'));
         $this->watch->attr('watchComponent',$this->component);
     }

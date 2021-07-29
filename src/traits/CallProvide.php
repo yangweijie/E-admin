@@ -34,6 +34,7 @@ trait CallProvide
             $this->callMethod = [
                 'eadmin_class'    => $this->callClass,
                 'eadmin_function' => $this->callFunction,
+                'eadmin_app' => app('http')->getName(),
             ];
             $this->callMethod = array_merge($this->callMethod,$this->callParams);
         }
