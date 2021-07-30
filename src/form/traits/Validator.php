@@ -32,7 +32,7 @@ trait Validator
 	 * @param string $text  文案，必须带上[字段]、[数量]
 	 * @return $this
 	 */
-	public function minRule($num = 5, $text = '[字段]不能超过[数量]字')
+	public function minRule($num = 5, $text = '[字段]不能少于[数量]字')
 	{
 		$this->formItem->rules([
 			"min:$num" => str_replace([
