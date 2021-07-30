@@ -24,11 +24,10 @@ use think\helper\Str;
 class Tabs extends Field
 {
     protected $name = 'ElTabs';
-    protected $tabPane = null;
 
     /**
-     * @param $title 标题
-     * @param $content 内容
+     * @param string $title 标题
+     * @param mixed $content 内容
      * @return $this
      */
     public function pane($title, $content)
