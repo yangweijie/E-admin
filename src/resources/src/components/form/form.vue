@@ -124,7 +124,8 @@
                             form:ctx.attrs.model,
                             eadmin_form_watch:true,
                             eadmin_class:ctx.attrs.model['eadmin_class'],
-                            eadmin_function:ctx.attrs.model['eadmin_function']
+                            eadmin_function:ctx.attrs.model['eadmin_function'],
+                            eadmin_app:ctx.attrs.model['eadmin_app'],
                         }
                     }).then(res=>{
                         res.data.showField.forEach(field=>{

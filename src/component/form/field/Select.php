@@ -159,7 +159,7 @@ class Select extends Field
             }
             $this->formItem->form()->push($formItem);
         }
-        if (Request::has('eadminSelectLoad') && Request::get('eadmin_field') == $this->bindAttr('modelValue')) {
+        if (Request::has('eadminSelectLoad') && Request::get('eadmin_field') == $select->bindAttr('modelValue')) {
             $datas = call_user_func($closure, Request::get('eadmin_id'));
             $options = [];
             foreach ($datas as $key => $value) {
@@ -170,7 +170,7 @@ class Select extends Field
             }
             $this->successCode($options);
         }
-        $this->params(['eadmin_field' => $this->bindAttr('modelValue')] + $this->formItem->form()->getCallMethod());
+        $this->params(['eadmin_field' => $select->bindAttr('modelValue')] + $this->formItem->form()->getCallMethod());
         return $this;
     }
     /**
