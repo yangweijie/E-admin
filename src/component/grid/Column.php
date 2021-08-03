@@ -343,20 +343,18 @@ class Column extends Component
             if (empty($val)) {
                 return '--';
             }
-            $images = [];
-            if (is_string($val)) {
-                $images = explode(',', $val);
-            } elseif (is_array($val)) {
-                $images = $val;
-            }
-            $html = Html::create();
+			$images = [];
+			if (is_string($val)) {
+				$images = explode(',', $val);
+			}
+			$html      = Html::create();
 			if ($multi) {
 				foreach ($images as $image) {
 					$html->content(
 						Image::create()
 							->fit('cover')
 							->src($image)
-							->previewSrcList($image)
+							->previewSrcList($images)
 							->style([
 								'width' => "{$width}px",
 								'height' => "{$height}px",
@@ -370,7 +368,7 @@ class Column extends Component
 					Image::create()
 						->fit('cover')
 						->src($images[0])
-						->previewSrcList($images[0])
+						->previewSrcList($images)
 						->style([
 							'width' => "{$width}px",
 							'height' => "{$height}px",

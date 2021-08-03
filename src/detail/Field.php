@@ -70,8 +70,6 @@ class Field extends Column
             $images = [];
             if (is_string($val)) {
                 $images = explode(',', $val);
-            } elseif (is_array($val)) {
-                $images = $val;
             }
             $html      = Html::create();
             if ($multi) {
@@ -80,7 +78,7 @@ class Field extends Column
                 		Image::create()
 							->fit('cover')
 							->src($image)
-							->previewSrcList($image)
+							->previewSrcList($images)
 							->style([
 								'width' => "{$width}px",
 								'height' => "{$height}px",
@@ -94,7 +92,7 @@ class Field extends Column
 					Image::create()
 						->fit('cover')
 						->src($images[0])
-						->previewSrcList($images[0])
+						->previewSrcList($images)
 						->style([
 							'width' => "{$width}px",
 							'height' => "{$height}px",
