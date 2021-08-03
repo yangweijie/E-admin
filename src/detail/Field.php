@@ -67,7 +67,7 @@ class Field extends Column
             if (empty($val)) {
                 return '--';
             }
-            $images = [];
+			$images = $val;
             if (is_string($val)) {
                 $images = explode(',', $val);
             }
