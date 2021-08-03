@@ -11,6 +11,8 @@ namespace Eadmin\detail;
 
 use Eadmin\component\basic\DownloadFile;
 use Eadmin\component\basic\Html;
+use Eadmin\component\basic\Image;
+use Eadmin\component\basic\Link;
 use Eadmin\component\basic\Tag;
 use Eadmin\component\basic\Tip;
 use Eadmin\component\basic\Video;
@@ -65,19 +67,41 @@ class Field extends Column
             if (empty($val)) {
                 return '--';
             }
+            $images = [];
             if (is_string($val)) {
                 $images = explode(',', $val);
             } elseif (is_array($val)) {
                 $images = $val;
             }
-            $html      = '';
-            $jsonImage = json_encode($images);
+            $html      = Html::create();
             if ($multi) {
                 foreach ($images as $image) {
-                    $html .= "<el-image style='width: {$width}px; height: {$height}px;border-radius: {$radius}%' src='{$image}' fit='cover' :preview-src-list='{$jsonImage}'></el-image>&nbsp;";
+                	$html->content(
+                		Image::create()
+							->fit('cover')
+							->src($image)
+							->previewSrcList($image)
+							->style([
+								'width' => "{$width}px",
+								'height' => "{$height}px",
+								'borderRadius' => "{$radius}%",
+								'marginRight' => '5px'
+							])
+					);
                 }
             } else {
-                $html = "<el-image style='width: {$width}px; height: {$height}px;border-radius: {$radius}%' src='{$images[0]}' fit='cover' :preview-src-list='{$jsonImage}'></el-image>&nbsp;";
+				$html->content(
+					Image::create()
+						->fit('cover')
+						->src($images[0])
+						->previewSrcList($images[0])
+						->style([
+							'width' => "{$width}px",
+							'height' => "{$height}px",
+							'borderRadius' => "{$radius}%",
+							'marginRight' => '5px'
+						])
+				);
             }
             return $html;
         });
@@ -89,12 +113,36 @@ class Field extends Column
      * @param int $width 宽度
      * @param int $height 高度
      * @param int $radius 圆角
-     * @return $this
      */
     public function images($width = 80, $height = 80, $radius = 5)
     {
         $this->image($width, $height, $radius, true);
     }
+
+	/**
+	 * 文字链接
+	 * @link https://element-plus.gitee.io/#/zh-CN/component/link 文字链接
+	 * @link https://element-plus.gitee.io/#/zh-CN/component/icon 图标
+	 * @param string $field 字段，不指定则显示当前value
+	 * @param string $target 打开方式 _blank(在新窗口中打开) / _self(在相同的窗口打开) / _parent(在父窗口打开) / _top(在整个窗口中)
+	 * @param string $icon 图标
+	 * @param string $type 类型
+	 * @param bool   $underline 是否下划线
+	 * @return $this
+	 */
+	public function link($field = '', $target = '_blank', $icon = '', $type = 'primary', $underline = false)
+	{
+		$this->display(function ($val, $data) use ($field, $target, $icon, $type, $underline) {
+			$label = $field ? $data[$field] : $val;
+			return Link::create($label)
+				->href($val)
+				->type($type)
+				->underline($underline)
+				->target($target)
+				->icon($icon);
+		});
+		return $this;
+	}
 
     /**
      * 标签显示
