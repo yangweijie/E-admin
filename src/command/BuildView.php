@@ -160,21 +160,26 @@ class BuildView extends Make
      */
     protected function execute(Input $input, Output $output)
     {
-        
+
         if($input->hasOption('model')){
             $model = $input->getOption('model');
             $names = explode('/',$model);
             $names = array_filter($names);
+
+
             if(isset($names[1])){
                 $model = $names[1];
+                $classname_basemodel = $this->getClassNames($names[0],'model\\BaseModel');
                 $classname_model = $this->getClassNames($names[0],'model\\'.$names[1]);
             }else{
+                $classname_basemodel = $this->getClassNames('','model\\BaseModel');
                 $classname_model = $this->getClassNames('','model\\'.$model);
             }
 
             $this->getTableInfo($model);
 
             $pathname = $this->getPathName($classname_model);
+            $basemodelPathname = $this->getPathName($classname_basemodel);
             if (is_file($pathname)) {
                 $output->writeln('<error>' . $classname_model . ' already exists!</error>');
             }
@@ -183,6 +188,9 @@ class BuildView extends Make
                 mkdir(dirname($pathname), 0755, true);
             }
             list($grid,$detail,$form) = $this->getTableInfo($model);
+            if (!is_file($basemodelPathname)) {
+                file_put_contents($basemodelPathname, $this->buildClasses($classname_basemodel,'baseModel'));
+            }
             if (!is_file($pathname)) {
                 file_put_contents($pathname, $this->buildClasses($classname_model,'model'));
             }
