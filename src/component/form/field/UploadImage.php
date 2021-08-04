@@ -66,7 +66,7 @@ class UploadImage extends Upload
                 $image->save($savePath,null,$file->getMime());
                 $file = new File($savePath);
             }
-            $res = FileService::instance()->upload($file, $filename, $saveDir . 'editor', $upType, $isUniqidmd5);
+            $res = FileService::instance()->upload($file, $filename, $saveDir, $upType, $isUniqidmd5);
             @unlink($savePath);
             if (!$res) {
                 return json(['code' => 999, 'message' => '上传失败'], 404);

@@ -29,7 +29,7 @@
         </span>
       </div>
     </span>
-    <span v-if="displayType=='image'" v-show="showUploadBtn" ref="btn"  @click="handelBrowse">
+    <span v-if="displayType=='image'" v-show="showUploadBtn || foreverShow" ref="btn"  @click="handelBrowse">
       <slot>
         <label class="uploader-btn" :style="{height: styleHeight,width:styleHeight}">
           <el-progress v-show="progressShow" class="progess" type="circle" :width="height" :percentage="percentage" />
