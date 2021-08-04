@@ -27,6 +27,7 @@ use Eadmin\component\form\field\Input;
 use Eadmin\component\form\field\Map;
 use Eadmin\component\form\field\Select;
 use Eadmin\component\form\field\TimePicker;
+use Eadmin\component\form\field\UploadImage;
 use Eadmin\component\form\FormAction;
 use Eadmin\component\form\FormItem;
 use Eadmin\component\form\FormMany;
@@ -73,7 +74,7 @@ use think\Model;
  * @method \Eadmin\component\form\field\Color color($field, $label = '') 颜色选择器
  * @method \Eadmin\component\form\field\Rate rate($field, $label = '') 评分组件
  * @method \Eadmin\component\form\field\Upload file($field, $label = '') 文件上传
- * @method \Eadmin\component\form\field\Upload image($field, $label = '') 图片上传
+ * @method \Eadmin\component\form\field\UploadImage image($field, $label = '') 图片上传
  * @method \Eadmin\component\form\field\Editor editor($field, $label = '') 富文本编辑器
  * @method \Eadmin\component\form\field\Tree tree($field, $label = '') 树形
  * @method \Eadmin\component\form\field\Cascader cascader(...$field, $label = '') 级联选择器
@@ -85,7 +86,7 @@ use think\Model;
  * @method \Eadmin\component\form\field\Checktag checkTag($field, $label = '') check标签
  * @method \Eadmin\component\form\field\Spec spec($field, $label = '') 规格
  * @method \Eadmin\component\form\field\Display display($field, $label = '') 显示
-*/
+ */
 class Form extends Component
 {
     use CallProvide, ComponentForm, WatchForm;
@@ -121,6 +122,8 @@ class Form extends Component
     //初始化
     protected static $init = null;
 
+    protected $imageUploads = [];
+
     public function __construct($data)
     {
         if ($data instanceof Model) {
@@ -133,7 +136,7 @@ class Form extends Component
         $field = Str::random(15, 3);
         $this->attr('exceptField', $this->exceptField);
         $this->bindAttr('model', $field);
-        $this->attr('formField',$field);
+        $this->attr('formField', $field);
         $this->bindAttValue('submit', false, true);
         $this->bindAttValue('reset', false, true);
         $this->bindAttValue('validate', false, true);
@@ -183,10 +186,10 @@ class Form extends Component
      */
     public function alignCenter(int $width = 1000)
     {
-        if(empty($width)){
+        if (empty($width)) {
             $this->removeAttr('style');
-        }else{
-            $this->attr('style', ['width' => $width .'px', 'margin' => '0 auto']);
+        } else {
+            $this->attr('style', ['width' => $width . 'px', 'margin' => '0 auto']);
         }
     }
 
@@ -306,8 +309,8 @@ class Form extends Component
         $html = Html::create($content)->tag('div');
 
         //按步骤表单显示
-        $backtrace          = debug_backtrace(1, 5);
-        if($this->steps && $backtrace[4]['class'] == FormSteps::class  && $backtrace[4]['function'] == 'add'){
+        $backtrace = debug_backtrace(1, 5);
+        if ($this->steps && $backtrace[4]['class'] == FormSteps::class && $backtrace[4]['function'] == 'add') {
             $active = $this->steps->bindAttr('current');
             $count = $this->steps->count();
             $html->where($active, $count);
@@ -388,14 +391,12 @@ class Form extends Component
             if ($component instanceof DatePicker || $component instanceof TimePicker) {
                 $value = empty($value) ? null : $value;
                 $this->setData($field, $value);
-            }elseif (($component instanceof Cascader || $component instanceof Map) && $attr != 'modelValue'){
-                if(is_array($value)) {
-                    $val = array_shift($value);
-                    $this->setData($field, $val);
-                    $component->default($value);
-                    $component->value($value);
-                }
-            }elseif ($component instanceof Map && $attr == 'modelValue' && is_array($value)){
+            } elseif (($component instanceof Cascader || $component instanceof Map) && $attr != 'modelValue' && is_array($value)) {
+                $val = array_shift($value);
+                $this->setData($field, $val);
+                $component->default($value);
+                $component->value($value);
+            } elseif ($component instanceof Map && $attr == 'modelValue' && is_array($value)) {
                 $this->setData($field, end($value));
             } else {
                 $this->setData($field, $value ?? '');
@@ -486,12 +487,12 @@ class Form extends Component
      * @param int $index 默认选项卡
      * @return $this
      */
-    public function tab($title, \Closure $closure,$index=1)
+    public function tab($title, \Closure $closure, $index = 1)
     {
         if (!$this->tab) {
             $this->tab = Tabs::create()->default($index);
             $prop = $this->tab->bindAttr('modelValue');
-            $this->attr('tabField',$prop);
+            $this->attr('tabField', $prop);
             $this->except([$prop]);
             $this->push($this->tab);
         }
@@ -671,15 +672,15 @@ class Form extends Component
         foreach ($formItems as $item) {
             $formItem = clone $item;
             $columns[] = [
-                'title'=>$formItem->attr('label'),
-                'dataIndex'=>$formItem->attr('prop'),
-                'prop'=>$formItem->attr('prop'),
-                'component'=>$formItem
+                'title' => $formItem->attr('label'),
+                'dataIndex' => $formItem->attr('prop'),
+                'prop' => $formItem->attr('prop'),
+                'component' => $formItem
             ];
             $formItem->removeAttr('label');
             $manyItem->content($item);
         }
-        $manyItem->attr('columns',$columns);
+        $manyItem->attr('columns', $columns);
         $this->push($manyItem);
         return $manyItem;
     }
@@ -715,9 +716,8 @@ class Form extends Component
         $prop = $field;
         $component = $class::create($field);
         $componentArr = array_merge($inputs, $dates, $times);
-        if ($name == 'image') {
-            //图片组件
-            $component->displayType('image')->accept('image/*')->size(120, 120)->isUniqidmd5();
+        if ($component instanceof UploadImage) {
+            $this->imageUploads[] = $component;
         }
         if (in_array($name, $componentArr)) {
             if ($component instanceof TimePicker || $component instanceof DatePicker) {
@@ -862,6 +862,10 @@ class Form extends Component
     public function save(array $data)
     {
         $this->exec();
+        //上传图片处理
+        if($response = $this->handleUploadFile()){
+            return $response;
+        }
         //监听watch
         $this->watchCall($data);
         //验证数据
@@ -889,7 +893,13 @@ class Form extends Component
             $id = $this->drive->model()[$this->drive->getPk()];
             call_user_func_array($this->steps->getClosure(), [new Result($data, $result, $id)]);
         }
-        return $result;
+        if ($result !== false) {
+            $url      = $this->redirectUrl;
+            $response = admin_success('操作完成', '数据保存成功')->redirect($url);
+        } else {
+            $response = admin_error_message('数据保存失败');
+        }
+        return $response;
     }
 
     /**
@@ -921,6 +931,7 @@ class Form extends Component
         $item = end($this->formItem);
         return $item;
     }
+
     public function popItem()
     {
         $item = array_pop($this->formItem);
@@ -963,8 +974,8 @@ class Form extends Component
         //将值绑定到form
         $this->bind($field, $this->data);
         //tab验证字段
-      
-        $this->attr('tabValidateField',$this->validator->getTabField());
+
+        $this->attr('tabValidateField', $this->validator->getTabField());
     }
 
     /**
@@ -999,6 +1010,16 @@ class Form extends Component
     public static function extend($name, $component)
     {
         self::$component[$name] = $component;
+    }
+
+    public function handleUploadFile()
+    {
+        foreach ($this->imageUploads as $imageUpload){
+            $res = $imageUpload->handelUpload();
+            if($res){
+                return $res;
+            }
+        }
     }
 
     public function jsonSerialize()

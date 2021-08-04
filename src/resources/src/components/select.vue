@@ -21,7 +21,7 @@
         emits:['update:modelValue','update:loadField','update:loadOptionField'],
         setup(props,ctx){
             const value = ref(props.modelValue)
-            const loadFieldValue = props.loadField
+            let loadFieldValue = props.loadField
             watch(()=>props.modelValue,val=>{
                 value.value = val
                 changeHandel(val)
@@ -32,6 +32,7 @@
             if(!ctx.attrs.multiple && !findTree(props.options,value.value,'id')){
                 value.value = ''
             }
+
             changeHandel(value.value)
             function changeHandel(val) {
                 if(props.params){
@@ -43,7 +44,12 @@
                             params: Object.assign(props.params, {eadminSelectLoad: true, eadmin_id: val}),
                         }).then(res=>{
                             ctx.emit('update:loadOptionField',res.data)
-                            if(findTree(res.data,loadFieldValue,'id')){
+                            if(Array.isArray(loadFieldValue)){
+                                loadFieldValue = loadFieldValue.filter(selectVal=>{
+                                    return findTree(res.data,selectVal,'id')
+                                })
+                                ctx.emit('update:loadField',loadFieldValue)
+                            }else if(findTree(res.data,loadFieldValue,'id')){
                                 ctx.emit('update:loadField',loadFieldValue)
                             }else{
                                 ctx.emit('update:loadField','')

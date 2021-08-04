@@ -265,11 +265,12 @@ class Model implements GridInterface
             admin_success('操作完成', '排序成功');
         } else {
             $res = $this->model->removeWhereField($this->softDeleteField)->strict(false)->whereIn($pk, $ids)->update($data);
-            if ($res) {
-                return true;
+            if ($res !== false) {
+                $response = admin_success('操作完成', '数据保存成功')->redirect($url);
             } else {
-                return false;
+                $response = admin_error_message('数据保存失败');
             }
+            return $response;
         }
     }
 

@@ -75,11 +75,13 @@
             })
             const debounceWatch = debounce((args)=>{
                 const length = watchData.length
-                watchData.push({
-                    field:args[0],
-                    newValue:args[1],
-                    oldValue:args[2],
-                })
+                if(JSON.stringify(args[1]) != JSON.stringify(args[2])){
+                    watchData.push({
+                        field:args[0],
+                        newValue:args[1],
+                        oldValue:args[2],
+                    })
+                }
                 if(length === 0){
                     watchListen()
                 }
@@ -121,7 +123,7 @@
                             field:field,
                             newValue:newValue,
                             oldValue:oldValue,
-                            form:ctx.attrs.model,
+                            form:submitData(),
                             eadmin_form_watch:true,
                             eadmin_class:ctx.attrs.model['eadmin_class'],
                             eadmin_function:ctx.attrs.model['eadmin_function'],
@@ -172,6 +174,23 @@
                     ctx.emit('update:step',++props.step)
                 }
             })
+            function submitData() {
+                const submitData = JSON.parse(JSON.stringify(ctx.attrs.model))
+                forEach(submitData,function (val,key) {
+                    if(props.exceptField.indexOf(key) > -1){
+                        delete submitData[key]
+                    }else if(Array.isArray(val)){
+                        forEach(val,function (many) {
+                            forEach(many,function (value,field) {
+                                if(props.exceptField.indexOf(field) > -1){
+                                    delete many[field]
+                                }
+                            })
+                        })
+                    }
+                })
+                return submitData
+            }
             //提交
             function sumbitForm(validate=false) {
                 ctx.emit('update:submit',false)
@@ -182,26 +201,13 @@
                 if(props.setAction){
                     clearValidator()
                     eadminForm.value.validate((bool,validateFields)=>{
-                        const submitData = JSON.parse(JSON.stringify(ctx.attrs.model))
-                        forEach(submitData,function (val,key) {
-                            if(props.exceptField.indexOf(key) > -1){
-                                delete submitData[key]
-                            }else if(Array.isArray(val)){
-                                forEach(val,function (many) {
-                                    forEach(many,function (value,field) {
-                                        if(props.exceptField.indexOf(field) > -1){
-                                            delete many[field]
-                                        }
-                                    })
-                                })
-                            }
-                        })
+
                         if(bool){
                             http({
                                 url: props.setAction,
                                 params:params,
                                 method: props.setActionMethod,
-                                data: submitData
+                                data: submitData()
                             }).then(res=>{
                                 if(res.code === 422){
                                     for (let field in res.data){

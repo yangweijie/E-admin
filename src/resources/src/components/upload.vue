@@ -325,9 +325,9 @@ export default defineComponent({
         return false
       }
       if (checkExt(file)) {
-        if (props.upType == 'oss') {
+        if (props.upType == 'oss' && props.displayType == 'file') {
           ossMultipartUpload(file)
-        } else if (props.upType == 'qiniu') {
+        } else if (props.upType == 'qiniu' && props.displayType == 'file') {
           qiniuMultipartUpload(file)
         }
       } else {

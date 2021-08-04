@@ -31,15 +31,7 @@ class ResourceController extends Controller
     public function save(Request $request)
     {
         $form = $this->call();
-        $res  = $form->save($request->post());
-        if ($res !== false) {
-            $url      = $form->redirectUrl();
-            $response = admin_success('操作完成', '数据保存成功')->redirect($url);
-
-
-        } else {
-            admin_error_message('数据保存失败');
-        }
+        return $form->save($request->post());
     }
 
     public function create()
@@ -78,18 +70,11 @@ class ResourceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $url = '';
         if ($id == 'batch') {
-            $res = $this->call()->update($this->request->put('eadmin_ids'), $request->put());
+            return $this->call()->update($this->request->put('eadmin_ids'), $request->put());
         } else {
             $form = $this->call();
-            $url  = $form->redirectUrl();
-            $res  = $form->save($request->put());
-        }
-        if ($res !== false) {
-            $response = admin_success('操作完成', '数据保存成功')->redirect($url);
-        } else {
-            admin_error_message('数据保存失败');
+            return $form->save($request->put());
         }
     }
 
