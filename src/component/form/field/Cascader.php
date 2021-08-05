@@ -73,10 +73,15 @@ class Cascader extends Field
 	 * @param string $parent_id 上级字段
 	 * @param string $label 名称字段
 	 * @param string $children 下级数组名
+	 * @param bool $tree 树形数据格式
 	 */
-	public function options(array $data, $id = 'id', $parent_id = 'pid', $label = 'label', $children = 'children')
+	public function options(array $data, $id = 'id', $parent_id = 'pid', $label = 'label', $children = 'children',$tree = true)
 	{
-		$options = Admin::tree($data, $id, $parent_id, $children);
+        if($tree){
+            $options = Admin::tree($data, $id, $parent_id, $children);
+        }else{
+            $options = $data;
+        }
 		$this->props('value', $id);
 		$this->props('label', $label);
 		$this->props('children', $children);

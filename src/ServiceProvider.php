@@ -74,6 +74,7 @@ class ServiceProvider extends Service
         $this->app->route->get('plug/grid', Plug::class . '@grid');
         $this->app->route->post('plug/enable', Plug::class . '@enable');
         $this->app->route->post('plug/install', Plug::class . '@install');
+        $this->app->route->post('plug/uninstall', Plug::class . '@uninstall');
         $this->app->route->get('plug', Plug::class . '@index');
         //消息通知
         $this->app->route->get('notice/notification', Notice::class . '@notification');

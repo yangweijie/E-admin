@@ -225,10 +225,10 @@ class Actions extends Html
     /**
      * @return Dropdown
      */
-    public function dropdown()
+    public function dropdown($text = '操作')
     {
         $this->isDropdown = true;
-        $this->dropdown = Dropdown::create(Button::create('操作 <i class="el-icon-arrow-down" />')->size('mini'));
+        $this->dropdown = Dropdown::create(Button::create($text.' <i class="el-icon-arrow-down" />')->size('mini'));
         return $this->dropdown;
     }
 

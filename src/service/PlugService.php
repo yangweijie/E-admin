@@ -24,11 +24,14 @@ class PlugService extends Service
     protected $plugPaths = [];
     protected $plugs = [];
     protected static $loader;
-    protected $installedPlug = [];
-
+    protected $client;
     public function __construct(App $app)
     {
         parent::__construct($app);
+        $this->client = new Client([
+            'base_uri' => 'https://eadmin.togy.com.cn/api/',
+            'verify'   => false,
+        ]);
         $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'eadmin-plugs');
 
         foreach (glob($this->plugPathBase . '/*') as $file) {
@@ -106,47 +109,43 @@ class PlugService extends Service
             }
         }
     }
-
+    public function getCate(){
+        $response = $this->client->get("Plugs/cate");
+        $content  = $response->getBody()->getContents();
+        $content = json_decode($content, true);
+        return $content['data'];
+    }
     /**
      * 获取所有插件
      * @param string $search 搜索的关键词
      */
-    public function all($search = '')
+    public function all($search = '',$cate_id=0,$page=1,$size=20,$names=null)
     {
-        $cacheKey = 'eadmin_plugs_' . $search;
-        $plugs    = Cache::get($cacheKey);
-        if (!$plugs) {
-            $plugs = GitlabService::instance()->getGroupProject(57, $search, 1, 100);
-        }
+        $response = $this->client->get("plugs/list", [
+            'query' => [
+                'cate_id'   => $cate_id,
+                'page'     => $page,
+                'size' => $size,
+                'search'   => $search,
+                'names'   => $names,
+            ]
+        ]);
+        $content  = $response->getBody()->getContents();
+        $plugs =  json_decode($content, true)['data']['data'];
         $delNames = [];
-        foreach ($plugs as $plug) {
-            if (isset($plug['composer'])) {
-                $content = $plug['composer'];
-            } else {
-                $content = GitlabService::instance()->getFile($plug['id'], 'composer.json');
-            }
-            if ($content) {
-                $info                = $this->getInfo($content);
-                $info['composer']    = $content;
-                $info['id']          = $plug['id'];
-                $info['title']       = $plug['title'] ?? $plug['name'];
-                $info['web_url']     = $plug['web_url'];
-                $info['description'] = $plug['description'];
-                $info['download']    = "https://gitlab.my8m.com/api/v4/projects/{$plug['id']}/repository/archive.zip?sha=eadmin";
-                $this->plugs[]       = $info;
-                if (!is_dir($info['path'])) {
-                    $info['status'] = false;
-                    $delNames[]     = trim($info['name']);
-                };
-                if ($info['install']) {
-                    $this->installedPlug[] = $info;
-                }
-            }
+        foreach ($plugs as &$plug) {
+            $status = $this->getInfo($plug['composer'],'status');
+            $plug['status'] = $status ?? false;
+            $plug['install_version'] = $this->getInfo($plug['composer'],'version');
+            $plug['install'] = is_null($status) ? false : true;
+            $plug['path'] = $this->plugPathBase . '/' . $plug['composer'];
+            $this->plugs[]       = $plug;
+            if (!is_dir($plug['path'])) {
+                $plug['status'] = false;
+                $delNames[]     = trim($plug['composer']);
+            };
         }
         Db::name('system_plugs')->whereIn('name', $delNames)->delete();
-        if (!Cache::has($cacheKey)) {
-            Cache::set($cacheKey, $this->plugs, 60 * 5);
-        }
         return $this->plugs;
     }
 
@@ -155,50 +154,22 @@ class PlugService extends Service
      * @param string $search 搜索的关键词
      * @return array
      */
-    public function installed($search = '')
+    public function installed($search = '',$page=1,$size=20)
     {
-        if (count($this->plugs) == 0) {
-            $this->all($search);
-        }
-        return $this->installedPlug;
-    }
-
-    /**
-     * 获取信息
-     * @param mixed $content 内容
-     * @return array
-     */
-    protected function getInfo($content)
-    {
-        $arr     = json_decode($content, true);
-        $version = '1.0.0';
-        $authors = array_column(Arr::get($arr, 'authors'), 'name');
-        $authors = implode(',', $authors);
-        $emails  = array_column(Arr::get($arr, 'authors'), 'email');
-        $emails  = implode(',', $emails);
-        $name    = Arr::get($arr, 'name');
-        $status  = $this->status($name);
-        return [
-            'name'        => $name,
-            'description' => Arr::get($arr, 'description'),
-            'author'      => $authors,
-            'email'       => $emails,
-            'status'      => $status ?? false,
-            'install'     => is_null($status) ? false : true,
-            'version'     => $version,
-            'path'        => $this->plugPathBase . '/' . $name,
-        ];
+        $names = Db::name('system_plugs')->column('name');
+        return $this->all($search,0,$page,$size,$names);
     }
 
     /**
      * 插件状态
      * @param string $name 插件名称
+     * @param string $field 字段
      * @return mixed
      */
-    public function status($name)
+    public function getInfo($name,$field='status')
     {
         try {
-            return Db::name('system_plugs')->where('name', $name)->value('status');
+            return Db::name('system_plugs')->where('name', $name)->value($field);
         } catch (\Exception $exception) {
             return false;
         }
@@ -228,7 +199,6 @@ class PlugService extends Service
         if (
             !is_dir($directory . '/src')
             || !is_file($directory . '/composer.json')
-            || !is_file($directory . '/version.php')
         ) {
             return false;
         }
@@ -255,9 +225,10 @@ class PlugService extends Service
      * 安装
      * @param string $name 插件名称
      * @param string $path 插件目录
+     * @param string $version 版本
      * @return mixed
      */
-    public function install($name, $path)
+    public function install($name, $path,$version)
     {
         try {
             $client  = new Client(['verify' => false]);
@@ -294,6 +265,7 @@ class PlugService extends Service
                 }
                 Db::name('system_plugs')->insert([
                     'name' => trim($name),
+                    'version'=>$version
                 ]);
                 return true;
             } else {
