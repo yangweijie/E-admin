@@ -14,6 +14,7 @@ use think\App;
 use think\facade\Cache;
 use think\facade\Filesystem;
 use Eadmin\Service;
+use think\File;
 
 class FileService extends Service
 {
@@ -133,7 +134,7 @@ class FileService extends Service
 
 	/**
 	 * 上传文件
-	 * @param mixed  $file        文件对象
+	 * @param mixed  $file        文件对象或文件内容
 	 * @param string $fileName    文件名
 	 * @param string $saveDir     保存目录
 	 * @param string $upType      disk
@@ -145,19 +146,23 @@ class FileService extends Service
 		if (!empty($upType)) {
 			$this->upType = $upType;
 		}
+        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 		if ($isUniqidmd5) {
-			$saveName = Filesystem::disk($this->upType)->putFile($saveDir, $file,function (){
-               return md5((string) microtime(true));
-            });
+            $fileName = md5((string) microtime(true)) . '.' . $ext;;
 		} elseif (empty($fileName)) {
-			$saveName = Filesystem::disk($this->upType)->putFileAs($saveDir, $file, $file->getOriginalName());
-		} else {
-			$saveName = Filesystem::disk($this->upType)->putFileAs($saveDir, $file, $fileName);
+            $fileName = $file->getOriginalName();
 		}
-		if ($saveName) {
-			$filename = Filesystem::disk($this->upType)->path($saveName);
+        $path = trim($saveDir . '/' . $fileName, '/');
+        if($file instanceof File){
+            $stream = file_get_contents($file->getRealPath());
+        }else{
+            $stream = $file;
+        }
+        $result = Filesystem::disk($this->upType)->put($path, $stream);
+		if ($result) {
+			$filename = Filesystem::disk($this->upType)->path($path);
 			$this->compressImage($filename);
-			return $this->url($saveName);
+			return $this->url($path);
 		} else {
 			return false;
 		}
