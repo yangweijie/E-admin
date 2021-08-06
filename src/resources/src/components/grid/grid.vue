@@ -239,7 +239,7 @@
             const tools = ref(props.tools)
             const header = ref(props.header)
             let page = 1
-            let size = props.pagination.pageSize
+            let size = props.pagination.pageSize || 20
             let sortableParams = {}
             let filterInitData = null
             function globalRequestParams(){
@@ -344,6 +344,7 @@
                             var oldIndex = evt.oldIndex;
                             var oldItem = tableData.value[oldIndex]
                             var startPage = (page-1) * size
+
                             const targetRow = tableData.value.splice(evt.oldIndex, 1)[0]
                             tableData.value.splice(evt.newIndex, 0, targetRow)
                             if(evt.newIndex != evt.oldIndex){

@@ -38,12 +38,15 @@ class Plug extends Controller
      */
     public function index(Content $content)
     {
-        $tabs = Tabs::create();
+        $tablField = 'bindTab';
+        $tabs = Tabs::create('bindTab',1);
         $cates = PlugService::instance()->getCate();
-        $tabs->pane('全部',$this->grid());
-        $tabs->pane('已安装',$this->grid(0,1));
+        $tabs->pane('全部',$this->grid()->where('bindTab',1),1);
+        $tabs->pane('已安装',$this->grid(0,1)->where('bindTab',2),2);
+        $i = 3;
         foreach ($cates as $cate){
-            $tabs->pane($cate['name'],$this->grid($cate['id']));
+            $tabs->pane($cate['name'],$this->grid($cate['id'])->where('bindTab',$i),$i);
+            $i++;
         }
         return
             $content->title('插件管理')->content(
@@ -58,6 +61,7 @@ class Plug extends Controller
 
         if ($type == 1) {
             $datas = PlugService::instance()->installed($search,$page,$size);
+
         } else {
             $datas = PlugService::instance()->all($search,$cate_id,$page,$size);
         }

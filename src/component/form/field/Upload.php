@@ -27,8 +27,6 @@ use think\helper\Str;
  * @method $this chunk(bool $value = true) 本地分片上传
  * @method $this url(string $value) 上传url
  * @method $this params(array $value) 上传参数
- * @method $this height($value) 图片框高度
- * @method $this width($value) 图片框宽度
  * @package Eadmin\component\form\field
  */
 class Upload extends Field

@@ -15,8 +15,17 @@
                         <fieldForm></fieldForm>
                     </el-dialog>
                     <el-button @click="dialogVisible = true">数据库</el-button>
+                    <el-button @click="dialogEnumVisible = true">枚举字典</el-button>
+                    <el-dialog
+                            title="枚举字典"
+                            @open="openEnum"
+                            v-model="dialogEnumVisible"
+                            width="80%"
+                            custom-class="dialogTableClass"
+                    >
+                        <render :data="dialogEnum"></render>
+                    </el-dialog>
                     <el-button @click="codeVisible = true">预览代码</el-button>
-
                     <el-button @click="isSave = true" type="primary">保存</el-button>
                 </div>
             </el-header>
@@ -146,6 +155,15 @@
                            <el-form-item label="隐藏删除按钮" v-if="generateData.grid">
                                <el-switch v-model="generateData.grid.hideDeleteButton" ></el-switch>
                            </el-form-item>
+                           <el-form-item label="隐藏操作列" v-if="generateData.grid">
+                               <el-switch v-model="generateData.grid.hideAction" ></el-switch>
+                           </el-form-item>
+                           <el-form-item label="关闭分页" v-if="generateData.grid">
+                               <el-switch v-model="generateData.grid.hidePage" ></el-switch>
+                           </el-form-item>
+                           <el-form-item label="分页大小" v-if="!generateData.grid.hidePage">
+                               <el-input-number v-model="generateData.grid.setPageLimit" ></el-input-number>
+                           </el-form-item>
                        </el-tab-pane>
                        <el-tab-pane v-if="methodType == 2" label="组件属性">
                            <el-form-item label="组件类型">
@@ -185,38 +203,53 @@
                            </el-form-item>
                            <template v-if="isComponentName('EadminSelect') || isComponentName('ElRadioGroup') || isComponentName('EadminCheckboxGroup')">
                                <el-divider>选项</el-divider>
-                               <draggable
-                                       :list="componentItem.component.attribute.options"
-                                       :animation="340"
-                                       group="selectItem"
-                                       handle=".option-drag"
-                               >
-                                   <template #item="{element,index}">
-                                       <div class="select-item">
-                                           <div class="select-line-icon option-drag">
-                                               <i class="el-icon-s-operation" />
-                                           </div>
-                                           <el-input v-model="element.label" placeholder="选项名" size="small" />
-                                           <el-input
-                                                   placeholder="选项值"
-                                                   size="small"
-                                                   v-model="element.value"
-                                           />
-                                           <div class="close-btn select-line-icon" @click="componentItem.component.attribute.options.splice(index, 1)">
-                                               <i class="el-icon-remove-outline" />
-                                           </div>
-                                       </div>
-                                   </template>
-                               </draggable>
-                               <div style="margin-left: 20px;">
-                                   <el-button
-                                           style="padding-bottom: 0"
-                                           icon="el-icon-circle-plus-outline"
-                                           type="text"
-                                           @click="addSelectItem(componentItem.component.attribute.options)"
+                               <div style="text-align: center;margin-bottom: 5px">
+                                   <el-radio-group v-model="componentItem.component.attribute.optionsType">
+                                       <el-radio label="">字典</el-radio>
+                                       <el-radio label="1">自定义</el-radio>
+                                   </el-radio-group>
+                               </div>
+
+                                <div v-show="componentItem.component.attribute.optionsType == 1">
+                                   <draggable
+
+                                           :list="componentItem.component.attribute.options"
+                                           :animation="340"
+                                           group="selectItem"
+                                           handle=".option-drag"
                                    >
-                                       添加选项
-                                   </el-button>
+                                       <template #item="{element,index}">
+                                           <div class="select-item">
+                                               <div class="select-line-icon option-drag">
+                                                   <i class="el-icon-s-operation" />
+                                               </div>
+                                               <el-input v-model="element.label" placeholder="选项名" size="small" />
+                                               <el-input
+                                                       placeholder="选项值"
+                                                       size="small"
+                                                       v-model="element.value"
+                                               />
+                                               <div class="close-btn select-line-icon" @click="componentItem.component.attribute.options.splice(index, 1)">
+                                                   <i class="el-icon-remove-outline" />
+                                               </div>
+                                           </div>
+                                       </template>
+                                   </draggable>
+                                   <div style="margin-left: 20px;">
+                                       <el-button
+                                               style="padding-bottom: 0"
+                                               icon="el-icon-circle-plus-outline"
+                                               type="text"
+                                               @click="addSelectItem(componentItem.component.attribute.options)"
+                                       >
+                                           添加选项
+                                       </el-button>
+                                   </div>
+                                </div>
+                               <div v-show="!componentItem.component.attribute.optionsType" style="text-align: center">
+                                   <el-select v-model="componentItem.component.attribute.enum_id" @change="selectEnum">
+                                       <el-option v-for="item in enumOptions" :value-key="item.id" :value="item.child" :label="item.name"></el-option>
+                                   </el-select>
                                </div>
                                <el-divider />
                            </template>
@@ -393,6 +426,7 @@
     import contoller from './contoller'
     import {defineComponent,reactive,toRefs,watch} from "vue";
     import {randomCoding,forEach} from '@/utils/index'
+    import {useHttp} from '@/hooks'
     import {generateComponent,components,getComponent} from './config'
     export default defineComponent({
         name: "index",
@@ -402,13 +436,17 @@
             fieldForm
         },
         setup(){
+            const {http} =  useHttp()
             const proxyData = reactive({})
             proxyData.filterField = {}
             const state = reactive({
+                enumOptions:[],
                 itemHover:-1,
                 codeVisible:false,
                 code:null,
+                dialogEnum:null,
                 dialogVisible:false,
+                dialogEnumVisible:false,
                 //左边组件
                 componentList:components,
                 //中间生成组件
@@ -428,7 +466,9 @@
                 generateData:{
                     grid:{
                         filterField:'filterField',
+                        setPageLimit:20,
                         columns:[],
+                        static:true,
                         proxyData:proxyData,
                     },
                     form:{
@@ -440,9 +480,12 @@
                     },
                 },
             })
+            http('PlugDictionary/data').then(res=>{
+                state.enumOptions = res.data
+            })
             watch(()=>state.initField,value=>{
                 if(state.methodType == 1){
-                    state.generateData.grid.columns = []
+                    state.generateData.grid.columns.splice(0,state.generateData.grid.columns.length)
                     value.forEach(item=> {
                         state.generateData.grid.columns.push({
                             align: 'center',
@@ -470,8 +513,8 @@
             watch(()=>state.chooseIndex,value=>{
                 state.componentItem = state.generateComponentList[value]
             })
-            watch(()=>state.generateData,value=>{
-                state.generateComponentList = value.form.list
+            watch(()=>state.generateData.form,value=>{
+                state.generateComponentList = value.list
             })
             watch(()=>state.generateComponentList,value=>{
                 state.generateComponentList.map(item=>{
@@ -599,6 +642,11 @@
                     value: ''
                 })
             }
+            function openEnum() {
+                http('plugDictionary').then(res=>{
+                    state.dialogEnum = res
+                })
+            }
             function addColumn(arr) {
                 arr.push({
                     align: 'center',
@@ -610,7 +658,18 @@
                     }
                 })
             }
+            //切换字典选项
+            function selectEnum(value){
+                state.componentItem.component.attribute.options = value.map(item=>{
+                    return {
+                        label:item.name,
+                        value:item.value,
+                    }
+                })
+            }
             return {
+                selectEnum,
+                openEnum,
                 addColumn,
                 addSelectItem,
                 changeComponent,

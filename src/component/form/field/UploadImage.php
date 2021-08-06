@@ -14,6 +14,8 @@ use think\file\UploadedFile;
 /**
  * Class UploadImage
  * @package Eadmin\component\form\field
+ * @method $this height($value) 图片框高度
+ * @method $this width($value) 图片框宽度
  * @mixin \Intervention\Image\Image
  */
 class UploadImage extends Upload

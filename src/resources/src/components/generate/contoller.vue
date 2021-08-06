@@ -255,8 +255,22 @@
 
             function selectMethod(index) {
                 state.selectMethodIndex = index
+                const type = state.methods[state.selectMethodIndex].type
+                ctx.emit('update:methodType',type)
                 if(state.methods[state.selectMethodIndex].config){
-                    ctx.emit('update:methodConfig',state.methods[state.selectMethodIndex].config)
+                    const config = props.methodConfig
+                    switch (type) {
+                        case 1:
+                            config.grid = state.methods[state.selectMethodIndex].config.grid
+                            break
+                        case 2:
+                            config.form = state.methods[state.selectMethodIndex].config.form
+                            break
+                        case 3:
+                            config.detail = state.methods[state.selectMethodIndex].config.detail
+                            break
+                    }
+                    ctx.emit('update:methodConfig',config)
                 }else{
                     http({
                         url:'rockysView/field',
@@ -264,8 +278,7 @@
                             table_id :state.controllers[state.selectIndex].table_id
                         }
                     }).then(res=>{
-                        const type = state.methods[state.selectMethodIndex].type
-                        ctx.emit('update:methodType',type)
+
                         state.tableField = res.data.filter(item=>{
                             switch (type) {
                                 case 1:

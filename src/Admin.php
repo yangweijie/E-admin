@@ -239,6 +239,10 @@ class Admin
                 $path = $parse['path'] ?? '';
                 $pathinfo = array_filter(explode('/', $path));
                 $name = current($pathinfo);
+                if(empty(app('http')->getName())){
+                    app('http')->name('admin');
+                    app()->setNamespace("app\\admin");
+                }
                 if ($name == app('http')->getName()) {
                     array_shift($pathinfo);
                 }
@@ -305,14 +309,12 @@ class Admin
                 parse_str($parse['query'], $vars);
             }
         }
-
         $data = $url;
         if ($dispatch) {
             $dispatch->init(app());
             $request = app()->request;
             $get = $request->get();
             $request->withGet($vars);
-
             if ($dispatch instanceof Controller) {
                 list($controller, $action) = $dispatch->getDispatch();
                 try {

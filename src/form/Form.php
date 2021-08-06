@@ -35,11 +35,14 @@ use Eadmin\component\form\step\FormSteps;
 use Eadmin\component\form\step\Result;
 use Eadmin\component\layout\Row;
 use Eadmin\contract\FormInterface;
+use Eadmin\form\event\Saved;
+use Eadmin\form\event\Saving;
 use Eadmin\form\traits\ComponentForm;
 use Eadmin\form\traits\WatchForm;
 use Eadmin\traits\CallProvide;
 use Eadmin\traits\Exec;
 use Eadmin\traits\FormModel;
+use think\facade\Event;
 use think\facade\Request;
 use think\helper\Str;
 use think\Model;
@@ -109,10 +112,7 @@ class Form extends Component
     protected $validator;
 
     protected $data = [];
-    //保存前回调
-    protected $beforeSave = null;
-    //保存后回调
-    protected $afterSave = null;
+
     //保存修改成功后跳转的url
     protected $redirectUrl = '';
 
@@ -771,7 +771,9 @@ class Form extends Component
      */
     public function saved(\Closure $closure)
     {
-        $this->afterSave = $closure;
+        Event::listen(Saved::class,function ($data) use($closure){
+            $closure($data,$this->drive->model());
+        });
     }
 
     /**
@@ -780,7 +782,7 @@ class Form extends Component
      */
     public function saving(\Closure $closure)
     {
-        $this->beforeSave = $closure;
+        Event::listen(Saving::class,$closure);
     }
 
     /**
@@ -872,11 +874,9 @@ class Form extends Component
         $validatorMode = $this->isEdit() ? 2 : 1;
         $this->validator->check($data, $validatorMode);
         //保存前回调
-        if (!is_null($this->beforeSave)) {
-            $beforeData = call_user_func($this->beforeSave, $data);
-            if (is_array($beforeData)) {
-                $data = array_merge($data, $beforeData);
-            }
+        $beforeData = Event::until(Saving::class,$data);
+        if (is_array($beforeData)) {
+            $data = $beforeData;
         }
         if ($this->batch) {
             $result = $this->drive->saveAll($data['eadmin_batch']);
@@ -885,9 +885,7 @@ class Form extends Component
         }
 
         //保存回后调
-        if (!is_null($this->afterSave)) {
-            call_user_func_array($this->afterSave, [$data, $this->drive->model()]);
-        }
+        Event::until(Saved::class,$data);
         //步骤表单
         if (isset($data['eadmin_step'])) {
             $id = $this->drive->model()[$this->drive->getPk()];

@@ -17,11 +17,14 @@ use Eadmin\component\layout\Content;
 use Eadmin\contract\GridInterface;
 use Eadmin\detail\Detail;
 use Eadmin\form\Form;
+use Eadmin\grid\event\Deling;
+use Eadmin\grid\event\Updateing;
 use Eadmin\grid\excel\Csv;
 use Eadmin\grid\excel\Excel;
 use Eadmin\grid\excel\ExcelQueue;
 use Eadmin\traits\CallProvide;
 use think\db\Query;
+use think\facade\Event;
 use think\facade\Filesystem;
 use think\facade\Request;
 use think\helper\Arr;
@@ -87,10 +90,6 @@ class Grid extends Component
     protected $formAction = null;
 
     protected $detailAction = null;
-    //删除前回调
-    protected $beforeDel = null;
-    //更新前回调
-    protected $beforeUpdate = null;
     //工具栏
     protected $tools = [];
     //展开行
@@ -275,15 +274,19 @@ class Grid extends Component
     //更新前回调
     public function updateing(\Closure $closure)
     {
-        $this->beforeUpdate = $closure;
+        Event::listen(Updateing::class,function ($params) use($closure){
+            call_user_func_array($closure,$params);
+        });
     }
 
     //删除前回调
     public function deling(\Closure $closure)
     {
-        $this->beforeDel = $closure;
+        Event::listen(Deling::class,function ($id) use($closure){
+            $trueDelete = Request::delete('trueDelete');
+            $closure($id,$trueDelete);
+        });
     }
-
 	/**
 	 * 删除
 	 * @param int $id 删除的id
@@ -292,10 +295,7 @@ class Grid extends Component
 	public function destroy($id)
 	{
 		$this->exec();
-		$trueDelete = Request::delete('trueDelete');
-		if (!is_null($this->beforeDel)) {
-			call_user_func($this->beforeDel, $id, $trueDelete);
-		}
+        Event::until(Deling::class,$id);
 		return $this->drive->destroy($id);
 	}
 
@@ -308,9 +308,7 @@ class Grid extends Component
     public function update($ids, $data)
     {
 		$this->exec();
-		if (!is_null($this->beforeUpdate)) {
-            call_user_func($this->beforeUpdate, $ids, $data);
-        }
+        Event::until(Updateing::class,[$ids, $data]);
         return $this->drive->update($ids, $data);
     }
 

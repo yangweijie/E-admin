@@ -28,11 +28,15 @@ class Tabs extends Field
     /**
      * @param string $title 标题
      * @param mixed $content 内容
+     * @param mixed $name 与选项卡绑定值
      * @return $this
      */
-    public function pane($title, $content)
+    public function pane($title, $content,$name=null)
     {
         $tabPane = new TabPane();
+        if($name){
+            $tabPane->name($name);
+        }
         $tabPane->content($title, 'label');
         $tabPane->content($content);
         $tabPane->lazy();
