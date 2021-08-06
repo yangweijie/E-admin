@@ -4,16 +4,16 @@
         <!--工具栏-->
         <div :class="['tools',custom?'custom':'']" v-if="!hideTools">
             <el-row style="padding-top: 10px">
-                <el-col :md="5" style="display: flex;margin-bottom: 10px" v-if="quickSearchOn">
+                <el-col :md="5" style="display: flex;margin-bottom: 10px" v-if="quickSearch">
                     <!--快捷搜索-->
-                    <el-input class="hidden-md-and-down" v-model="quickSearch" clearable prefix-icon="el-icon-search"
+                    <el-input class="hidden-md-and-down" v-model="quickSearchValue" clearable prefix-icon="el-icon-search"
                               size="small" style="margin-right: 10px;flex: 1" :placeholder="quickSearchText" @change="handleFilter"  @keyup.enter="handleFilter">
                         <template #append>
                             <el-button class="hidden-md-and-down searchButton" type="primary" size="small" @click="handleFilter">搜索</el-button>
                         </template>
                     </el-input>
                 </el-col>
-                <el-col :md="quickSearchOn ? 15:20" style="margin-bottom: 10px">
+                <el-col :md="quickSearch ? 15:20" style="margin-bottom: 10px">
                     <!--添加-->
                     <render v-if="addButton" :data="addButton" :slot-props="grid"></render>
                     <!--导出-->
@@ -180,6 +180,7 @@
             },
             hideDeleteButton: Boolean,
             hideTrashed: Boolean,
+            quickSearch: Boolean,
             hideDeleteSelection: Boolean,
             expandedRow: Boolean,
             filter: [Object, Boolean],
@@ -211,7 +212,7 @@
                 selectRadio.value = props.selection[0]
             }
             const filterShow = ref(props.expandFilter)
-            const quickSearch = ref('')
+            const quickSearchValue = ref('')
             const selectIds = ref(props.selection || [])
             const expandedRowKeys = ref([])
             const eadminActionWidth = ref(0)
@@ -223,7 +224,6 @@
                 file:'',
                 status:'',
             })
-            const quickSearchOn = ctx.attrs.quickSearch
             const quickSearchText = ctx.attrs.quickSearchText || '请输入关键字'
             const columns = ref(props.columns)
             const tableData = ref([])
@@ -254,7 +254,7 @@
                         delete filterData[key]
                     }
                 })
-                requestParams = Object.assign(requestParams, filterData,{quickSearch:quickSearch.value},route.query,props.params,props.addParams,sortableParams)
+                requestParams = Object.assign(requestParams, filterData,{quickSearch:quickSearchValue.value},route.query,props.params,props.addParams,sortableParams)
                 if(trashed.value){
                     requestParams = Object.assign(requestParams ,{eadmin_deleted:true})
                 }
@@ -281,7 +281,7 @@
             })
             watch(() => props.modelValue, (value) => {
                 if(value){
-                    //quickSearch.value = ''
+                    //quickSearchValue.value = ''
                     loading.value = value
                 }
             })
@@ -293,10 +293,11 @@
             })
             //动态控制列显示隐藏
             const checkboxColumn = ref([])
-            checkboxColumn.value = props.columns.map(item => {
-                return item.prop
-            })
+
             const tableColumns = computed(()=>{
+                checkboxColumn.value = props.columns.map(item => {
+                    return item.prop
+                })
                 return columns.value.filter(item=>{
                     if(item.prop === 'EadminAction'){
                         item.width = eadminActionWidth.value
@@ -642,7 +643,6 @@
                 grid,
                 pageLayout,
                 eadminActionWidth,
-                quickSearchOn,
                 quickSearchText,
                 page,
                 size,
@@ -655,7 +655,7 @@
                 handleCurrentChange,
                 loading,
                 tableData,
-                quickSearch,
+                quickSearchValue,
                 rowSelection,
                 visibleFilter,
                 filterShow,
