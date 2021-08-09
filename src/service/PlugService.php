@@ -294,6 +294,7 @@ class PlugService extends Service
         FileSystemService::instance()->delFiels($path);
         Db::name('system_plugs')->where('name', $name)->delete();
         Db::name('system_menu')->where('mark', $name)->delete();
+        Db::name('system_config')->where('mark', $name)->delete();
         return true;
     }
 }
