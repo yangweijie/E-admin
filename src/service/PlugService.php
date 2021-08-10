@@ -164,7 +164,7 @@ class PlugService extends Service
         if (count($names) == 0) {
             return [];
         }
-        $onlinePlugs = $this->all($search, 0, $page, $size, $names);
+        $installedPlugs = $this->all($search, 0, $page, $size, $names);
 
         foreach ($this->plugPaths as $plugPaths) {
             $file = $plugPaths . DIRECTORY_SEPARATOR . 'composer.json';
@@ -173,24 +173,31 @@ class PlugService extends Service
                 $plugs[] = $arr;
             }
         }
-        $onlinePlugNames = array_column($onlinePlugs, 'composer');
+        $onlinePlugNames = array_column($installedPlugs, 'composer');
 
         $plugnames = array_column($plugs, 'name');
 
-        $names = array_diff($plugnames,$onlinePlugNames);
-        foreach ($names as $name){
+        $names = array_diff($plugnames, $onlinePlugNames);
+        foreach ($names as $name) {
+            $index = array_search($name,$plugnames);
+            $plug = [];
             $status = $this->getInfo($name, 'status');
+            $plug['name']=  $plugs[$index]['description'];
             $plug['status'] = $status ?? false;
-            $plug['install_version'] = '';
+            $plug['install_version'] = '本地插件';
             $plug['install'] = is_null($status) ? false : true;
-            $plug['path'] = $this->plugPathBase . '/' . $plug['composer'];
-            $this->plugs[] = $plug;
-            if (!is_dir($plug['path'])) {
-                $plug['status'] = false;
-                $delNames[] = trim($plug['composer']);
-            };
+            $plug['path'] = $this->plugPathBase . '/' . $name;
+            $plug['composer'] = $name;
+            $plug['version'] = [
+                [
+                    'version'=>'本地插件',
+                    'desc'=>'',
+                    'require'=>[]
+                ]
+            ];
+            $installedPlugs[] = $plug;
         }
-
+        return $installedPlugs;
     }
 
     /**
