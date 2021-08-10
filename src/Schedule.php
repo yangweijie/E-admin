@@ -138,7 +138,7 @@ class Schedule
                 array_unshift($log, ['message' => $message .'耗时：'.$time, 'time' => $datetime]);
             }else{
                 if(app()->runningInConsole()){
-                    dump("[{$this->name}] 执行完成");
+                    dump("[{$this->name}] 执行完成,耗时:".$time);
                 }
                 array_unshift($log, ['message' => $message .PHP_EOL. '执行完成,耗时：'.$time, 'time' => $datetime]);
             }

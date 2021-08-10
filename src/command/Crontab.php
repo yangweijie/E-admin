@@ -30,7 +30,7 @@ class Crontab extends Command
     }
     protected function execute(Input $input, Output $output)
     {
-        if($input->hasOption('process')){
+        if($input->hasOption('daemon')){
             $phpLibry = (new PhpExecutableFinder)->find(false);
             $cmd = [
                 $phpLibry,
