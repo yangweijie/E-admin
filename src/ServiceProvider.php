@@ -11,10 +11,13 @@ namespace Eadmin;
 
 use Eadmin\component\basic\Message;
 use Eadmin\component\basic\Notification;
+use Eadmin\controller\Crontab;
 use Eadmin\controller\FileSystem;
 use Eadmin\controller\ResourceController;
 use Eadmin\controller\Queue;
+use Eadmin\facade\Schedule;
 use Eadmin\middleware\Response;
+use Eadmin\service\BackupData;
 use Eadmin\service\MenuService;
 use Eadmin\service\QueueService;
 use think\facade\Db;
@@ -98,6 +101,10 @@ class ServiceProvider extends Service
         });
         $this->app->route->get('queue', Queue::class . '@index');
         $this->app->route->post('queue/retry', Queue::class . '@retry');
+        //定时任务
+        $this->app->route->any('crontab/clear', Crontab::class . '@clear');
+        $this->app->route->any('crontab/exec', Crontab::class . '@exec');
+        $this->app->route->get('crontab', Crontab::class . '@index');
     }
 
     public function boot()
@@ -113,6 +120,22 @@ class ServiceProvider extends Service
             'Eadmin\command\ReplaceData',
             'Eadmin\command\ClearDatabase',
             'Eadmin\command\Queue',
+            'Eadmin\command\Crontab',
+            'Eadmin\command\CrontabList',
         ]);
+        Schedule::call('数据库备份和定时清理excel目录',function () {
+            //数据库备份
+            if(sysconf('databackup_on') == 1){
+                BackupData::instance()->backup();
+                $list = BackupData::instance()->getBackUpList();
+                if(count($list) > sysconf('database_number')){
+                    $backData = array_pop($list);
+                    BackupData::instance()->delete($backData['id']);
+                }
+            }
+            //定时清理excel目录
+            $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
+            $fileSystem->remove(app()->getRootPath().'public/upload/excel');
+        })->everyDay(sysconf('database_day'));
     }
 }

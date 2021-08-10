@@ -86,6 +86,7 @@ class SelectTable extends Field
         $this->selectRequest($closure,function ($datas){
             $this->successCode($datas);
         });
+        return $this;
     }
     public function options(\Closure $closure)
     {

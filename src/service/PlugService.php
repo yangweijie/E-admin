@@ -164,7 +164,33 @@ class PlugService extends Service
         if (count($names) == 0) {
             return [];
         }
-        return $this->all($search, 0, $page, $size, $names);
+        $onlinePlugs = $this->all($search, 0, $page, $size, $names);
+
+        foreach ($this->plugPaths as $plugPaths) {
+            $file = $plugPaths . DIRECTORY_SEPARATOR . 'composer.json';
+            if (is_file($file)) {
+                $arr = json_decode(file_get_contents($file), true);
+                $plugs[] = $arr;
+            }
+        }
+        $onlinePlugNames = array_column($onlinePlugs, 'composer');
+
+        $plugnames = array_column($plugs, 'name');
+
+        $names = array_diff($plugnames,$onlinePlugNames);
+        foreach ($names as $name){
+            $status = $this->getInfo($name, 'status');
+            $plug['status'] = $status ?? false;
+            $plug['install_version'] = '';
+            $plug['install'] = is_null($status) ? false : true;
+            $plug['path'] = $this->plugPathBase . '/' . $plug['composer'];
+            $this->plugs[] = $plug;
+            if (!is_dir($plug['path'])) {
+                $plug['status'] = false;
+                $delNames[] = trim($plug['composer']);
+            };
+        }
+
     }
 
     /**
