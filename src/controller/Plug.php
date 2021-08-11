@@ -39,14 +39,12 @@ class Plug extends Controller
     public function index(Content $content)
     {
         $tablField = 'bindTab';
-        $tabs = Tabs::create('bindTab',1);
+        $tabs = Tabs::create();
         $cates = PlugService::instance()->getCate();
-        $tabs->pane('全部',$this->grid()->where('bindTab',1),1);
-        $tabs->pane('已安装',$this->grid(0,1)->where('bindTab',2),2);
-        $i = 3;
+        $tabs->pane('全部',$this->grid());
+        $tabs->pane('已安装',$this->grid(0,1));
         foreach ($cates as $cate){
-            $tabs->pane($cate['name'],$this->grid($cate['id'])->where('bindTab',$i),$i);
-            $i++;
+            $tabs->pane($cate['name'],$this->grid($cate['id']));
         }
         return
             $content->title('插件管理')->content(
