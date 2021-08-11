@@ -123,19 +123,23 @@ class ServiceProvider extends Service
             'Eadmin\command\Crontab',
             'Eadmin\command\CrontabList',
         ]);
-        Schedule::call('数据库备份和定时清理excel目录',function () {
-            //数据库备份
-            if(sysconf('databackup_on') == 1){
-                BackupData::instance()->backup();
-                $list = BackupData::instance()->getBackUpList();
-                if(count($list) > sysconf('database_number')){
-                    $backData = array_pop($list);
-                    BackupData::instance()->delete($backData['id']);
+        try{
+            Schedule::call('数据库备份和定时清理excel目录',function () {
+                //数据库备份
+                if(sysconf('databackup_on') == 1){
+                    BackupData::instance()->backup();
+                    $list = BackupData::instance()->getBackUpList();
+                    if(count($list) > sysconf('database_number')){
+                        $backData = array_pop($list);
+                        BackupData::instance()->delete($backData['id']);
+                    }
                 }
-            }
-            //定时清理excel目录
-            $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
-            $fileSystem->remove(app()->getRootPath().'public/upload/excel');
-        })->everyDay(sysconf('database_day'));
+                //定时清理excel目录
+                $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
+                $fileSystem->remove(app()->getRootPath().'public/upload/excel');
+            })->everyDay(sysconf('database_day'));
+        }catch (\Exception $exception){
+
+        }
     }
 }
