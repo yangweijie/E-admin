@@ -46,22 +46,7 @@ body {
 .eadmin-detail img{
   max-width:100%;
 }
-body *::-webkit-scrollbar {width:9px; height:9px;} /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
-body *::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-  border-style: dashed;
-  background-color: rgba(157, 165, 183, 0.4);
-  border-color: transparent;
-  border-width: 2px;
-  background-clip: padding-box;
-}
 
-body *::-webkit-scrollbar-thumb:hover {
-  box-shadow: 5px 5px 5px rgba(157, 165, 183,.5);
-  background: rgba(157, 165, 183,.5);
-}
-.scrollbarHide::-webkit-scrollbar{display: none}
-.scrollbarShow::-webkit-scrollbar{display: block}
 .xgplayer-skin-default .xgplayer-start {
   z-index:1!important;
 }

@@ -292,12 +292,12 @@
                 }
             })
             //动态控制列显示隐藏
-            const checkboxColumn = ref([])
+            const checkboxColumn = ref(props.columns.map(item => {
+                return item.prop
+            }))
 
             const tableColumns = computed(()=>{
-                checkboxColumn.value = props.columns.map(item => {
-                    return item.prop
-                })
+
                 return columns.value.filter(item=>{
                     if(item.prop === 'EadminAction'){
                         item.width = eadminActionWidth.value

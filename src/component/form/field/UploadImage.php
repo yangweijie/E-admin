@@ -80,6 +80,7 @@ class UploadImage extends Upload
             $upType = Request::param('upType', 'local');
             $realPath = $file->getRealPath();
             $ext = $file->extension();
+           
             if (count($this->interventionCalls) > 0) {
                 $image = Image::make($realPath);
                 $savePath = $file->getPath() . DIRECTORY_SEPARATOR . $filename;
@@ -90,10 +91,11 @@ class UploadImage extends Upload
 
                     }
                 }
-                $file = $image->encode(null, null);
+                $file = $image->encode(null, null)->getEncoded();
             }
 
             $url = FileService::instance()->upload($file, $filename, $saveDir, $upType, $isUniqidmd5);
+
             $this->uploadThumbnail($url, $realPath, $ext, $saveDir, $upType);
             if (!$url) {
                 return json(['code' => 999, 'message' => '上传失败'], 404);

@@ -146,6 +146,7 @@ class FileService extends Service
 		if (!empty($upType)) {
 			$this->upType = $upType;
 		}
+
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 		if ($isUniqidmd5) {
             $fileName = md5((string) microtime(true)) . '.' . $ext;;
@@ -158,7 +159,7 @@ class FileService extends Service
         }else{
             $stream = $file;
         }
-        $result = Filesystem::disk($this->upType)->put($path, $stream);
+        $result = Filesystem::disk('oss')->put($path, $stream);
 		if ($result) {
 			$filename = Filesystem::disk($this->upType)->path($path);
 			$this->compressImage($filename);

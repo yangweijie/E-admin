@@ -1011,8 +1011,10 @@ class Form extends Component
 
     public function handleUploadFile()
     {
+
         foreach ($this->imageUploads as $imageUpload){
             $res = $imageUpload->handelUpload();
+          
             if($res){
                 return $res;
             }

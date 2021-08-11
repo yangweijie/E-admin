@@ -324,13 +324,7 @@ export default defineComponent({
         uploader.cancel()
         return false
       }
-      if (checkExt(file)) {
-        if (props.upType == 'oss' && props.displayType == 'file') {
-          ossMultipartUpload(file)
-        } else if (props.upType == 'qiniu' && props.displayType == 'file') {
-          qiniuMultipartUpload(file)
-        }
-      } else {
+      if (!checkExt(file)) {
         uploader.cancel()
         ElMessage({
           type: 'error',
@@ -353,7 +347,16 @@ export default defineComponent({
         uploader.cancel()
         return false
       }
-      if (props.upType != 'oss' && props.upType != 'qiniu') {
+      if(props.displayType == 'file' && props.upType != 'local'){
+        files.forEach(file=>{
+          if (props.upType == 'oss') {
+            ossMultipartUpload(file)
+          } else if (props.upType == 'qiniu') {
+            qiniuMultipartUpload(file)
+          }
+        })
+        uploader.cancel()
+      }else{
         uploader.upload()
       }
       if (files.length > 0) {

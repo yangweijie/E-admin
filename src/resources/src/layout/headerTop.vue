@@ -178,6 +178,7 @@
 <style lang="scss" scoped>
     .menu{
         overflow-x: auto;
+        scrollbar-width:none;
         display: flex;
     }
     .header-container {

@@ -138,6 +138,7 @@
         align-items:center;
         flex: 1;
         overflow: auto;
+        scrollbar-width:none;
     }
     .tagsView .tabs .tabMove{
         cursor: pointer;
@@ -157,6 +158,7 @@
         height: 40px;
         flex: 1;
         overflow-x: auto;
+        scrollbar-width:none;
     }
     .tagsView ul::-webkit-scrollbar {
         display:none
