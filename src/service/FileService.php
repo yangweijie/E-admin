@@ -159,7 +159,7 @@ class FileService extends Service
         }else{
             $stream = $file;
         }
-        $result = Filesystem::disk('oss')->put($path, $stream);
+        $result = Filesystem::disk($this->upType)->put($path, $stream);
 		if ($result) {
 			$filename = Filesystem::disk($this->upType)->path($path);
 			$this->compressImage($filename);
