@@ -154,7 +154,6 @@ class Plug extends Controller
         $form->actions(function (FormAction $formAction){
            $formAction->submitButton()->content('安装');
            $formAction->hideResetButton();
-           $formAction->confirm('确认安装?');
         });
         $form->saving(function ($post) use($data,$composer){
             $urls = array_column($data,'url','id');

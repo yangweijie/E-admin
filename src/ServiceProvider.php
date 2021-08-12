@@ -52,7 +52,7 @@ class ServiceProvider extends Service
     }
     //检测静态文件版本发布
     protected function publishVersion(){
-        $file = __DIR__.'/assets/public/version.txt';
+        $file = __DIR__.'/../version.txt';
         $system_version = file_get_contents($file);
         $file = app()->getRootPath().'public/eadmin/version.txt';
         $version = '';

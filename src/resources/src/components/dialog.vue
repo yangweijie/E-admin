@@ -1,10 +1,19 @@
 <template>
-    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog">
+    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog" :before-close="beforeClose">
                     <template #title>
                         <slot name="title"></slot>
                     </template>
                     <slot></slot>
-           <render :data="content" :slot-props="slotProps" @success="hide"></render>
+            <render :data="content" :slot-props="slotProps" @success="hide"></render>
+            <template #footer v-if="footer">
+                <div v-if="footerShow">
+                    <render v-for="item in action.leftAction" :data="item"></render>
+                    <render v-if="action.submit" :loading="dialogRef.loading" :data="action.submit" :disabled="dialogRef.disabled"></render>
+                    <render v-if="action.reset" :data="action.reset" @click="dialogRef.resetForm"></render>
+                    <render v-if="action.cancel" :data="action.cancel" @click="dialogRef.cancelForm"></render>
+                    <render v-for="item in action.rightAction" :data="item"></render>
+                </div>
+            </template>
     </component>
     <span @click.stop="open">
         <slot name="reference"></slot>
@@ -12,7 +21,7 @@
 </template>
 
 <script>
-    import {defineComponent, watch,computed} from "vue";
+    import {defineComponent, watch,computed ,reactive,toRefs,ref ,nextTick } from "vue";
     import {useVisible} from '@/hooks'
     import {ElMessage} from "element-plus";
 
@@ -48,6 +57,13 @@
         },
         emits: ['update:modelValue','update:show','update:reRender'],
         setup(props, ctx) {
+            const dialogRef = ref('')
+            const state = reactive({
+                footer:false,
+                footerShow:false,
+                action:{},
+                formLoading:false,
+            })
             if(ctx.attrs.eadmin_popup){
                 props.slotProps.eadmin_popup = ctx.attrs.eadmin_popup
             }
@@ -71,12 +87,30 @@
                 }
                 ctx.emit('update:show',value)
             })
+            watch(content,value=>{
+                if(value.name == 'EadminForm'){
+                    value.attribute.ref = dialogRef
+                    state.action = value.attribute.action
+                    if(!value.attribute.action.hide){
+                        state.footer = true
+                        value.attribute.action.hide = true
+                        nextTick(()=>{
+                            state.footerShow = true
+                        })
+                    }
+                }
+            })
             function open(){
-                if(props.gridBatch  && props.addParams.eadmin_ids.length == 0){
+                if(props.gridBatch && props.addParams.eadmin_ids.length == 0){
                     return ElMessage('请勾选操作数据')
                 }
                 init = true
                 http(props)
+            }
+            function beforeClose(done) {
+                state.footerShow = false
+                state.action = {}
+                done()
             }
             const dialog = computed(()=>{
                 if(visible.value || init){
@@ -86,6 +120,9 @@
                 }
             })
             return {
+                beforeClose,
+                dialogRef,
+                ...toRefs(state),
                 dialog,
                 hide,
                 content,

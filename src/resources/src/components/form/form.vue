@@ -4,11 +4,11 @@
             <slot></slot>
             <render :data="stepResult"></render>
             <el-form-item v-if="!action.hide" v-bind="action.attr">
-                <slot name="leftAction"></slot>
+                <render v-for="item in action.leftAction" :data="item"></render>
                 <render v-if="action.submit" :loading="loading" :data="action.submit" :disabled="disabled"></render>
                 <render v-if="action.reset" :data="action.reset" @click="resetForm"></render>
                 <render v-if="action.cancel" :data="action.cancel" @click="cancelForm"></render>
-                <slot name="rightAction"></slot>
+                <render v-for="item in action.rightAction" :data="item"></render>
             </el-form-item>
             <slot name="footer"></slot>
         </el-form>
@@ -329,17 +329,6 @@
 </script>
 
 <style scoped>
-.eadmin-dialog .el-form-item:last-child{
-   margin-bottom: 0;
-}
-.eadmin-dialog .footer{
-    position: absolute;
-    bottom: 0;
-    background: #ffffff;
-    width: 100%;
-    margin-bottom: 0;
-    padding-bottom:10px;
-}
 .eadmin-form{
     background: rgb(255, 255, 255);
     border-radius: 4px;

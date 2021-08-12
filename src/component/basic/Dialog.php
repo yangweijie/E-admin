@@ -84,6 +84,7 @@ class Dialog extends Field
         return $this->content($content, 'reference');
     }
 
+
     /**
      * 标题
      * @param string $content

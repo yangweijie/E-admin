@@ -311,10 +311,7 @@ class Admin
     {
         $dispatch = Admin::getDispatch($url);
         $vars = [];
-        if($url instanceof Url){
-            $url = $url->build();
-        }
-        if (is_string($url)) {
+        if (is_string($url) || $url instanceof Url) {
             $parse = parse_url($url);
             if (isset($parse['query'])) {
                 parse_str($parse['query'], $vars);
