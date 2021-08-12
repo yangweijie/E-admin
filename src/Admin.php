@@ -8,6 +8,14 @@ use Eadmin\component\Component;
 use Eadmin\component\basic\Html;
 use Eadmin\component\basic\Message;
 use Eadmin\component\basic\Notification;
+use Eadmin\controller\Backup;
+use Eadmin\controller\Crontab;
+use Eadmin\controller\FileSystem;
+use Eadmin\controller\Log;
+use Eadmin\controller\Menu;
+use Eadmin\controller\Notice;
+use Eadmin\controller\Plug;
+use Eadmin\controller\Queue;
 use Eadmin\controller\ResourceController;
 use Eadmin\service\MenuService;
 use Eadmin\service\NodeService;
@@ -342,5 +350,44 @@ class Admin
     public static function registerRoute()
     {
         app()->route->resource('eadmin', ResourceController::class)->ext('rest');
+        //菜单管理
+        app()->route->resource('menu', Menu::class);
+        //日志调试
+        app()->route->post('log/logData', Log::class . '@logData');
+        app()->route->get('log/debug', Log::class . '@debug');
+        app()->route->post('log/remove', Log::class . '@remove');
+        //插件
+        app()->route->get('plug/add', Plug::class . '@add');
+        app()->route->get('plug/grid', Plug::class . '@grid');
+        app()->route->post('plug/enable', Plug::class . '@enable');
+        app()->route->post('plug/install', Plug::class . '@install');
+        app()->route->post('plug/uninstall', Plug::class . '@uninstall');
+        app()->route->get('plug', Plug::class . '@index');
+        //消息通知
+        app()->route->get('notice/notification', Notice::class . '@notification');
+        app()->route->post('notice/system', Notice::class . '@system');
+        app()->route->post('notice/reads', Notice::class . '@reads');
+        app()->route->delete('notice/clear', Notice::class . '@clear');
+        //数据库备份
+        app()->route->get('backup/config', Backup::class . '@config');
+        app()->route->post('backup/add', Backup::class . '@add');
+        app()->route->post('backup/reduction', Backup::class . '@reduction');
+        app()->route->get('backup', Backup::class . '@index');
+        //文件管理系统
+        app()->route->get('filesystem', FileSystem::class . '@index');
+        app()->route->post('filesystem/mkdir', FileSystem::class . '@mkdir');
+        app()->route->post('filesystem/rename', FileSystem::class . '@rename');
+        app()->route->delete('filesystem/del', FileSystem::class . '@del');
+        //系统队列
+        app()->route->get('queue/progress',function (){
+            $queue = new QueueService(app()->request->get('id'));
+            return json(['code'=>200,'data'=>$queue->progress()]);
+        });
+        app()->route->get('queue', Queue::class . '@index');
+        app()->route->post('queue/retry', Queue::class . '@retry');
+        //定时任务
+        app()->route->any('crontab/clear', Crontab::class . '@clear');
+        app()->route->any('crontab/exec', Crontab::class . '@exec');
+        app()->route->get('crontab', Crontab::class . '@index');
     }
 }
