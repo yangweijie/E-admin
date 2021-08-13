@@ -39,7 +39,10 @@
             reset:Boolean,
             submit:Boolean,
             validate:Boolean,
-            step:Number,
+            step:{
+                type:Number,
+                default:1,
+            },
             watch:{
                 type:Array,
                 default:[],
@@ -189,6 +192,7 @@
                         })
                     }
                 })
+                submitData.eadmin_step_num = props.step + 1
                 return submitData
             }
             //提交

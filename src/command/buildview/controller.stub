@@ -69,6 +69,10 @@ class {%className%} extends Controller
 			    // 隐藏重置按钮
                 // $action->hideResetButton();
 			});
+			// 验证前回调
+            $form->validating(function ($post) {
+
+            });
             // 保存前回调
             $form->saving(function ($post) {
 

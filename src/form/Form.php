@@ -37,6 +37,7 @@ use Eadmin\component\layout\Row;
 use Eadmin\contract\FormInterface;
 use Eadmin\form\event\Saved;
 use Eadmin\form\event\Saving;
+use Eadmin\form\event\Validating;
 use Eadmin\form\traits\ComponentForm;
 use Eadmin\form\traits\WatchForm;
 use Eadmin\traits\CallProvide;
@@ -775,7 +776,14 @@ class Form extends Component
             $closure($data,$this->drive->model());
         });
     }
-
+    /**
+     * 验证前回调
+     * @param \Closure $closure
+     */
+    public function validating(\Closure $closure)
+    {
+        Event::listen(Validating::class,$closure);
+    }
     /**
      * 保存前回调
      * @param \Closure $closure
@@ -1014,7 +1022,7 @@ class Form extends Component
 
         foreach ($this->imageUploads as $imageUpload){
             $res = $imageUpload->handelUpload();
-          
+
             if($res){
                 return $res;
             }
