@@ -58,9 +58,9 @@ class ServiceProvider extends Service
         $version = '';
         if(is_file($file)){
             $version = file_get_contents($file);
-        }
-        if($system_version != $version){
-            Console::call('eadmin:publish',['-f','-p']);
+            if($system_version != $version){
+                Console::call('eadmin:publish',['-f','-p']);
+            }
         }
     }
     protected function zlib(){

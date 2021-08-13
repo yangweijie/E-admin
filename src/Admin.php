@@ -243,6 +243,9 @@ class Admin
         $dispatch = null;
         try {
             if (strpos($url, '/') !== false) {
+                if($url instanceof Url){
+                    $url->suffix(false);
+                }
                 $parse = parse_url($url);
                 $path = $parse['path'] ?? '';
                 $pathinfo = array_filter(explode('/', $path));
@@ -303,13 +306,11 @@ class Admin
     }
 
     /**
-     * 解析url并执行返回
-     * @param mixed $url
-     * @return mixed
+     * 解析url返回query
+     * @param $url
+     * @return array
      */
-    public static function dispatch($url)
-    {
-        $dispatch = Admin::getDispatch($url);
+    public static function parseUrlQuery($url){
         $vars = [];
         if (is_string($url) || $url instanceof Url) {
             $parse = parse_url($url);
@@ -317,6 +318,17 @@ class Admin
                 parse_str($parse['query'], $vars);
             }
         }
+        return $vars;
+    }
+    /**
+     * 解析url并执行返回
+     * @param mixed $url
+     * @return mixed
+     */
+    public static function dispatch($url)
+    {
+        $dispatch = Admin::getDispatch($url);
+        $vars = self::parseUrlQuery($url);
         $data = $url;
         if ($dispatch) {
             $dispatch->init(app());
