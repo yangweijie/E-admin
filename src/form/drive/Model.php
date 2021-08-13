@@ -46,11 +46,8 @@ class Model implements FormInterface
         Db::startTrans();
         try {
             if (isset($data[$this->pkField])) {
-                $isExists = Db::name($this->model->getTable())->where($this->pkField, $data[$this->pkField])->find();
-                if ($isExists) {
-                    $this->data  = $this->model->where($this->pkField, $data[$this->pkField])->find();
-                    $this->model = $this->model->where($this->pkField, $data[$this->pkField])->find();
-                }
+                $this->model  = $this->model->where($this->pkField, $data[$this->pkField])->find();
+                $this->data = clone $this->model;
             }
             $result = $this->model->save($data);
             foreach ($data as $field => $value) {
