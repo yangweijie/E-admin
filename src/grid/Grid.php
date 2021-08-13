@@ -46,6 +46,8 @@ use think\Model;
  * @method $this hideTools(bool $bool = true) 隐藏工具栏
  * @method $this hideSelection(bool $bool = true) 隐藏选择框
  * @method $this hideDeleteSelection(bool $bool = true) 隐藏删除选中按钮
+ * @method $this hideTrashedDelete(bool $bool = true) 隐藏回收站删除按钮
+ * @method $this hideTrashedRestore(bool $bool = true) 隐藏回收站恢复按钮
  * @method $this expandFilter(bool $bool = true) 展开筛选
  * @method $this defaultExpandAllRows(bool $bool) 是否默认展开所有行
  * @method $this static(bool $bool) 静态表格

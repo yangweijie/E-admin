@@ -29,9 +29,9 @@
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
-                    <el-button plain size="small" icon="el-icon-delete" v-if="!hideDeleteSelection && selectIds.length > 0" @click="deleteSelect">删除选中</el-button>
-                    <el-button plain size="small" icon="el-icon-help" v-if="trashed && selectIds.length > 0" @click="recoverySelect">恢复选中</el-button>
-                    <el-button type="danger" size="small" icon="el-icon-delete" v-if="!hideDeleteButton" @click="deleteAll()">{{trashed && !hideTrashed?'清空回收站':'清空数据'}}</el-button>
+                    <el-button plain size="small" icon="el-icon-delete" v-if="((!hideDeleteButton && !trashed) || (trashed && !hideTrashedDelete)) && selectIds.length > 0" @click="deleteSelect">删除选中</el-button>
+                    <el-button plain size="small" icon="el-icon-help" v-if="!hideTrashedRestore && trashed && selectIds.length > 0" @click="recoverySelect">恢复选中</el-button>
+                    <el-button type="danger" size="small" icon="el-icon-delete" v-if="(!hideDeleteButton && !trashed)|| (trashed && !hideTrashedDelete)" @click="deleteAll()">{{trashed && !hideTrashed?'清空回收站':'清空数据'}}</el-button>
 
                     <render v-for="tool in tools" :data="tool" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params" :slot-props="grid"></render>
                 </el-col>
@@ -180,6 +180,8 @@
             },
             hideDeleteButton: Boolean,
             hideTrashed: Boolean,
+            hideTrashedDelete: Boolean,
+            hideTrashedRestore: Boolean,
             quickSearch: Boolean,
             hideDeleteSelection: Boolean,
             expandedRow: Boolean,

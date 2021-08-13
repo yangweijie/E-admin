@@ -131,7 +131,7 @@ class Actions extends Html
         if (!$this->hideDelButton && Admin::check($params['eadmin_class'], $params['eadmin_function'], 'delete')) {
             $text = '<i class="el-icon-delete" /> ' . $this->delText;
 
-            if (request()->has('eadmin_deleted')) {
+            if (request()->has('eadmin_deleted') && !$this->grid->attr('hideTrashedRestore')) {
                 $text = '<i class="el-icon-help" /> 恢复数据 ';
                 $url = "/eadmin/batch.rest";
                 $confirm = Confirm::create($text)->message('确认恢复？')
@@ -143,13 +143,16 @@ class Actions extends Html
                 $params['trueDelete'] = true;
                 $text = '<i class="el-icon-delete" /> 彻底删除';
             }
-            $url = '/eadmin/' . $this->id . '.rest';
-            $confirm = Confirm::create($text)->message('确认删除？')
-                ->url($url)
-                ->type('error')
-                ->params($params)
-                ->method('DELETE');
-            $this->dropdown->item($confirm);
+            if(!$this->grid->attr('hideTrashedDelete') || !request()->has('eadmin_deleted')){
+                $url = '/eadmin/' . $this->id . '.rest';
+                $confirm = Confirm::create($text)->message('确认删除？')
+                    ->url($url)
+                    ->type('error')
+                    ->params($params)
+                    ->method('DELETE');
+                $this->dropdown->item($confirm);
+            }
+
         }
         $this->content($this->dropdown);
     }
@@ -199,8 +202,8 @@ class Actions extends Html
         //是否隐藏删除
         if (!$this->hideDelButton && Admin::check($params['eadmin_class'], $params['eadmin_function'], 'delete')) {
             $text = $this->delText;
-            if (request()->has('eadmin_deleted')) {
-                $this->content(
+            if (request()->has('eadmin_deleted') && !$this->grid->attr('hideTrashedRestore')) {
+                $this->space->content(
                     Button::create('恢复数据')
                         ->size('small')
                         ->icon('el-icon-s-help')
@@ -209,16 +212,19 @@ class Actions extends Html
                 $params['trueDelete'] = true;
                 $text = '彻底删除';
             }
-            $url = '/eadmin/' . $this->id . '.rest';
-            $button = Button::create($text)
-                ->type('danger')
-                ->size('small')
-                ->icon('el-icon-delete')
-                ->confirm('确认删除？', $url)
-                ->type('error')
-                ->params($params)
-                ->method('DELETE');
-            $this->space->content($button);
+            if(!$this->grid->attr('hideTrashedDelete') || !request()->has('eadmin_deleted')){
+                $url = '/eadmin/' . $this->id . '.rest';
+                $button = Button::create($text)
+                    ->type('danger')
+                    ->size('small')
+                    ->icon('el-icon-delete')
+                    ->confirm('确认删除？', $url)
+                    ->type('error')
+                    ->params($params)
+                    ->method('DELETE');
+                $this->space->content($button);
+            }
+
         }
     }
 
