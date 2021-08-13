@@ -13,7 +13,7 @@ class ExcelQueue extends Queue
      * @param $data
      * @return bool
      */
-    public function handel($data): bool
+    public function handle($data): bool
     {
         unset($data['eadmin_queue']);
         request()->withGet($data);

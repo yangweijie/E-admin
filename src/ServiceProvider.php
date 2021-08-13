@@ -60,6 +60,7 @@ class ServiceProvider extends Service
             $version = file_get_contents($file);
             if($system_version != $version){
                 Console::call('eadmin:publish',['-f','-p']);
+                file_put_contents($file,$system_version);
             }
         }
     }
