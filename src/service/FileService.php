@@ -170,30 +170,6 @@ class FileService extends Service
 	}
 
 	/**
-	 * 上传二进制流文件
-	 * @param mixed       $file 二进制流数据
-	 * @param null   $fileName 文件名
-	 * @param string $saveDir 保存目录
-	 * @param string $upType 上传方式 disk
-	 * @return bool|string
-	 */
-	public function uploadStream($file, $fileName = null, $saveDir = '', $upType = '')
-	{
-		if (!empty($upType)) {
-			$this->upType = $upType;
-		}
-		$path = trim($saveDir . '/' . $fileName, '/');
-		$result = Filesystem::disk($upType)->put($path, $file);
-		if ($result) {
-			$filename = Filesystem::disk($upType)->path($path);
-			$this->compressImage($filename);
-			return $this->url($path);
-		} else {
-			return false;
-		}
-	}
-
-	/**
 	 * 获取目录下文件数量
 	 * @param string $chunkSaveDir
 	 * @return int
