@@ -130,8 +130,10 @@ class Select extends Field
                     'disabled' => $disabled,
                 ];
             }
+            $bindOptions = array_merge($bindOptions,$options);
             $this->content($selectGroup);
         }
+        $this->bindValue($bindOptions, 'options', $this->optionBindField);
         return $this;
     }
 
