@@ -10,11 +10,14 @@ namespace Eadmin\service;
 
 use Composer\Autoload\ClassLoader;
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
 use think\App;
 use think\facade\Cache;
 use think\facade\Console;
 use think\facade\Db;
+use think\facade\Request;
 use think\helper\Arr;
 use Eadmin\Service;
 
@@ -25,7 +28,7 @@ class PlugService extends Service
     protected $plugs = [];
     protected static $loader;
     protected $client;
-
+    protected $loginKey = '';
     public function __construct(App $app)
     {
         parent::__construct($app);
@@ -43,9 +46,38 @@ class PlugService extends Service
                 }
             }
         }
-
+        $this->loginKey = md5(Request::header('Authorization').'plug');
     }
 
+    /**
+     * 是否登录
+     * @return bool
+     */
+    public function isLogin(){
+        return Cache::has($this->loginKey);
+    }
+    /**
+     * 登录
+     * @param string $username 账号
+     * @param string $password 密码
+     * @return mixed
+     */
+    public function login($username,$password){
+        $response = $this->client->post('plugs/login',[
+            'form_params'=>[
+                'username'=>$username,
+                'password'=>$password,
+            ]
+        ]);
+        $content = $response->getBody()->getContents();
+        $res = json_decode($content, true);
+        if($res['code'] == 200){
+            Cache::set($this->loginKey,$res['data'],60*60*24);
+            return true;
+        }else{
+            return false;
+        }
+    }
     /**
      * 获取插件目录
      * @return string
@@ -260,7 +292,14 @@ class PlugService extends Service
 
         return true;
     }
-
+    protected function loginSession(){
+        $cookies = Cache::get($this->loginKey);
+        $cookieJar = new CookieJar();
+        foreach ($cookies as $cookie){
+            $cookieJar->setCookie(new SetCookie($cookie));
+        }
+        return $cookieJar;
+    }
     /**
      * 安装
      * @param string $name 插件名称
@@ -273,7 +312,10 @@ class PlugService extends Service
         try {
             $client = new Client(['verify' => false]);
             $plugZip = app()->getRootPath() . 'plug' . time() . '.zip';
-            $client->get($path, ['save_to' => $plugZip]);
+            $client->get($path, [
+                'cookies'=>$this->loginSession(),
+                'save_to' => $plugZip
+            ]);
             $zip = new \ZipArchive();
             if ($zip->open($plugZip) === true) {
                 $path = $this->plugPathBase . '/' . $name;
