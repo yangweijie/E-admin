@@ -233,7 +233,7 @@ class FileService extends Service
 		if ($upType == 'safe') {
 			return $name;
 		} else {
-			if ($upType == 'local') {
+			if (Filesystem::getDiskConfig($upType,'type') == 'local') {
 				return $this->app->request->domain() . $config->get('url') . '/' . $name;
 			} else {
 				$domain = config('filesystem.disks.' . $upType . '.domain');

@@ -80,7 +80,7 @@ class UploadImage extends Upload
             $upType = Request::param('upType', 'local');
             $realPath = $file->getRealPath();
             $ext = $file->extension();
-           
+
             if (count($this->interventionCalls) > 0) {
                 $image = Image::make($realPath);
                 $savePath = $file->getPath() . DIRECTORY_SEPARATOR . $filename;

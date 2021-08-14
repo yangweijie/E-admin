@@ -51,6 +51,7 @@ class Upload extends Field
     {
         $config = config('filesystem.disks.' . $diskType);
         $uptype = $config['type'];
+        $this->attr('disk', $diskType);
         $this->attr('upType', $uptype);
         if ($uptype == 'qiniu') {
             $this->attr('bucket', $config['bucket']);
