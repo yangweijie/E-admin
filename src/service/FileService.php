@@ -83,7 +83,7 @@ class FileService extends Service
 
 				//判断分片数量是否和总数量一致,一致就合并分片文件
 
-				if ($this->getChunkDircounts($chunkSaveDir) == $totalChunks) {
+				if ($this->getChunkDirCounts($chunkSaveDir) == $totalChunks) {
 					if (!Cache::has(md5($filename))) {
 						Cache::set(md5($filename), 1, 10);
 						$url = $this->merge($chunkSaveDir, $filename, $totalChunks, $saveDir, $isUniqidmd5);
@@ -170,11 +170,35 @@ class FileService extends Service
 	}
 
 	/**
+	 * 上传二进制流文件
+	 * @param mixed       $file 二进制流数据
+	 * @param null   $fileName 文件名
+	 * @param string $saveDir 保存目录
+	 * @param string $upType 上传方式 disk
+	 * @return bool|string
+	 */
+	public function uploadStream($file, $fileName = null, $saveDir = '', $upType = '')
+	{
+		if (!empty($upType)) {
+			$this->upType = $upType;
+		}
+		$path = trim($saveDir . '/' . $fileName, '/');
+		$result = Filesystem::disk($upType)->put($path, $file);
+		if ($result) {
+			$filename = Filesystem::disk($upType)->path($path);
+			$this->compressImage($filename);
+			return $this->url($path);
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * 获取目录下文件数量
 	 * @param string $chunkSaveDir
 	 * @return int
 	 */
-	protected function getChunkDircounts($chunkSaveDir)
+	protected function getChunkDirCounts($chunkSaveDir)
 	{
 		$dir = Filesystem::disk($this->upType)->path('');
 		$chunkSaveDir = $dir . $chunkSaveDir;
