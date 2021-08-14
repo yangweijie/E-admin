@@ -16,6 +16,7 @@ use Eadmin\grid\Filter;
 use Eadmin\traits\CallProvide;
 use think\db\Query;
 use think\facade\Db;
+use think\facade\Event;
 use think\facade\Request;
 use think\helper\Str;
 use think\Model;
@@ -49,6 +50,7 @@ class Echart extends Component
     protected $groupSeries = [];
     protected $radarMaxKey = -1;
     protected $date_type = null;
+    protected $pkField = '';
     protected $groupMode = false;
     /**
      * Echart constructor.
@@ -93,11 +95,13 @@ class Echart extends Component
     public function filter($callback)
     {
         if ($callback instanceof \Closure) {
-            $field = Str::random(15, 3);
+			$field = Str::random(15, 3);
             $this->bind($field, false);
             $this->bindAttr('modelValue', $field, true);
             $this->filter = new Filter($this->db);
-            call_user_func($callback, $this->filter);
+            Event::listen(\Eadmin\chart\event\Filter::class,function () use ($callback) {
+				call_user_func($callback, $this->filter);
+			});
             $form = $this->filter->render();
             $form->eventSuccess([$field => true]);
             $this->attr('filterField', $form->bindAttr('model'));
@@ -109,8 +113,9 @@ class Echart extends Component
      * 设置表名数据源
      * @param mixed $table 模型或表名
      * @param string $dateField 日期字段
+	 * @param string $pkField 主键字段
      */
-    public function table($table, $dateField = 'create_time')
+    public function table($table, $dateField = 'create_time', $pkField = '')
     {
         $this->template = 'echart';
         if ($table instanceof Model) {
@@ -121,29 +126,33 @@ class Echart extends Component
             $this->db = Db::name($table);
         }
         $this->dateField = $dateField;
+        $this->pkField = $pkField ?: $this->db->getPk();
     }
 
     public function __call($name, $arguments)
     {
+    	if(!is_null($this->filter)){
+			Event::until(\Eadmin\chart\event\Filter::class);
+		}
         if ($name == 'count') {
             $text = array_shift($arguments);
             $query = array_shift($arguments);
             $after = array_shift($arguments);
             if ($this->chartType == 'line' || $this->chartType == 'bar') {
                 if ($this->groupMode) {
-                    $this->lineAnalyzeGroup($name, $this->db->getPk(), $text, $query, $after);
+                    $this->lineAnalyzeGroup($name, $this->pkField, $text, $query, $after);
                 } else {
-                    $this->lineAnalyze($name, $this->db->getPk(), $text, $query, $after);
+                    $this->lineAnalyze($name, $this->pkField, $text, $query, $after);
                 }
 
             } elseif ($this->chartType == 'pie' || $this->chartType == 'funnel') {
-                $this->pieAnalyze($name, $this->db->getPk(), $text, $query, $after);
+                $this->pieAnalyze($name, $this->pkField, $text, $query, $after);
             } elseif ($this->chartType == 'radar') {
                 $max = array_shift($arguments);
                 if ($max instanceof \Closure) {
                     $max = 100;
                 }
-                $this->radarAnalyze($name, $this->db->getPk(), $text, $max, $query, $after);
+                $this->radarAnalyze($name, $this->pkField, $text, $max, $query, $after);
             }
 
         } else {
@@ -282,7 +291,7 @@ class Echart extends Component
                         call_user_func($query, $db);
                     }
                     $value = $db->whereDay($this->dateField, $month)->$type($field);
-                    if ($after instanceof \Closure) {
+					if ($after instanceof \Closure) {
                         $value = call_user_func($after, $value);
                     }
                     $series[] = $value;
