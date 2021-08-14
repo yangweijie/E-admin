@@ -51,7 +51,7 @@ class Upload extends Field
     {
         $config = config('filesystem.disks.' . $diskType);
         $uptype = $config['type'];
-        $this->attr('upType', $diskType);
+        $this->attr('upType', $uptype);
         if ($uptype == 'qiniu') {
             $this->attr('bucket', $config['bucket']);
             $this->attr('domain', $config['domain']);
@@ -123,7 +123,7 @@ class Upload extends Field
         $this->attr('accept', $accept);
         return $this;
     }
-    
+
     public function jsonSerialize()
     {
         if ($this->attr('upType') === 'local' && is_null($this->attr('finder'))) {
