@@ -24,16 +24,19 @@
             let loadFieldValue = props.loadField
             watch(()=>props.modelValue,val=>{
                 value.value = val
+                initClearValue()
                 changeHandel(val)
             })
             watch(value,value=>{
                 ctx.emit('update:modelValue',value)
             })
-            if(!ctx.attrs.multiple && !findTree(props.options,value.value,'id')){
-                value.value = ''
-            }
-
+            initClearValue()
             changeHandel(value.value)
+            function initClearValue() {
+                if(!ctx.attrs.multiple && !findTree(props.options,value.value,'id')){
+                    value.value = ''
+                }
+            }
             function changeHandel(val) {
                 if(props.params){
                     ctx.emit('update:loadField','')

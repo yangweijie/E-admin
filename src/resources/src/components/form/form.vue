@@ -91,15 +91,24 @@
             }, 300)
             //watch监听变化
             const watchData = []
+
             props.watch.forEach(field=>{
                 watchData.push({
                     field:field,
                     newValue:ctx.attrs.model[field],
                     oldValue:ctx.attrs.model[field],
                 })
-                watch(()=>ctx.attrs.model[field],(newValue,oldValue)=>{
-                    debounceWatch([field,newValue,oldValue],field)
-                },{deep:true})
+                if(isReactive(ctx.attrs.model[field])){
+                    watch(computed(()=>{
+                        return JSON.stringify(ctx.attrs.model[field])
+                    }),(newValue,oldValue)=>{
+                        debounceWatch([field,JSON.parse(newValue),JSON.parse(oldValue)],field)
+                    },{deep:true})
+                }else{
+                    watch(()=>ctx.attrs.model[field],(newValue,oldValue)=>{
+                        debounceWatch([field,newValue,oldValue],field)
+                    })
+                }
             })
             watchListen()
             //监听watch变化数据队列执行

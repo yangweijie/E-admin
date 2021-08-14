@@ -1,5 +1,5 @@
 <template>
-    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog" :before-close="beforeClose">
+    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog">
                     <template #title>
                         <slot name="title"></slot>
                     </template>
@@ -80,6 +80,10 @@
                if(visible.value && !value){
                    hide()
                }
+               if(!value){
+                   state.footerShow = false
+                   state.action = {}
+               }
             })
             watch(()=>props.show,(value)=>{
                 if(value){
@@ -107,11 +111,6 @@
                 init = true
                 http(props)
             }
-            function beforeClose(done) {
-                state.footerShow = false
-                state.action = {}
-                done()
-            }
             const dialog = computed(()=>{
                 if(visible.value || init){
                     return 'ElDialog'
@@ -120,7 +119,6 @@
                 }
             })
             return {
-                beforeClose,
                 dialogRef,
                 ...toRefs(state),
                 dialog,
