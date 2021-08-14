@@ -138,6 +138,10 @@ export default defineComponent({
       type: Object,
       default: {}
     },
+    disk: {
+      type: String,
+      default: 'local'
+    },
     upType: {
       type: String,
       default: 'local'
@@ -291,7 +295,7 @@ export default defineComponent({
       query: Object.assign(props.params,{
         saveDir: props.saveDir,
         isUniqidmd5: props.isUniqidmd5,
-        upType: props.upType
+        upType: props.disk,
       }),
       testChunks: props.chunk,
       chunkSize: props.chunk ? 1 * 1024 * 1024 : 500 * 1024 * 1024,
