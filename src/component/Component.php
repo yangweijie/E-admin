@@ -12,6 +12,7 @@ use Eadmin\detail\Detail;
 use Eadmin\form\Form;
 use Eadmin\grid\Grid;
 use think\helper\Str;
+use think\app\Url;
 
 /**
  * Class Component
@@ -214,6 +215,9 @@ abstract class Component implements \JsonSerializable
      */
     public function redirect($url, array $params = [])
     {
+        if($url instanceof Url){
+            $url = $url->build();
+        }
         if ($params) {
             $url = $url . '?' . http_build_query($params);
         }
