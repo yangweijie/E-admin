@@ -16,43 +16,29 @@ use think\facade\Log;
 class BuildView extends Make
 {
     protected $formComponent = [
-        'text',
-        'textarea',
-        'password',
-        'mobile',
-        'email',
-        'number',
-        'money',
-        'select',
-        'radio',
-        'checkbox',
-        'switch',
-        'datetime',
-        'date',
-        'dates',
-        'year',
-        'month',
-        'time',
-        'slider',
-        'rate',
-        'color',
-        'file',
-        'image',
-        'images',
-        'editor',
-        'cascader',
-        'icon',
-        'selectTable',
-        'maps',
-        'tag',
-        'checkTag',
+        'text', 'textarea', 'password', 'mobile',
+        'email',  'number', 'money', 'select',
+        'radio', 'checkbox', 'switch', 'datetime',
+        'date', 'dates', 'year', 'month',
+        'time', 'slider', 'rate', 'color', 'file',
+        'image', 'images', 'editor', 'cascader',
+        'icon', 'selectTable', 'maps', 'tag',
+        'checkTag', 'url',
     ];
 
     protected $tableSpace = "\n\t\t\t\t";
 
     protected $optionSpace = "\n\t\t\t\t\t";
 
-    protected $endSpace = ";\r\n";
+    protected $modelSpace = "\n\t";
+
+    protected $funcSpace = "\n\n\t";
+
+    protected $commentSpace = "\t";
+
+	protected $modelContentSpace = "\n\t\t";
+
+	protected $endSpace = ";\r\n";
 
     protected $startSpace = "\t\t\t";
 
@@ -97,6 +83,7 @@ class BuildView extends Make
     /**
      * @param string $name 类名
      * @param string $type 文件名
+	 * @param string $modelContent 模型内容
      * @param string $model 模型名
      * @param string $model_namespace 模型命名空间
      * @param string $grid 表格
@@ -104,19 +91,23 @@ class BuildView extends Make
      * @param string $form 表单
      * @return false|string|string[]
      */
-    protected function buildClasses($name, $type, $model = '', $model_namespace = '', $grid = '', $detail = '', $form = '')
+    protected function buildClasses($name, $type, $modelContent = '', $model = '', $model_namespace = '', $grid = '', $detail = '', $form = '')
     {
         $stub = file_get_contents($this->getStubs($type));
-
         $namespace = trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
         $class = str_replace($namespace . '\\', '', $name);
-        // 判断控制器名和模型名是否冲突
-        if (strtolower($class) == strtolower($model)) {
-            $model_origin = $model;
-            $model .= "Model";
-            $model_namespace = str_replace("{$model_origin};", "{$model_origin} as {$model};", $model_namespace);
-        }
-        return str_replace(['{%className%}', '{%actionSuffix%}', '{%namespace%}', '{%app_namespace%}', '{%model%}', '{%model_namespace%}', '{%grid%}', '{%detail%}', '{%form%}'], [
+        return str_replace([
+        	'{%className%}',
+			'{%actionSuffix%}',
+			'{%namespace%}',
+			'{%app_namespace%}',
+			'{%model%}',
+			'{%model_namespace%}',
+			'{%grid%}',
+			'{%detail%}', 
+			'{%form%}',
+			'{%modelContent%}',
+		], [
             $class,
             '',
             $namespace,
@@ -125,7 +116,8 @@ class BuildView extends Make
             $model_namespace,
             $grid,
             $detail,
-            $form
+            $form,
+			$modelContent,
         ], $stub);
     }
 
@@ -142,6 +134,7 @@ class BuildView extends Make
         $grid = '';
         $detail = '';
         $form = '';
+        $modelContent = '';
         foreach ($tableInfo as $val) {
             $label = $val['Comment'] ? $val['Comment'] : $val['Field'];
             preg_match('/(?:\{)(.*)(?:\})/i', $val['Comment'], $matchArr);
@@ -150,13 +143,17 @@ class BuildView extends Make
             $option = $matchArr2[1][0] ?? [];
             // 正则过滤大括号 和 中括号的内容
             $label = preg_replace('/\[.*?\]/', '', preg_replace('/\{(.*?)\}/', '', $label));
+			$action = $this->camelize($val['Field']);
             if (!empty($type) && in_array($type, $this->formComponent)) {
                 $origin_type = $type;
                 if (in_array($type, ['images'])) {
                     $type = rtrim($type, 's');
                 }
+                if ($type == 'url') {
+                	$type = 'text';
+				}
                 $form .= $this->startSpace . '$form->' . $type . '(\'' . $val['Field'] . '\',\'' . $label . '\')';
-                if (in_array($origin_type, ['select', 'radio', 'checkbox'])) {
+                if (in_array($origin_type, ['select', 'radio', 'checkbox', 'checkTag'])) {
                     if (!empty($option)) {
                         $form .= $this->tableSpace . "->options([";
                         foreach (explode(', ', $option) as $value) {
@@ -166,12 +163,28 @@ class BuildView extends Make
                                 $form .= $this->optionSpace . "{$key} => {$item},";
                             }
                         }
-                        $form .= $this->tableSpace . "])";
+						$form .= $this->tableSpace . "])";
                         $form .= $this->endSpace;
                     } else {
                         $form .= $this->tableSpace . '->options([])';
                         $form .= $this->endSpace;
                     }
+                    if (in_array($origin_type, ['checkbox'])) {
+						if (empty($modelContent)) {
+							$modelContent .= $this->commentSpace;
+						} else {
+							$modelContent .= $this->funcSpace;
+						}
+                    	$modelContent .= '// '. $label .' - 获取器';
+                    	$modelContent .= $this->modelSpace . 'public function get'. $action .'Attr($val){';
+                    	$modelContent .= $this->modelContentSpace . 'return array_filter(explode(\',\', $val));';
+                    	$modelContent .= $this->modelSpace . '}';
+						$modelContent .= $this->funcSpace . '// '. $label .' - 获取器';
+						$modelContent .= $this->modelSpace . 'public function set'. $action .'Attr($val){';
+						$modelContent .= $this->modelContentSpace . 'if (is_string($val)) return $val;';
+						$modelContent .= $this->modelContentSpace . 'return implode(\',\', $val);';
+						$modelContent .= $this->modelSpace . '}';
+					}
                 } elseif ($origin_type == 'switch') {
                     if (!empty($option)) {
                         list($active, $inactive) = explode(', ', $option);
@@ -236,13 +249,27 @@ class BuildView extends Make
                     $form .= $this->tableSpace . '})';
                     $form .= $this->endSpace;
                 } elseif (in_array($origin_type, ['image', 'images'])) {
-                    if ($type == 'images') {
+                    if ($origin_type == 'images') {
                         $form .= $this->tableSpace . "->multiple()";
                         $form .= $this->endSpace;
                         $grid .= $this->startSpace . '$grid->column(\'' . $val['Field'] . '\',\'' . $label . '\')->images()';
                         $grid .= $this->endSpace;
                         $detail .= $this->startSpace . '$detail->field(\'' . $val['Field'] . '\',\'' . $label . '\')->images()';
                         $detail .= $this->endSpace;
+                        if (empty($modelContent)) {
+                        	$modelContent .= $this->commentSpace;
+						} else {
+                        	$modelContent .= $this->funcSpace;
+						}
+						$modelContent .=  '// '. $label .' - 获取器';
+						$modelContent .= $this->modelSpace . 'public function get'. $action .'Attr($val){';
+						$modelContent .= $this->modelContentSpace . 'return array_filter(explode(\',\', $val));';
+						$modelContent .= $this->modelSpace . '}';
+						$modelContent .= $this->funcSpace . '// '. $label .' - 获取器';
+						$modelContent .= $this->modelSpace . 'public function set'. $action .'Attr($val){';
+						$modelContent .= $this->modelContentSpace . 'if (is_string($val)) return $val;';
+						$modelContent .= $this->modelContentSpace . 'return implode(\',\', $val);';
+						$modelContent .= $this->modelSpace . '}';
                     } else {
                         $form .= $this->endSpace;
                         $grid .= $this->startSpace . '$grid->column(\'' . $val['Field'] . '\',\'' . $label . '\')->image()';
@@ -250,7 +277,14 @@ class BuildView extends Make
                         $detail .= $this->startSpace . '$detail->field(\'' . $val['Field'] . '\',\'' . $label . '\')->image()';
                         $detail .= $this->endSpace;
                     }
-                } elseif ($origin_type == 'color') {
+                } elseif ($origin_type == 'url') {
+                	$form .= $this->tableSpace . '->urlRule()';
+					$form .= $this->endSpace;
+					$grid .= $this->startSpace . '$grid->column(\'' . $val['Field'] . '\',\'' . $label . '\')->link()';
+					$grid .= $this->endSpace;
+					$detail .= $this->startSpace . '$detail->field(\'' . $val['Field'] . '\',\'' . $label . '\')->link()';
+					$detail .= $this->endSpace;
+				} elseif ($origin_type == 'color') {
                     $form .= $this->endSpace;
                     $grid .= $this->startSpace . '$grid->column(\'' . $val['Field'] . '\',\'' . $label . '\')->display(function ($val) {';
                     $grid .= $this->optionSpace . 'return Html::create()->tag(\'div\')->style([\'width\' => \'20px\', \'height\' => \'20px\', \'background\' => $val]);';
@@ -300,6 +334,7 @@ class BuildView extends Make
             $grid,
             $detail,
             $form,
+			$modelContent
         ];
     }
 
@@ -333,9 +368,9 @@ class BuildView extends Make
             if (!is_dir(dirname($pathname))) {
                 mkdir(dirname($pathname), 0755, true);
             }
-            list($grid, $detail, $form) = $this->getTableInfo($model);
+            list($grid, $detail, $form, $modelContent) = $this->getTableInfo($model);
             if (!is_file($pathname)) {
-                file_put_contents($pathname, $this->buildClasses($classname_model, 'model'));
+                file_put_contents($pathname, $this->buildClasses($classname_model, 'model', $modelContent));
             }
 
         } else {
@@ -368,8 +403,18 @@ class BuildView extends Make
             } else {
                 $classname_model = 'use ' . $classname_model . ';';
             }
-            file_put_contents($pathname, $this->buildClasses($classname, 'controller', $model, $classname_model, $grid, $detail, $form));
+            file_put_contents($pathname, $this->buildClasses($classname, 'controller', $modelContent, $model, $classname_model, $grid, $detail, $form));
         }
         $output->writeln('<info>created successfully.</info>');
     }
+
+	// 下划线转为驼峰
+	public function camelize($str)
+	{
+		$str = preg_replace_callback('/([-_]+([a-z]{1}))/i',function($matches){
+			return strtoupper($matches[2]);
+		},$str);
+		return ucfirst($str);
+	}
+
 }

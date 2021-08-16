@@ -3,5 +3,5 @@ namespace {%namespace%};
 
 class {%className%} extends BaseModel
 {
-    //
+{%modelContent%}
 }
