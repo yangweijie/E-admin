@@ -85,8 +85,21 @@ class Echart extends Component
     {
         return $this->chart;
     }
+
+    /**
+     * 头部内容
+     * @param $content
+     */
     public function header($content){
         $this->attr('header',$content);
+    }
+
+    /**
+     * 底部内容
+     * @param $content
+     */
+    public function footer($content){
+        $this->attr('footer',$content);
     }
     /**
      * 查询过滤
@@ -99,9 +112,7 @@ class Echart extends Component
             $this->bind($field, false);
             $this->bindAttr('modelValue', $field, true);
             $this->filter = new Filter($this->db);
-            Event::listen(\Eadmin\chart\event\Filter::class,function () use ($callback) {
-				call_user_func($callback, $this->filter);
-			});
+            call_user_func($callback, $this->filter);
             $form = $this->filter->render();
             $form->eventSuccess([$field => true]);
             $this->attr('filterField', $form->bindAttr('model'));
@@ -131,9 +142,6 @@ class Echart extends Component
 
     public function __call($name, $arguments)
     {
-    	if(!is_null($this->filter)){
-			Event::until(\Eadmin\chart\event\Filter::class);
-		}
         if ($name == 'count') {
             $text = array_shift($arguments);
             $query = array_shift($arguments);
@@ -336,6 +344,7 @@ class Echart extends Component
 
     public function jsonSerialize()
     {
+
         if ($this->chart instanceof RadarChart) {
             $seriesData[] = [
                 'name' => $this->title,
@@ -361,8 +370,9 @@ class Echart extends Component
         if (count($this->seriesData) > 0) {
             $this->chart->series($this->title, $this->seriesData);
         }
+
         if (Request::has('ajax')) {
-            return ['header'=>$this->attr('header'),'content'=>$this->chart];
+            return ['header'=>$this->attr('header'),'footer'=>$this->attr('footer'),'content'=>$this->chart];
         }
 
         $this->attr('echart', $this->chart);

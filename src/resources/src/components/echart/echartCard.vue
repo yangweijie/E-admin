@@ -37,6 +37,7 @@
         <render :data="header" v-if="header"></render>
         <render :data="filter" v-if="filter"></render>
         <render :data="chart" v-loading="loading"></render>
+        <render :data="footer" v-if="footer"></render>
     </el-card>
 </template>
 
@@ -53,6 +54,7 @@
             params:Object,
             title:String,
             header: [Object, Boolean],
+            footer: [Object, Boolean],
             filter: [Object, Boolean],
             modelValue: Boolean,
             filterField:String,
@@ -73,6 +75,7 @@
             },route.query,props.params))
             const chart = ref(props.echart)
             const header = ref(props.header)
+            const footer = ref(props.footer)
             const rangeDate = ref([])
             watch(rangeDate,(value)=>{
                 if(value == null){
@@ -92,11 +95,13 @@
                 }).then(res=>{
                     header.value = res.header
                     chart.value = res.content
+                    footer.value = res.footer
                 }).finally(() => {
                     ctx.emit('update:modelValue', false)
                 })
             }
             return {
+                footer,
                 params,
                 rangeDate,
                 loading,
