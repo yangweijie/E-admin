@@ -38,7 +38,6 @@ class Plug extends Controller
      */
     public function index(Content $content)
     {
-        $tablField = 'bindTab';
         $tabs = Tabs::create();
         $cates = PlugService::instance()->getCate();
         $tabs->pane('全部', $this->grid());
@@ -64,7 +63,7 @@ class Plug extends Controller
         } else {
             $datas = PlugService::instance()->all($search, $cate_id, $page, $size);
         }
-     
+
         $grid = new Grid($datas['list']);
         $grid->drive()->setTotal($datas['total']);
         $grid->title('插件管理');
@@ -187,15 +186,10 @@ class Plug extends Controller
             if(!PlugService::instance()->isLogin()){
                 admin_error_message('请先登录插件');
             }
+
+            $this->requireInstall($data, $post['id']);
             $urls = array_column($data, 'url', 'id');
             $versions = array_column($data, 'version', 'id');
-            $requires = array_column($data, 'require', 'id');
-            $requires = $requires[$post['id']];
-            foreach ($requires as $require) {
-                if (!Db::name('system_plugs')->where('name', $require['composer'])->find()) {
-                    PlugService::instance()->install($require['composer'], $require['url'], $require['version']);
-                }
-            }
             PlugService::instance()->install($composer, $urls[$post['id']], $versions[$post['id']]);
             admin_success_message('安装完成');
         });
@@ -285,5 +279,26 @@ class Plug extends Controller
     {
         PlugService::instance()->enable($id, $status);
         admin_success_message('操作完成');
+    }
+
+    /**
+     * @param $data
+     * @param $version
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function requireInstall($data, $version)
+    {
+        $urls = array_column($data, 'url', 'id');
+        $versions = array_column($data, 'version', 'id');
+        $requires = array_column($data, 'require', 'id');
+        $requires = $requires[$version];
+        foreach ($requires as $require) {
+            if (!Db::name('system_plugs')->where('name', $require['composer'])->find()) {
+                PlugService::instance()->install($require['composer'], $require['url'], $require['version_number']);
+                $this->requireInstall($require['version'],$require['id']);
+            }
+        }
     }
 }

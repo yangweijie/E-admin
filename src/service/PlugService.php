@@ -176,7 +176,9 @@ class PlugService extends Service
         foreach ($plugs as &$plug) {
             $status = $this->getInfo($plug['composer'], 'status');
             $plug['status'] = $status ?? false;
+
             $plug['install_version'] = $this->getInfo($plug['composer'], 'version');
+
             $plug['install'] = is_null($status) ? false : true;
             $plug['path'] = $this->plugPathBase . '/' . $plug['composer'];
             $this->plugs[] = $plug;
