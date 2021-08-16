@@ -166,8 +166,12 @@ class PlugService extends Service
                 'names' => $names,
             ]
         ]);
+
         $content = $response->getBody()->getContents();
-        $plugs = json_decode($content, true)['data']['data'];
+        $content = json_decode($content, true);
+
+        $plugs = $content['data']['data'];
+
         $delNames = [];
         foreach ($plugs as &$plug) {
             $status = $this->getInfo($plug['composer'], 'status');
@@ -182,7 +186,10 @@ class PlugService extends Service
             };
         }
         Db::name('system_plugs')->whereIn('name', $delNames)->delete();
-        return $this->plugs;
+        return [
+            'list'=>$this->plugs,
+            'total'=>$content['data']['total']
+        ];
     }
 
     /**
@@ -196,7 +203,7 @@ class PlugService extends Service
         if (count($names) == 0) {
             return [];
         }
-        $installedPlugs = $this->all($search, 0, $page, $size, $names);
+        $installedPlugs = $this->all($search, 0, $page, $size, $names)['list'];
 
         foreach ($this->plugPaths as $plugPaths) {
             $file = $plugPaths . DIRECTORY_SEPARATOR . 'composer.json';
@@ -229,7 +236,10 @@ class PlugService extends Service
             ];
             $installedPlugs[] = $plug;
         }
-        return $installedPlugs;
+        return  [
+            'list'=>$installedPlugs,
+            'total'=>count($installedPlugs)
+        ];
     }
 
     /**
