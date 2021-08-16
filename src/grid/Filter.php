@@ -148,7 +148,6 @@ class Filter
         $this->form->text($field, $label)->prefixIcon('el-icon-search');
         return $this;
     }
-
     /**
      * 等于查询
      * @param string $field 字段
@@ -438,6 +437,12 @@ class Filter
         return $this->form->select($field, $label)->options($options);
     }
 
+    /**
+     * 隐藏
+     */
+    public function hide(){
+        $this->form->getLastItem()->style(['display'=>'none']);
+    }
     /**
      * 解析查询过滤
      * @param string $method 方法

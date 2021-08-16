@@ -53,17 +53,20 @@ class Plug extends Controller
 
     }
 
-    public function grid($cate_id = 0, $type = 0, $page = 1, $size = 20)
+    public function grid($cate_id = 0, $type = 0)
     {
         $search = $this->request->get('quickSearch');
-
+        $page = $this->request->get('page',1);
+        $size = $this->request->get('size',20);
         if ($type == 1) {
             $datas = PlugService::instance()->installed($search, $page, $size);
 
         } else {
             $datas = PlugService::instance()->all($search, $cate_id, $page, $size);
         }
-        $grid = new Grid($datas);
+     
+        $grid = new Grid($datas['list']);
+        $grid->drive()->setTotal($datas['total']);
         $grid->title('插件管理');
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');

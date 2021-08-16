@@ -45,7 +45,7 @@ class Model implements FormInterface
         $result = true;
         Db::startTrans();
         try {
-            if (isset($data[$this->pkField])) {
+            if (isset($data[$this->pkField]) && !empty($data[$this->pkField])) {
                 $this->model  = $this->model->where($this->pkField, $data[$this->pkField])->find();
                 $this->data = clone $this->model;
             }
