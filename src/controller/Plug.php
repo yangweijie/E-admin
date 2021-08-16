@@ -208,7 +208,15 @@ class Plug extends Controller
         PlugService::instance()->uninstall($name, $path);
         admin_success_message('卸载完成');
     }
-
+    protected function getRequires($require){
+        $options = array_column($require, 'title', 'composer');
+        foreach ($require as $req){
+            foreach ($req['version'] as $row){
+                $options = array_merge($options,$this->getRequires($row['require']));
+            }
+        }
+        return $options;
+    }
     /**
      * 卸载
      * @auth false
@@ -216,9 +224,9 @@ class Plug extends Controller
      */
     public function uninstallAll($composer, $path, $require)
     {
-        $options = array_column($require, 'title', 'composer');
+
         $form = new Form([]);
-        $form->checkbox('requires', '卸载依赖')->options($options);
+        $form->checkbox('requires', '卸载依赖')->options($this->getRequires($require));
         $form->actions(function (FormAction $formAction) {
             $formAction->submitButton()->content('卸载');
             $formAction->hideResetButton();

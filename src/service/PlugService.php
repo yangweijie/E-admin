@@ -203,7 +203,10 @@ class PlugService extends Service
     {
         $names = Db::name('system_plugs')->column('name');
         if (count($names) == 0) {
-            return [];
+            return  [
+                'list'=>[],
+                'total'=>0
+            ];
         }
         $installedPlugs = $this->all($search, 0, $page, $size, $names)['list'];
 
