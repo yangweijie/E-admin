@@ -104,6 +104,10 @@ const EadminStep = defineAsyncComponent(() =>
 const EadminCheckTag = defineAsyncComponent(() =>
     import('./components/EadminCheckTag.vue')
 )
+const EadminSidebarGrid = defineAsyncComponent(() =>
+    import('./components/grid/sidebarGrid.vue')
+)
+app.component('EadminSidebarGrid',EadminSidebarGrid)
 app.component('EadminCheckTag',EadminCheckTag)
 app.component('EadminStep',EadminStep)
 app.component('EadminCheckboxGroup',EadminCheckboxGroup)
