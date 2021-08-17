@@ -23,8 +23,9 @@ class SidebarGrid extends Component
     protected $sidebar;
     protected $grid;
     protected $tools = [];
-    protected $pid = '';
     protected $id = '';
+    protected $treePid = '';
+    protected $treeId = '';
     protected $db;
     /**
      * @param Model $model
@@ -48,9 +49,10 @@ class SidebarGrid extends Component
      * @param string $pid 父级pid
      * @return $this
      */
-    public function treePid($pid)
+    public function treePid($pid='pid',$id = 'id')
     {
-        $this->pid = $pid;
+        $this->treePid = $pid;
+        $this->treeId = $id;
         return $this;
     }
 
@@ -212,8 +214,8 @@ class SidebarGrid extends Component
         //加载数据
         if(request()->has('eadmin_sidebar_data')){
             $data = $this->db->select()->toArray();
-            if ($this->pid) {
-                $data = Admin::tree($data, $this->id, $this->pid);
+            if ($this->treePid) {
+                $data = Admin::tree($data, $this->treeId, $this->treePid);
             }
             throw new HttpResponseException(json([
                 'code' => 200,
