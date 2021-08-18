@@ -103,25 +103,23 @@ class Select extends Field
 		*/
 		$bindOptions = [];
 		foreach ($data as $key => $option) {
+			$disabled = false;
 			$options = [];
 			if (in_array($option[$id], $this->disabledData)) {
 				$disabled = true;
-			} else {
-				$disabled = false;
 			}
 			$selectGroup = OptionGroup::create()
 				->attr('label', $option[$label])
 				->attr('disabled', $disabled);
 			foreach ($option[$name] as $item) {
+				$disabled = false;
 				if (in_array($item[$id], $this->disabledData)) {
 					$disabled = true;
-				} else {
-					$disabled = false;
 				}
 				$selectGroup->content(
 					SelectOption::create()
 						->attr('label', $item[$label])
-						->attr('disabled', $disabled,)
+						->attr('disabled', $disabled)
 						->attr('value', $item[$id])
 				);
 				$options[] = [
@@ -156,9 +154,9 @@ class Select extends Field
 			$this->formItem->form()->push($formItem);
 		}
 		if (Request::has('eadminSelectLoad') && Request::get('eadmin_field') == $select->bindAttr('modelValue')) {
-			$datas = call_user_func($closure, Request::get('eadmin_id'));
+			$data = call_user_func($closure, Request::get('eadmin_id'));
 			$options = [];
-			foreach ($datas as $key => $value) {
+			foreach ($data as $key => $value) {
 				$options[] = [
 					'id'    => $key,
 					'label' => $value,
@@ -208,15 +206,4 @@ class Select extends Field
 			->mapAttr('disabled', 'disabled');
 		return $this->content($this->selectOption);
 	}
-
-	/**
-	 * 设置宽度
-	 * @param string $width 宽度大小
-	 * @return Select
-	 */
-	public function width($width = '100%')
-	{
-		return $this->style(['width' => $width]);
-	}
-
 }

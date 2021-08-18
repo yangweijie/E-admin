@@ -185,4 +185,14 @@ abstract class Field extends Component
         $this->bindAttr($attr, $field, true);
         return $this;
     }
+
+
+	/**
+	 * 设置宽度
+	 * @param string $width 宽度大小
+	 */
+	public function width($width = '100%')
+	{
+		return $this->style(['width' => $width]);
+	}
 }
