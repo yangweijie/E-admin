@@ -97,7 +97,6 @@ class Grid extends Component
     protected $expandRow = null;
     //初始化
     protected static $init = null;
-
     //自定义列表元素
     protected $customClosure = null;
 

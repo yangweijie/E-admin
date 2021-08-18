@@ -4,7 +4,7 @@
                         <slot name="title"></slot>
                     </template>
                     <slot></slot>
-            <render :data="content" :slot-props="slotProps" @success="hide"></render>
+            <render :data="content" :slot-props="slotProps" @success="emitSuccess()"></render>
             <template #footer v-if="footer">
                 <div v-if="footerShow">
                     <render v-for="item in action.leftAction" :data="item"></render>
@@ -55,7 +55,7 @@
                 default:{},
             },
         },
-        emits: ['update:modelValue','update:show','update:reRender'],
+        emits: ['update:modelValue','update:show','update:reRender','success'],
         setup(props, ctx) {
             const dialogRef = ref('')
             const state = reactive({
@@ -118,11 +118,15 @@
                     return null
                 }
             })
+            function emitSuccess() {
+                hide()
+                ctx.emit('success')
+            }
             return {
+                emitSuccess,
                 dialogRef,
                 ...toRefs(state),
                 dialog,
-                hide,
                 content,
                 visible,
                 open,

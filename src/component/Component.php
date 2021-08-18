@@ -288,7 +288,9 @@ abstract class Component implements \JsonSerializable
             return $this;
         }
     }
-
+    public function setName($name){
+        $this->name = $name;
+    }
     public function jsonSerialize()
     {
         $this->attribute['key'] = Str::random(30, 3);

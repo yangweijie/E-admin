@@ -176,7 +176,9 @@ class PlugService extends Service
         foreach ($plugs as &$plug) {
             $status = $this->getInfo($plug['composer'], 'status');
             $plug['status'] = $status ?? false;
+
             $plug['install_version'] = $this->getInfo($plug['composer'], 'version');
+
             $plug['install'] = is_null($status) ? false : true;
             $plug['path'] = $this->plugPathBase . '/' . $plug['composer'];
             $this->plugs[] = $plug;
@@ -201,7 +203,10 @@ class PlugService extends Service
     {
         $names = Db::name('system_plugs')->column('name');
         if (count($names) == 0) {
-            return [];
+            return  [
+                'list'=>[],
+                'total'=>0
+            ];
         }
         $installedPlugs = $this->all($search, 0, $page, $size, $names)['list'];
 

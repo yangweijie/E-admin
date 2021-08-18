@@ -1,6 +1,5 @@
 <template>
     <div class="grid">
-
         <!--工具栏-->
         <div :class="['tools',custom?'custom':'']" v-if="!hideTools">
             <el-row style="padding-top: 10px">
