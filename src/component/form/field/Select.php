@@ -206,4 +206,13 @@ class Select extends Field
 			->mapAttr('disabled', 'disabled');
 		return $this->content($this->selectOption);
 	}
+
+	/**
+	 * 设置宽度
+	 * @param string $width 宽度大小
+	 */
+	public function width($width = '100%')
+	{
+		return $this->style(['width' => $width]);
+	}
 }
