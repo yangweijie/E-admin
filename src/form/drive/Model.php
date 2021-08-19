@@ -87,6 +87,9 @@ class Model implements FormInterface
                         $localKey = $this->model->$field()->getLocalKey();
                         $parent =  $this->model->$field()->getParent();
                         foreach ($value as $key => &$val) {
+                            if(empty($val[$localKey]) && isset($val[$localKey])){
+                                unset($val[$localKey]);
+                            }
                             $val['sort'] = $key;
                             $val[$foreignKey] = $parent->$localKey;
                         }

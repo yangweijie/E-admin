@@ -128,7 +128,6 @@
                         data = data.shift()
                     }
                 }
-
                 data =  data.map(item => {
                     const spec = findTree(selectValue, item.spec, 'spec')
                     props.columns.forEach(column => {
@@ -140,6 +139,7 @@
                     })
                     return item
                 })
+
                 state.tableData = data
             })
 
