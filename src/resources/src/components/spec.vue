@@ -1,7 +1,7 @@
 <template>
-    <el-select v-model="specGroup" style="width: 100%;margin-bottom: 5px" clearable @change="selectHandel">
+    <EadminSelect :options="group" v-model="specGroup" style="width: 100%;margin-bottom: 5px" clearable @change="selectHandel">
         <el-option v-for="item in group" :key="item.id" :value="item.id" :label="item.name"></el-option>
-    </el-select>
+    </EadminSelect>
     <el-table :data="specs" border size="mini" v-if="specGroup" style="margin-bottom: 5px" :row-class-name="tableRowClassName" @cell-mouse-leave="cellMouseLeave" @cell-mouse-enter="cellMouseEnter">
         <el-table-column
                 prop="name"
@@ -112,7 +112,9 @@
                 let selectedArr = []
                 checkboxSpec = []
                 state.selectSpec.forEach(item => {
-                    checkboxSpec.push({name: item.name, spec: item.selected})
+                    if(item.selected.length > 0){
+                        checkboxSpec.push({name: item.name, spec: item.selected})
+                    }
                     let arr = []
                     item.selected.forEach(selected => {
                         arr.push({
@@ -130,6 +132,9 @@
                 }
                 data =  data.map(item => {
                     const spec = findTree(selectValue, item.spec, 'spec')
+                    if (spec) {
+                        item.id = spec.id
+                    }
                     props.columns.forEach(column => {
                         if (spec) {
                             item[column.dataIndex] = spec[column.dataIndex]

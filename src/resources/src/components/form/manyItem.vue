@@ -7,7 +7,7 @@
                     <render :slot-props="{ row:record ,$index:index ,propField:field,validator:$attrs.validator}" :data="column.component"></render>
                 </template>
             </a-table-column>
-            <a-table-column :width="70">
+            <a-table-column :width="70" v-if="!disabled">
                 <template #default="{ record , index}">
                     <el-space size="5">
                         <i class="el-icon-arrow-up" style="cursor: pointer;" @click="handleUp(index)" v-show='hoverIndex == index && value.length > 1 && index > 0'></i>
@@ -17,7 +17,7 @@
                  </template>
             </a-table-column>
         </a-table>
-        <el-button size="mini" type='primary' plain @click="add" v-if="limit == 0 || limit > value.length">新增</el-button>
+        <el-button size="mini" type='primary' plain @click="add" v-if="!disabled && (limit == 0 || limit > value.length)">新增</el-button>
     </el-form-item>
     <div v-else>
         <div v-for="(item,index) in value">
