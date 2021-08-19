@@ -37,7 +37,20 @@
                 </el-breadcrumb>
             </template>
         </a-table-column>
-        <a-table-column v-for="column in columns" :title="column.title" :data-index="column.prop">
+        <a-table-column v-for="(column,index) in columns"  :data-index="column.prop">
+            <template #title>
+                {{column.title}} <i class="el-icon-edit-outline" style="cursor: pointer" @click="dialogs[index].dialog = true"></i>
+                <el-dialog
+                        title="批量修改"
+                        v-model="dialogs[index].dialog"
+                        width="30%">
+                    <render :data="column.component.content.default[0]" v-model="dialogs[index].value"></render>
+                    <template #footer>
+                        <el-button size="small" @click="dialogs[index].dialog = false">取 消</el-button>
+                        <el-button size="small" type="primary" @click="()=>{batch(index,column.prop,dialogs[index].value)}">保 存</el-button>
+                    </template>
+                </el-dialog>
+            </template>
             <template #default="{ record , index}">
                 <div style="margin: 10px 0">
                     <render :slot-props="{ row:record ,$index:index ,propField:field,validator:$attrs.validator}" :data="column.component"></render>
@@ -73,6 +86,14 @@
                 selectSpec: [],
                 hoverIndex:-1,
                 tableData:[],
+                dialogs:[],
+                value:'',
+            })
+            props.columns.forEach(item=>{
+                state.dialogs.push({
+                    dialog:false,
+                    value:'',
+                })
             })
             let selectValue = props.modelValue
             let propsSpecs = props.specs
@@ -171,7 +192,7 @@
                     return arr3
                 }
                 arr1[0].forEach(item1 => {
-                    if (arr1[1].length > 0) {
+                    if (arr1[1] && arr1[1].length > 0) {
                         arr1[1].forEach(item2 => {
                             arr3.push({
                                 group: item1.group.concat(item2.group),
@@ -222,9 +243,17 @@
             function cellMouseLeave(row, column, cell, event){
                 state.hoverIndex = -1
             }
-
-
+            function batch(index,field,value) {
+                if(value){
+                    state.dialogs[index].dialog = false
+                }
+                state.tableData = state.tableData.map(item=>{
+                    item[field] = value
+                    return item
+                })
+            }
             return {
+                batch,
                 tableRowClassName,
                 cellMouseEnter,
                 cellMouseLeave,
