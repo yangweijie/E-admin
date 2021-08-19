@@ -39,7 +39,6 @@ class FormAction extends Component
         $this->form = $form;
         $submitField = $this->form->bindAttr('submit');
         $this->submitButton = Button::create('保存')->sizeMedium()
-            ->nativeType('submit')
             ->type('primary')
             ->event('click', [$submitField => true]);
         $this->resetButton = Button::create('重置')->sizeMedium();

@@ -1,6 +1,6 @@
 <template>
     <el-main class='eadmin-form'>
-        <el-form ref="eadminForm" :label-position="labelPosition" v-bind="$attrs" @submit.native.prevent>
+        <el-form ref="eadminForm" :label-position="labelPosition" v-bind="$attrs" @keyup.enter.native="sumbitForm(false)">
             <slot></slot>
             <render :data="stepResult"></render>
             <el-form-item v-if="!action.hide" v-bind="action.attr">
@@ -206,6 +206,7 @@
             }
             //提交
             function sumbitForm(validate=false) {
+
                 ctx.emit('update:submit',false)
                 let params = {}
                 if(validate){
@@ -329,6 +330,7 @@
                 ctx.emit('success')
             }
             return {
+                sumbitForm,
                 stepResult,
                 disabled,
                 eadminForm,

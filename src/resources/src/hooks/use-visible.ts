@@ -22,7 +22,6 @@ const useVisible = function(props:object,ctx:any){
     function useHttp() {
         const content = ref('')
         const http = function (props,isShow) {
-            console.log(props,isShow)
             return new Promise((resolve, reject) =>{
                 if (props.url) {
                     request({
