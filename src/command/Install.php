@@ -45,6 +45,8 @@ class Install extends Command
         Console::call('migrate:eadmin',['cmd'=>'run','path'=>$path.'/database/migrations']);
         Console::call('seed:eadmin',['path'=> $path.'/database/seeds']);
         Console::call('eadmin:publish',$params);
+        $file = __DIR__.'/../../version.txt';
+        copy($file,app()->getRootPath().'public/eadmin/version.txt');
         $configPath = $path.'/assets/config';
         $finder = new Finder();
         foreach ($finder->in($configPath) as $file) {
