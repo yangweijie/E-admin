@@ -1,5 +1,5 @@
 <template>
-    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog">
+    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog" >
                     <template #title>
                         <slot name="title"></slot>
                     </template>
@@ -57,6 +57,7 @@
         },
         emits: ['update:modelValue','update:show','update:reRender','success'],
         setup(props, ctx) {
+
             const dialogRef = ref('')
             const state = reactive({
                 footer:false,
@@ -108,8 +109,10 @@
                 if(props.gridBatch && props.addParams.eadmin_ids.length == 0){
                     return ElMessage('请勾选操作数据')
                 }
-                init = true
-                http(props)
+                if(!visible.value){
+                    init = true
+                    http(props,true)
+                }
             }
             const dialog = computed(()=>{
                 if(visible.value || init){
