@@ -392,7 +392,12 @@ class Form extends Component
             if ($component instanceof DatePicker || $component instanceof TimePicker) {
                 $value = empty($value) ? null : $value;
                 $this->setData($field, $value);
-            } elseif (($component instanceof Cascader || $component instanceof Map) && $attr != 'modelValue' && is_array($value)) {
+            } elseif (
+                ($component instanceof Cascader || $component instanceof Map) &&
+                $attr != 'modelValue' &&
+                is_array($value) &&
+                (!empty($component->getDefault()) && !empty($component->getValue()))
+            ) {
                 $val = array_shift($value);
                 $this->setData($field, $val);
                 $component->default($value);
