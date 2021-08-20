@@ -673,7 +673,7 @@ class Form extends Component
         foreach ($formItems as $item) {
             $formItem = clone $item;
             $columns[] = [
-                'title' => $formItem->attr('label'),
+                'title' => Html::create($formItem->attr('label')),
                 'dataIndex' => $formItem->attr('prop'),
                 'prop' => $formItem->attr('prop'),
                 'component' => $formItem

@@ -73,9 +73,21 @@
                                     }
                                 }
                             }else if(data.attribute.bindFields){
-                                data.attribute.bindFields.forEach((field,index)=>{
-                                    slotProps.row[field] = value[index]
-                                })
+                                //级联选择器处理
+                                if(data.name == 'ElCascader' && data.bindAttribute.relation){
+                                    slotProps.row[data.bindAttribute.relation] = []
+                                    value.forEach(row=>{
+                                        var rowValue = {}
+                                        data.attribute.bindFields.forEach((field,index)=>{
+                                            rowValue[field] = row[index]
+                                        })
+                                        slotProps.row[data.bindAttribute.relation].push(rowValue)
+                                    })
+                                }else{
+                                    data.attribute.bindFields.forEach((field,index)=>{
+                                        slotProps.row[field] = value[index]
+                                    })
+                                }
                             }
 
                             slotProps.row[field] = value
@@ -107,7 +119,7 @@
                                 }
                             }else if(data.attribute.bindFields){
                                 //级联选择器处理
-                                if(data.bindAttribute.relation){
+                                if(data.name == 'ElCascader' && data.bindAttribute.relation){
                                     expression = 'modelValue.' + data.bindAttribute.relation + ' = []'
                                     eval(expression)
                                     value.forEach(row=>{

@@ -2,7 +2,10 @@
     <el-divider content-position='left' v-if="title && !table">{{title}}</el-divider>
     <el-form-item :label="title" v-if="table">
         <a-table row-key="id" v-if="value.length > 0" :data-source="value" size="small"  :pagination="false" :custom-row="customRow" class="manyItemEadminTable">
-            <a-table-column v-for="column in columns" :title="column.title" :data-index="column.prop">
+            <a-table-column v-for="column in columns" :data-index="column.prop">
+                <template #title>
+                    <render :data="column.title"></render>
+                </template>
                 <template #default="{ record , index}">
                     <render :slot-props="{ row:record ,$index:index ,propField:field,validator:$attrs.validator}" :data="column.component"></render>
                 </template>
