@@ -48,6 +48,7 @@ class Tabs extends Field
 		$tabPane->content($title, 'label');
 		$tabPane->content($content);
 		$tabPane->lazy();
+		$content = end($tabPane->content['default']);
 		if (is_object($content) && $destroy) {
 			$content->where($this->bindAttr('modelValue'), $this->getContentCount());
 		}
