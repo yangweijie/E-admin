@@ -259,11 +259,11 @@ class Filter
      */
     public function between($field, $label = '')
     {
-        $field = $this->parseFilter(__FUNCTION__, $field);
-        $formItem = $this->form->text($field . '__between_start', $label)->placeholder("请输入开始$label")->getFormItem();
-        $components = $formItem->getComponent();
-        $formItem->clearContent();
-        $text = $this->form->text($field . '__between_end')->placeholder("请输入结束$label");
+		$field = $this->parseFilter(__FUNCTION__, $field);
+		$formItem = $this->form->text($field . '__between_start', $label)->style(['width'=>'160px'])->placeholder("开始$label")->getFormItem();
+		$components = $formItem->getComponent();
+		$formItem->clearContent();
+		$text = $this->form->text($field . '__between_end')->style(['width'=>'160px'])->placeholder("结束$label");
         $this->form->popItem();
         array_push($components,'-');
         array_push($components,$text);
