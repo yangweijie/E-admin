@@ -14,6 +14,7 @@ use Eadmin\component\basic\Space;
 use Eadmin\component\form\field\Select;
 use Eadmin\component\form\field\Spec;
 use Eadmin\component\form\FormAction;
+use Eadmin\component\form\FormItem;
 use Eadmin\component\layout\Row;
 use Eadmin\constant\Style;
 use Eadmin\form\Form;
@@ -773,7 +774,7 @@ class Filter
                 }
                 $column = $row->column($item,$md);
             }
-            $row->column($actions,3);
+            $row->column($actions,3)->style(['margin-bottom'=>'18px']);
             $this->form->content($row);
         }else{
             $this->form->push($actions);
