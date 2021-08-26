@@ -754,7 +754,7 @@ class Filter
             Button::create('重置')->sizeSmall()
                 ->event('click', [$this->form->bindAttr('reset') => true]),
         ];
-        if(count($this->form->getFormItems()) > 4){
+        if($this->columnNum > 0){
             $formItems = [];
             do{
                 $formItem = $this->form->popItem();
@@ -765,12 +765,10 @@ class Filter
             $row = new Row();
             foreach ($formItems as $key=>$item){
                 $md = $item->md?:6;
-                if($this->columnNum >0){
-                    if($item->md){
-                        $md = $item->md;
-                    }else{
-                        $md = 24 / $this->columnNum;
-                    }
+                if($item->md){
+                    $md = $item->md;
+                }else{
+                    $md = 24 / $this->columnNum;
                 }
                 $column = $row->column($item,$md);
             }
