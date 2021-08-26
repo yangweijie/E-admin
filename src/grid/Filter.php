@@ -8,8 +8,14 @@
 
 namespace Eadmin\grid;
 
+use Eadmin\component\basic\Button;
+use Eadmin\component\basic\Html;
+use Eadmin\component\basic\Space;
+use Eadmin\component\form\field\Select;
+use Eadmin\component\form\field\Spec;
 use Eadmin\component\form\FormAction;
 use Eadmin\component\layout\Row;
+use Eadmin\constant\Style;
 use Eadmin\form\Form;
 use think\db\Query;
 use think\facade\Db;
@@ -52,12 +58,17 @@ class Filter
             ->removeAttr('labelWidth')
             ->removeAttr('setAction')
             ->size('small');
-        $this->form->actions(function (FormAction $action) {
-            $action->submitButton()->content('搜索')->sizeSmall()->icon('el-icon-search');
-            $action->resetButton()->sizeSmall();
-        });
+        $this->form->actions()->hide();
     }
 
+    /**
+     * 占列
+     * @param int $span
+     */
+    public function md(int $span = 24)
+    {
+        $this->form->getLastItem()->md($span);
+    }
     /**
      * 布局列数
      * @param $num
@@ -248,8 +259,16 @@ class Filter
     public function between($field, $label = '')
     {
         $field = $this->parseFilter(__FUNCTION__, $field);
-        $this->form->text($field . '__between_start', $label)->placeholder("请输入开始$label");
-        $this->form->text($field . '__between_end', '-')->placeholder("请输入结束$label");
+        $formItem = $this->form->text($field . '__between_start', $label)->placeholder("请输入开始$label")->getFormItem();
+        $components = $formItem->getComponent();
+        $formItem->clearContent();
+        $text = $this->form->text($field . '__between_end')->placeholder("请输入结束$label");
+        $this->form->popItem();
+        array_push($components,'-');
+        array_push($components,$text);
+        $formItem->content(
+            Space::create()->content($components)
+        )->md(8);
         return $this;
     }
 
@@ -298,7 +317,7 @@ class Filter
     public function datetimeRange($field, $label = '')
     {
         $field = $this->parseFilter('dateBetween', $field);
-        return $this->form->datetimeRange($field . '__start', $field . '__end', $label);
+        return $this->form->datetimeRange($field . '__start', $field . '__end', $label)->md(8);
     }
 
     /**
@@ -329,7 +348,7 @@ class Filter
     public function dateRange($field, $label = '')
     {
         $field = $this->parseFilter('dateBetween', $field);
-        return $this->form->dateRange($field . '__start', $field . '__end', $label);
+        return $this->form->dateRange($field . '__start', $field . '__end', $label)->md(8);
     }
 
     /**
@@ -341,7 +360,7 @@ class Filter
     public function timeRange($field, $label = '')
     {
         $field = $this->parseFilter('dateBetween', $field);
-        return $this->form->timeRange($field . '__start', $field . '__end', $label);
+        return $this->form->timeRange($field . '__start', $field . '__end', $label)->md(8);
     }
 
     /**
@@ -725,7 +744,16 @@ class Filter
      */
     public function render()
     {
-        if($this->columnNum > 0){
+        $actions = [
+            Button::create('搜索')
+                ->typePrimary()
+                ->sizeSmall()
+                ->icon('el-icon-search')
+                ->event('click', [$this->form->bindAttr('submit') => true]),
+            Button::create('重置')->sizeSmall()
+                ->event('click', [$this->form->bindAttr('reset') => true]),
+        ];
+        if(count($this->form->getFormItems()) > 4){
             $formItems = [];
             do{
                 $formItem = $this->form->popItem();
@@ -734,10 +762,21 @@ class Filter
                 }
             }while ($formItem);
             $row = new Row();
-            foreach ($formItems as $item){
-                $row->column($item,24 / $this->columnNum );
+            foreach ($formItems as $key=>$item){
+                $md = $item->md?:6;
+                if($this->columnNum >0){
+                    if($item->md){
+                        $md = $item->md;
+                    }else{
+                        $md = 24 / $this->columnNum;
+                    }
+                }
+                $column = $row->column($item,$md);
             }
+            $row->column($actions,3);
             $this->form->content($row);
+        }else{
+            $this->form->push($actions);
         }
         return $this->form;
     }

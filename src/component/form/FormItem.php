@@ -105,7 +105,9 @@ class FormItem extends Field
         );
         return $this;
     }
-
+    public function getComponent(){
+        return $this->content['default'];
+    }
     /**
      * 添加内容
      * @param mixed $content

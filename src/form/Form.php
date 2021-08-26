@@ -520,7 +520,9 @@ class Form extends Component
         $this->formItem = array_slice($this->formItem, 0, $offset);
         return $formItems;
     }
-
+    public function getFormItems(){
+        return $this->formItem;
+    }
     public function push($item)
     {
         $this->formItem[] = $item;
@@ -564,7 +566,7 @@ class Form extends Component
             $this->push("<h4 style='font-size:16px;'>{$title}</h4>");
         }
         foreach ($formItems as $item) {
-            $column = $row->column($item, $item->md);
+            $column = $row->column($item, $item->md ?? 24);
             $column->setWhere($item->getWhere());
         }
         $this->push($row);

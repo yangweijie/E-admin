@@ -150,7 +150,7 @@
    // import {tableDefer} from '@/hooks/use-defer'
     import request from '@/utils/axios'
     import {store} from '@/store'
-    import {forEach, unique, deleteArr, buildURL, findTree,treeMap} from '@/utils'
+    import {forEach, unique, deleteArr, buildURL, debounce,treeMap} from '@/utils'
     import {ElMessageBox,ElMessage} from 'element-plus'
     import Sortable from 'sortablejs'
     import {useRoute} from 'vue-router'
@@ -292,6 +292,14 @@
                     loadData()
                 }
             })
+            if(props.filterField){
+                const filterDebounce = debounce(()=>{
+                    loading.value = true
+                },300)
+                watch(()=>proxyData[props.filterField], (value) => {
+                    filterDebounce('','eadmin_grid_filter')
+                },{deep:true})
+            }
             //动态控制列显示隐藏
             const checkboxColumn = ref(props.columns.map(item => {
                 return item.prop
@@ -468,7 +476,6 @@
             }
             //请求获取数据
             function loadData() {
-
                 http({
                     url: props.loadDataUrl,
                     params: globalRequestParams()
