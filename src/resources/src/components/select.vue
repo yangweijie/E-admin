@@ -27,6 +27,9 @@
                 initClearValue()
                 changeHandel(val)
             })
+            watch(()=>props.options,val=>{
+                initClearValue()
+            })
             watch(value,value=>{
                 ctx.emit('update:modelValue',value)
             })
