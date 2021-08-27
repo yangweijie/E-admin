@@ -209,8 +209,7 @@ class Column extends Component
         }
         //自定义导出
         if (!is_null($this->exportClosure)) {
-            $value = call_user_func_array($this->exportClosure, [$originValue, $data]);
-            $this->exportData = $value;
+            $this->exportData  = call_user_func_array($this->exportClosure, [$originValue, $data]);
         }
         //内容过长超出tip显示
         if ($this->tip) {
@@ -246,7 +245,7 @@ class Column extends Component
         $this->header(Html::create()->content($label));
         return $this;
     }
-   
+
     /**
      * 隐藏
      * @return \Eadmin\grid\Column|$this

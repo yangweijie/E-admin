@@ -202,10 +202,12 @@ class Grid extends Component
             $avatarValue = Arr::get($data,$avatar);
             $image = Image::create()
                 ->fit('cover')
-                ->attr('style', ['width' => '80px', 'height' => '80px', "borderRadius" => '50%'])
+                ->attr('style', ['width' => '50px', 'height' => '50px', "borderRadius" => '50%'])
                 ->previewSrcList([$avatarValue])->src($avatarValue);
             return Html::create()->content($image)->content("<br>{$val}");
-        })->align('center');
+        })->align('center')->export(function ($val){
+            return $val;
+        });
     }
 
     public function formAction()
