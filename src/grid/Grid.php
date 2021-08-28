@@ -370,14 +370,17 @@ class Grid extends Component
         $this->hidePage();
         $this->defaultExpandAllRows($expand);
     }
-
     /**
      * 操作列定义
-     * @param \Closure $closure
+     * @param \Closure|null $closure
+     * @return Column
      */
-    public function actions(\Closure $closure)
+    public function actions(\Closure $closure = null)
     {
-        $this->actionColumn->setClosure($closure);
+        if(!is_null($closure)){
+            $this->actionColumn->setClosure($closure);
+        }
+        return $this->actionColumn->column();
     }
 
     /**
