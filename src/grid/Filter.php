@@ -42,7 +42,7 @@ class Filter
     protected $relationLastDb = null;
     protected $relationLastMethod = '';
     protected $columnNum = 0;
-    protected $hideAction = true;
+    protected $hideAction = false;
 
     public function __construct($model)
     {

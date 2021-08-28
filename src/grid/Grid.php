@@ -124,7 +124,7 @@ class Grid extends Component
         $this->attr('eadmin_grid_param', $this->bindAttr('addParams'));
         $this->attr('key',Str::random(30, 3));
         $this->attr('eadmin_grid', $this->bindAttr('modelValue'));
-        $this->scroll(['x' => true]);
+        $this->scroll(['x' => 'max-content']);
         $this->attr('locale', ['emptyText' => '暂无数据']);
         $this->loadDataUrl('eadmin.rest');
         $this->parseCallMethod();
