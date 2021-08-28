@@ -55,7 +55,7 @@ class Actions extends Html
     }
     public function row($data)
     {
-        $this->space = Space::create()->size(0)->wrap()->size(5);
+        $this->space = Space::create()->wrap()->size(10);
         $this->row = $data;
         //如果有id设置id标示
         $pk = $this->grid->drive()->getPk();
