@@ -304,12 +304,9 @@
             const checkboxColumn = ref(props.columns.map(item => {
                 return item.prop
             }))
-
-            const tableColumns = computed(()=>{
-
+            function computedColumn() {
                 return columns.value.filter(item=>{
                     if(item.prop === 'EadminAction'){
-                        item.width = eadminActionWidth.value
                         //有滚动条操作列fixed
                         if(dragTable.value && !item.fixed){
                             const el = dragTable.value.$el.querySelectorAll('.ant-table-body')[0]
@@ -318,12 +315,11 @@
                                 item.fixed = 'right'
                             }
                         }
-
                     }
                     return checkboxColumn.value.indexOf(item.prop) >= 0 && !item.hide
                 })
-
-            })
+            }
+            const tableColumns = computed(computedColumn)
             nextTick(()=>{
                 if(proxyData[props.filterField]){
                     filterInitData = JSON.parse(JSON.stringify(proxyData[props.filterField]))
@@ -488,7 +484,7 @@
                     header.value = res.header
                     tools.value = res.tools
                     nextTick(()=>{
-                        actionAutoWidth()
+                        computedColumn()
                     })
                 }).finally(() => {
                     ctx.emit('update:modelValue', false)
