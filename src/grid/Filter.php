@@ -409,13 +409,30 @@ class Filter
     }
 
     /**
+     * 单选框按钮
+     * @param array $options 选项值
+     * @param \Closure|null $closure 回调统计数量
+     */
+    public function radioButton(array $options,\Closure $closure = null){
+
+        return $this->radio($options,true,$closure);
+    }
+    /**
      * 单选框
      * @param array $options 选项值
      * @param bool $buttonTheme 是否按钮样式
+     * @param \Closure|null $closure 回调统计数量
      * @return \Eadmin\component\form\field\RadioGroup
      */
-    public function radio(array $options, bool $buttonTheme = false)
+    public function radio(array $options, bool $buttonTheme = false,\Closure $closure = null)
     {
+        $options = [''=>'全部']+$options;
+        foreach ($options as $value=>$text){
+            if(is_callable($closure)){
+                $count = call_user_func($closure,$value);
+                $options[$value] = $text . " ($count)";
+            }
+        }
         $item = $this->form->popItem();
         $field = $item->attr('prop');
         $label = $item->attr('label');
