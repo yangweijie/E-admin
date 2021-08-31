@@ -57,7 +57,9 @@ class Watch implements ArrayAccess
 		$field = request()->param('formField') . $field . 'Show';
 		return $field;
 	}
-
+    public function setData($data){
+	    return $this->data = $data;
+    }
 	/**
 	 * 获取字段值
 	 * @param string $field 字段

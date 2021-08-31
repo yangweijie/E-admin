@@ -495,8 +495,8 @@ class Grid extends Component
             if(is_null($this->customClosure)){
                 //树形父级pid
                 if ($this->isTree) {
-                    $row[$this->treeId] = $data[$this->treeId];
-                    $row[$this->treeParent] = $data[$this->treeParent];
+                    $row['eadmin_tree_id'] = $data[$this->treeId];
+                    $row['eadmin_tree_parent'] = $data[$this->treeParent];
                 }
                 foreach ($this->column as $column) {
                     $field = $column->attr('prop');
@@ -601,12 +601,12 @@ class Grid extends Component
         $page = Request::get('page', 1);
         $size = Request::get('size', $this->pagination->attr('pageSize'));
         $data = $this->drive->getData($this->hidePage, $page, $size);
+
         //解析列
         $data = $this->parseColumn($data);
-
         //树形
         if ($this->isTree) {
-            $data = Admin::tree($data, $this->treeId, $this->treeParent);
+            $data = Admin::tree($data, 'eadmin_tree_id', 'eadmin_tree_parent');
         }
         return $data;
     }

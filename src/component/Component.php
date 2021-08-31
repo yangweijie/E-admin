@@ -186,6 +186,7 @@ abstract class Component implements \JsonSerializable
     public function removeEvent($name){
         $name = ucfirst($name);
         unset($this->event[$name]);
+        return $this;
     }
     public function event($name, array $value)
     {

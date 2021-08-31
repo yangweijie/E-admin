@@ -28,6 +28,7 @@ use Eadmin\component\form\Field;
  * @method $this prefixIcon(string $icon) 自定义头部图标的类名
  * @method $this clearIcon(string $icon) 自定义清空图标的类名
  * @method $this valueFormat(string $format) 显示在输入框中的格式 YYYY-MM-DD
+ * @method $this format(string $format) 显示在输入框中的格式 YYYY-MM-DD
  * @package Eadmin\component\form\field
  */
 class TimePicker extends Field
