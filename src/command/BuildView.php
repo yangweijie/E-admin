@@ -160,7 +160,7 @@ class BuildView extends Make
                             $valueArr = explode(':', $value);
                             if (count($valueArr) == 2) {
                                 list($key, $item) = $valueArr;
-                                $form .= $this->optionSpace . "{$key} => {$item},";
+                                $form .= $this->optionSpace . "{$key} => '{$item}',";
                             }
                         }
 						$form .= $this->tableSpace . "])";
@@ -194,18 +194,18 @@ class BuildView extends Make
                             list($activeKey, $activeValue) = $active;
                             list($inactiveKey, $inactiveValue) = $inactive;
                             $form .= $this->tableSpace . "->state([";
-                            $form .= $this->optionSpace . "[{$activeKey} => {$activeValue}],";
-                            $form .= $this->optionSpace . "[{$inactiveKey} => {$inactiveValue}],";
+                            $form .= $this->optionSpace . "[{$activeKey} => '{$activeValue}'],";
+                            $form .= $this->optionSpace . "[{$inactiveKey} => '{$inactiveValue}'],";
                             $form .= $this->tableSpace . "])";
                             $form .= $this->endSpace;
                             $grid .= $this->startSpace . '$grid->column(\'' . $val['Field'] . '\',\'' . $label . '\')->switch([';
-                            $grid .= $this->optionSpace . "[{$activeKey} => {$activeValue}],";
-                            $grid .= $this->optionSpace . "[{$inactiveKey} => {$inactiveValue}],";
+                            $grid .= $this->optionSpace . "[{$activeKey} => '{$activeValue}'],";
+                            $grid .= $this->optionSpace . "[{$inactiveKey} => '{$inactiveValue}'],";
                             $grid .= $this->tableSpace . "])";
                             $grid .= $this->endSpace;
                             $detail .= $this->startSpace . '$detail->field(\'' . $val['Field'] . '\',\'' . $label . '\')->using([';
-                            $detail .= $this->optionSpace . "[{$activeKey} => {$activeValue}],";
-                            $detail .= $this->optionSpace . "[{$inactiveKey} => {$inactiveValue}],";
+                            $detail .= $this->optionSpace . "[{$activeKey} => '{$activeValue}'],";
+                            $detail .= $this->optionSpace . "[{$inactiveKey} => '{$inactiveValue}'],";
                             $detail .= $this->tableSpace . "])";
                             $detail .= $this->endSpace;
                         } else {
