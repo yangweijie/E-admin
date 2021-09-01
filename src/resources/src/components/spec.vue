@@ -37,26 +37,29 @@
                 </el-breadcrumb>
             </template>
         </a-table-column>
-        <a-table-column v-for="(column,index) in columns"  :data-index="column.prop">
-            <template #title>
-                {{column.title}} <i class="el-icon-edit-outline" style="cursor: pointer" v-if="column.component.content.default[0].name != 'EadminDisplay' && !column.component.content.default[0].attribute.disabled" @click="dialogs[index].dialog = true"></i>
-                <el-dialog
-                        title="批量修改"
-                        v-model="dialogs[index].dialog"
-                        width="30%">
-                    <render :data="column.component.content.default[0]" v-model="dialogs[index].value"></render>
-                    <template #footer>
-                        <el-button size="small" @click="dialogs[index].dialog = false">取 消</el-button>
-                        <el-button size="small" type="primary" @click="()=>{batch(index,column.prop,dialogs[index].value)}">保 存</el-button>
-                    </template>
-                </el-dialog>
-            </template>
-            <template #default="{ record , index}">
-                <div style="margin: 10px 0">
-                    <render :slot-props="{ row:record ,$index:index ,propField:field,validator:$attrs.validator}" :data="column.component"></render>
-                </div>
-            </template>
-        </a-table-column>
+        <template v-for="(column,index) in columns">
+            <a-table-column  v-if="!column.hide"  :data-index="column.prop">
+                <template #title>
+                    {{column.title}} <i class="el-icon-edit-outline" style="cursor: pointer" v-if="column.component.content.default[0].name != 'EadminDisplay' && !column.component.content.default[0].attribute.disabled" @click="dialogs[index].dialog = true"></i>
+                    <el-dialog
+                            title="批量修改"
+                            v-model="dialogs[index].dialog"
+                            width="30%">
+                        <render :data="column.component.content.default[0]" v-model="dialogs[index].value"></render>
+                        <template #footer>
+                            <el-button size="small" @click="dialogs[index].dialog = false">取 消</el-button>
+                            <el-button size="small" type="primary" @click="()=>{batch(index,column.prop,dialogs[index].value)}">保 存</el-button>
+                        </template>
+                    </el-dialog>
+                </template>
+                <template #default="{ record , index}">
+                    <div style="margin: 10px 0">
+                        <render :slot-props="{ row:record ,$index:index ,propField:field,validator:$attrs.validator}" :data="column.component"></render>
+                    </div>
+                </template>
+            </a-table-column>
+        </template>
+
     </a-table>
 </template>
 
