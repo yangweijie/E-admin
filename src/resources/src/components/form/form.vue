@@ -130,17 +130,14 @@
                     request({
                         url: props.setAction,
                         method: props.setActionMethod,
-                        data: {
+                        data: Object.assign({
                             formField:ctx.attrs.formField,
                             field:field,
                             newValue:newValue,
                             oldValue:oldValue,
                             form:submitData(),
                             eadmin_form_watch:true,
-                            eadmin_class:ctx.attrs.model['eadmin_class'],
-                            eadmin_function:ctx.attrs.model['eadmin_function'],
-                            eadmin_app:ctx.attrs.model['eadmin_app'],
-                        }
+                        },ctx.attrs.callMethod)
                     }).then(res=>{
                         res.data.showField.forEach(field=>{
                             proxyData[field] = 1

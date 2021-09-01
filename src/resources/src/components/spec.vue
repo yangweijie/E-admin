@@ -1,8 +1,8 @@
 <template>
-    <EadminSelect :options="group" v-model="specGroup" style="width: 100%;margin-bottom: 5px" clearable @change="selectHandel">
+    <EadminSelect :options="group" v-model="specGroup" style="width: 100%;margin-bottom: 5px" clearable @change="selectHandel" v-if="!disabled">
         <el-option v-for="item in group" :key="item.id" :value="item.id" :label="item.name"></el-option>
     </EadminSelect>
-    <el-table :data="specs" border size="mini" v-if="specGroup" style="margin-bottom: 5px" :row-class-name="tableRowClassName" @cell-mouse-leave="cellMouseLeave" @cell-mouse-enter="cellMouseEnter">
+    <el-table :data="specs" border size="mini" v-if="specGroup" v-show="!disabled" style="margin-bottom: 5px" :row-class-name="tableRowClassName" @cell-mouse-leave="cellMouseLeave" @cell-mouse-enter="cellMouseEnter">
         <el-table-column
                 prop="name"
                 label="可选规格">
@@ -26,7 +26,7 @@
             </template>
         </el-table-column>
     </el-table>
-    <a-table row-key="group" :data-source="tableData" v-if="tableData.length > 0" size="small" bordered :pagination="false">
+    <a-table row-key="group" :data-source="tableData" v-if="tableData.length > 0" size="small" bordered :pagination="false" :scroll="{x:'max-content'}">
         <a-table-column title="规格" data-index="eadminSpecGroup">
             <template #default="{ record }">
                 <el-breadcrumb separator="|">
@@ -39,7 +39,7 @@
         </a-table-column>
         <a-table-column v-for="(column,index) in columns"  :data-index="column.prop">
             <template #title>
-                {{column.title}} <i class="el-icon-edit-outline" style="cursor: pointer" @click="dialogs[index].dialog = true"></i>
+                {{column.title}} <i class="el-icon-edit-outline" style="cursor: pointer" v-if="column.component.content.default[0].name != 'EadminDisplay' && !column.component.content.default[0].attribute.disabled" @click="dialogs[index].dialog = true"></i>
                 <el-dialog
                         title="批量修改"
                         v-model="dialogs[index].dialog"
@@ -70,6 +70,7 @@
         props: {
             field:String,
             data: Array,
+            disabled: Boolean,
             specId: {
                 type:[String, Number],
                 default:'',

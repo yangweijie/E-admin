@@ -216,7 +216,7 @@
             const quickSearchValue = ref('')
             const selectIds = ref(props.selection || [])
             const expandedRowKeys = ref([])
-            const eadminActionWidth = ref(0)
+
             const trashed = ref(false)
             const excel  = reactive({
                 excelVisible:false,
@@ -326,16 +326,33 @@
                 }
                 dragSort()
             })
-            function actionAutoWidth(){
-                let width = 0
-                //操作列宽度自适应
-                document.getElementsByClassName('EadminAction').forEach(item=>{
-                    if(width < item.offsetWidth){
-                        width = item.offsetWidth
+            function tableAutoWidth(){
+                try {
+                    if(ctx.attrs.scroll.y){
+                        columns.value.forEach(column=>{
+                            let width = 0
+                            if(!column.width){
+                                document.getElementsByClassName('eadmin_table_th_'+column.prop).forEach(item=>{
+                                    let offsetWidth = item.parentNode.parentNode.parentNode.parentNode.offsetWidth
+                                    if(width < offsetWidth){
+                                        width = offsetWidth
+                                    }
+                                })
+                                document.getElementsByClassName('eadmin_table_td_'+column.prop).forEach(item=>{
+                                    if(width < item.parentNode.offsetWidth){
+                                        width = item.parentNode.offsetWidth
+                                    }
+                                })
+                                column.width = width
+                            }
+                        })
+                        nextTick(()=>{
+                            computedColumn()
+                        })
                     }
-                })
-                width += 30
-                eadminActionWidth.value = width
+                }catch (e) {
+
+                }
             }
             //拖拽排序
             function dragSort(){
@@ -482,9 +499,10 @@
                     tableData.value = res.data
                     total.value = res.total
                     header.value = res.header
+                    columns.value = res.columns
                     tools.value = res.tools
                     nextTick(()=>{
-                        computedColumn()
+                        tableAutoWidth()
                     })
                 }).finally(() => {
                     ctx.emit('update:modelValue', false)
@@ -647,7 +665,6 @@
                 isMobile,
                 grid,
                 pageLayout,
-                eadminActionWidth,
                 quickSearchText,
                 page,
                 size,
