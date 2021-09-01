@@ -972,7 +972,8 @@ class Form extends Component
             $this->valueModel($component);
         }
         $field = $this->bindAttr('model');
-        $this->data = array_merge($this->callParams, $this->callMethod, $this->data);
+        $this->data = array_merge($this->callMethod, $this->data);
+        $this->attr('callMethod',$this->callMethod);
         //主键值
         if ($this->isEdit) {
             $pk = $this->drive->getPk();

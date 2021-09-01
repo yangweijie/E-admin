@@ -6,6 +6,7 @@ namespace Eadmin\component\form;
 
 use Eadmin\component\basic\Html;
 use Eadmin\component\Component;
+use Eadmin\component\form\field\Input;
 use Eadmin\form\traits\Validator;
 use Eadmin\form\traits\WhenForm;
 use think\helper\Str;
@@ -89,7 +90,7 @@ abstract class Field extends Component
      */
     public function required()
     {
-      
+
         $this->formItem->required();
         return $this;
     }
