@@ -292,6 +292,9 @@ abstract class Component implements \JsonSerializable
     public function clearContent(){
         $this->content = [];
     }
+    public function getName(){
+        return $this->name;
+    }
     public function setName($name){
         $this->name = $name;
     }

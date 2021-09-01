@@ -209,24 +209,24 @@ class Column extends Component
         }
         //自定义导出
         if (!is_null($this->exportClosure)) {
-            $this->exportData  = call_user_func_array($this->exportClosure, [$originValue, $data]);
+            $this->exportData = call_user_func_array($this->exportClosure, [$originValue, $data]);
         }
         //内容过长超出tip显示
         if ($this->tip) {
             if (!$this->attr('width')) {
                 $this->width(120);
             }
-            return Tip::create(Html::create($value)
+            $width = $this->attr('width') - 20;
+            $value = Tip::create(Html::div()->content($value)
                 ->style([
-                    'width' => $this->attr('width') . 'px',
+                    'width' => $width . 'px',
                     'textOverflow' => 'ellipsis',
                     'overflow' => 'hidden',
                     'whiteSpace' => 'nowrap',
                 ])
-                ->tag('div'))->content($value)->placement('top');
-        } else {
-            return Html::create()->content($value);
+            )->content($value)->placement('top');
         }
+        return Html::div()->content($value)->attr('class','eadmin_table_td_'.$this->attr('prop'));
     }
 
     public function getExportData()
@@ -242,7 +242,9 @@ class Column extends Component
     public function label(string $label)
     {
         $this->attr('label', $label);
-        $this->header(Html::create()->content($label));
+        $this->header(
+            Html::div()->content($label)->attr('class','eadmin_table_th_'.$this->attr('prop'))
+        );
         return $this;
     }
 
@@ -280,37 +282,38 @@ class Column extends Component
      * 音频显示
      * @return $this
      */
-    public function audio(){
-        $this->display(function ($val){
+    public function audio()
+    {
+        $this->display(function ($val) {
             return "<audio controls src='{$val}'>您的浏览器不支持 audio 标签。</audio>";
         });
         return $this;
     }
 
-	/**
-	 * 文字链接
-	 * @link https://element-plus.gitee.io/#/zh-CN/component/link 文字链接
-	 * @link https://element-plus.gitee.io/#/zh-CN/component/icon 图标
-	 * @param string $field 字段，不指定则显示当前value
-	 * @param string $target 打开方式 _blank(在新窗口中打开) / _self(在相同的窗口打开) / _parent(在父窗口打开) / _top(在整个窗口中)
-	 * @param string $icon 图标
-	 * @param string $type 类型
-	 * @param bool   $underline 是否下划线
-	 * @return $this
-	 */
-	public function link($field = '', $target = '_blank', $icon = '', $type = 'primary', $underline = false)
-	{
-		$this->display(function ($val, $data) use ($field, $target, $icon, $type, $underline) {
-			$label = $field ? $data[$field] : $val;
-			return Link::create($label)
-				->href($val)
-				->type($type)
-				->underline($underline)
-				->target($target)
-				->icon($icon);
-		});
-		return $this;
-	}
+    /**
+     * 文字链接
+     * @link https://element-plus.gitee.io/#/zh-CN/component/link 文字链接
+     * @link https://element-plus.gitee.io/#/zh-CN/component/icon 图标
+     * @param string $field 字段，不指定则显示当前value
+     * @param string $target 打开方式 _blank(在新窗口中打开) / _self(在相同的窗口打开) / _parent(在父窗口打开) / _top(在整个窗口中)
+     * @param string $icon 图标
+     * @param string $type 类型
+     * @param bool $underline 是否下划线
+     * @return $this
+     */
+    public function link($field = '', $target = '_blank', $icon = '', $type = 'primary', $underline = false)
+    {
+        $this->display(function ($val, $data) use ($field, $target, $icon, $type, $underline) {
+            $label = $field ? $data[$field] : $val;
+            return Link::create($label)
+                ->href($val)
+                ->type($type)
+                ->underline($underline)
+                ->target($target)
+                ->icon($icon);
+        });
+        return $this;
+    }
 
     /**
      * 视频显示
@@ -342,40 +345,40 @@ class Column extends Component
             if (empty($val)) {
                 return '--';
             }
-			$images = $val;
-			if (is_string($val)) {
-				$images = explode(',', $val);
-			}
-			$html      = Html::create();
-			if ($multi) {
-				foreach ($images as $image) {
-					$html->content(
-						Image::create()
-							->fit('cover')
-							->src($image)
-							->previewSrcList($images)
-							->style([
-								'width' => "{$width}px",
-								'height' => "{$height}px",
-								'borderRadius' => "{$radius}%",
-								'marginRight' => '5px'
-							])
-					);
-				}
-			} else {
-				$html->content(
-					Image::create()
-						->fit('cover')
-						->src($images[0])
-						->previewSrcList($images)
-						->style([
-							'width' => "{$width}px",
-							'height' => "{$height}px",
-							'borderRadius' => "{$radius}%",
-							'marginRight' => '5px'
-						])
-				);
-			}
+            $images = $val;
+            if (is_string($val)) {
+                $images = explode(',', $val);
+            }
+            $html = Html::create();
+            if ($multi) {
+                foreach ($images as $image) {
+                    $html->content(
+                        Image::create()
+                            ->fit('cover')
+                            ->src($image)
+                            ->previewSrcList($images)
+                            ->style([
+                                'width' => "{$width}px",
+                                'height' => "{$height}px",
+                                'borderRadius' => "{$radius}%",
+                                'marginRight' => '5px'
+                            ])
+                    );
+                }
+            } else {
+                $html->content(
+                    Image::create()
+                        ->fit('cover')
+                        ->src($images[0])
+                        ->previewSrcList($images)
+                        ->style([
+                            'width' => "{$width}px",
+                            'height' => "{$height}px",
+                            'borderRadius' => "{$radius}%",
+                            'marginRight' => '5px'
+                        ])
+                );
+            }
             return $html;
         });
         return $this;
@@ -404,16 +407,16 @@ class Column extends Component
             $params = $this->grid->getCallMethod();
             $params['eadmin_ids'] = [$data[$this->grid->drive()->getPk()]];
             $content = [];
-            foreach ($fields as $field=>$label){
+            foreach ($fields as $field => $label) {
                 $switch = Switchs::create(null, $data[$field])
                     ->state([[1 => ''], [0 => '']])
                     ->url('/eadmin/batch.rest')
                     ->field($field)
                     ->params($params);
-                $content[] =  Html::create([
+                $content[] = Html::create([
                     Html::create($label . ': '),
                     $switch
-                ])->style(['display'=>'flex','justifyContent'=>'space-between'])->tag('p');
+                ])->style(['display' => 'flex', 'justifyContent' => 'space-between'])->tag('p');
             }
             return $content;
         });
@@ -459,7 +462,7 @@ class Column extends Component
         $params['eadmin_ids'] = [$data[$this->grid->drive()->getPk()]];
         if (!empty($text)) $text .= "：";
         return Html::create([
-        	$text,
+            $text,
             Switchs::create(null, $data[$field])
                 ->state($switchArr)
                 ->url('/eadmin/batch.rest')

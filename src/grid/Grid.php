@@ -660,18 +660,20 @@ class Grid extends Component
         if (!$this->hideAction) {
             $this->column[] = $this->actionColumn->column();
         }
+        //静态表格
         if($this->attr('static')){
             $data = $this->parseData();
             $this->attr('data',$data);
         }
-
         if (request()->has('ajax_request_data') && request()->get('eadmin_class') == $this->callClass && !$this->attr('static')) {
             $data = $this->parseData();
+            $columns = array_column($this->column, 'attribute');
             return [
                 'code' => 200,
                 'data' => $data,
                 'header'=> $this->attr('header'),
                 'tools'=> $this->attr('tools'),
+                'columns'=> $columns,
                 'total' => $this->pagination->attr('total')
             ];
         } else {
