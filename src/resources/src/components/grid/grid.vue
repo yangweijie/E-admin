@@ -328,23 +328,25 @@
             })
             function tableAutoWidth(){
                 try {
-                    columns.value.forEach(column=>{
-                        let width = 0
-                        if(!column.width){
-                            document.getElementsByClassName('eadmin_table_th_'+column.prop).forEach(item=>{
-                                let offsetWidth = item.parentNode.parentNode.parentNode.parentNode.offsetWidth
-                                if(width < offsetWidth){
-                                    width = offsetWidth
-                                }
-                            })
-                            document.getElementsByClassName('eadmin_table_td_'+column.prop).forEach(item=>{
-                                if(width < item.parentNode.offsetWidth){
-                                    width = item.parentNode.offsetWidth
-                                }
-                            })
-                            column.width = width
-                        }
-                    })
+                    if(ctx.attrs.scroll.y){
+                        columns.value.forEach(column=>{
+                            let width = 0
+                            if(!column.width){
+                                document.getElementsByClassName('eadmin_table_th_'+column.prop).forEach(item=>{
+                                    let offsetWidth = item.parentNode.parentNode.parentNode.parentNode.offsetWidth
+                                    if(width < offsetWidth){
+                                        width = offsetWidth
+                                    }
+                                })
+                                document.getElementsByClassName('eadmin_table_td_'+column.prop).forEach(item=>{
+                                    if(width < item.parentNode.offsetWidth){
+                                        width = item.parentNode.offsetWidth
+                                    }
+                                })
+                                column.width = width
+                            }
+                        })
+                    }
                     nextTick(()=>{
                         computedColumn()
                     })
