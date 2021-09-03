@@ -306,16 +306,6 @@
             }))
             function computedColumn() {
                 return columns.value.filter(item=>{
-                    if(item.prop === 'EadminAction'){
-                        //有滚动条操作列fixed
-                        if(dragTable.value && !item.fixed){
-                            const el = dragTable.value.$el.querySelectorAll('.ant-table-body')[0]
-                            const table = dragTable.value.$el.querySelectorAll('.ant-table-body > table')[0]
-                            if(table.clientWidth > el.clientWidth){
-                                item.fixed = 'right'
-                            }
-                        }
-                    }
                     return checkboxColumn.value.indexOf(item.prop) >= 0 && !item.hide
                 })
             }
@@ -347,12 +337,34 @@
                             }
                         })
                     }
-                    nextTick(()=>{
-                        computedColumn()
-                    })
                 }catch (e) {
 
                 }
+                nextTick(()=>{
+                    //操作列自适应
+                    columns.value.forEach(item=> {
+                        if(item.prop === 'EadminAction'){
+                            if(!item.width){
+                                let width = 0
+                                document.getElementsByClassName('EadminAction').forEach(item => {
+                                    let offsetWidth = item.offsetWidth
+                                    if (width < offsetWidth) {
+                                        width = offsetWidth
+                                    }
+                                })
+                                item.width = width+20
+                            }
+                            //有滚动条操作列fixed
+                            if(dragTable.value && !item.fixed){
+                                const el = dragTable.value.$el.querySelectorAll('.ant-table-body')[0]
+                                const table = dragTable.value.$el.querySelectorAll('.ant-table-body > table')[0]
+                                if(table.clientWidth > el.clientWidth){
+                                    item.fixed = 'right'
+                                }
+                            }
+                        }
+                    })
+                })
             }
             //拖拽排序
             function dragSort(){
