@@ -47,6 +47,7 @@ class Model implements FormInterface
         try {
             if (isset($data[$this->pkField]) && !empty($data[$this->pkField])) {
                 $this->model  = $this->model->where($this->pkField, $data[$this->pkField])->find();
+
                 $this->data = clone $this->model;
             }
             $result = $this->model->save($data);

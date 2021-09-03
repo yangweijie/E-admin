@@ -6,6 +6,7 @@ namespace Eadmin\component\form\field;
 
 use Eadmin\Admin;
 use Eadmin\component\basic\Button;
+use Eadmin\component\Component;
 use Eadmin\component\form\Field;
 
 use Eadmin\component\form\FormItem;
@@ -139,8 +140,10 @@ class Upload extends Field
                         ->sizeMini()
                 );
             $uploadButton->bindValue('', 'modelValue', null);
-            $filesystem->attr('upload', $uploadButton);
-            $this->attr('finder', $filesystem);
+            if($filesystem instanceof Component){
+                $filesystem->attr('upload', $uploadButton);
+                $this->attr('finder', $filesystem);
+            }
         }
         return parent::jsonSerialize();
     }

@@ -226,7 +226,7 @@ class Column extends Component
                 ])
             )->content($value)->placement('top');
         }
-        return Html::div()->content($value)->attr('class','eadmin_table_td_'.$this->attr('prop'));
+        return Html::create($value)->attr('class','eadmin_table_td_'.$this->attr('prop'));
     }
 
     public function getExportData()
@@ -243,7 +243,7 @@ class Column extends Component
     {
         $this->attr('label', $label);
         $this->header(
-            Html::div()->content($label)->attr('class','eadmin_table_th_'.$this->attr('prop'))
+            Html::create($label)->attr('class','eadmin_table_th_'.$this->attr('prop'))
         );
         return $this;
     }

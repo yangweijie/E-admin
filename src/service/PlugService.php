@@ -271,6 +271,7 @@ class PlugService extends Service
      */
     public function enable($name, $status)
     {
+        Db::name('system_menu')->where('mark',$name)->update(['status' => $status]);
         return Db::name('system_plugs')->where('name', $name)->update(['status' => $status]);
     }
 

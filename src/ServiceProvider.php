@@ -45,7 +45,7 @@ class ServiceProvider extends Service
         //注册插件
         PlugService::instance()->register();
         //视图路由
-        Admin::registerRoute();;
+        Admin::registerRoute();
         //权限中间件
         $this->app->middleware->route(\Eadmin\middleware\Permission::class);
         $this->registerService();
