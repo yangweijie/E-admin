@@ -47,14 +47,14 @@
             //侧边栏菜单渲染
             const menus = computed(() => {
                 let menu = null
-                if(state.device === 'mobile'){
-                    menu = state.menus
-                }else{
+                if(state.topMenuMode && state.device === 'desktop'){
                     state.menus.forEach(res => {
                         if (res.id == state.menuModule && res.children) {
                             menu = res.children
                         }
                     })
+                }else{
+                    menu = state.menus
                 }
                 return menu
             })

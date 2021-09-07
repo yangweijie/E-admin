@@ -12,7 +12,9 @@
             <i class="el-icon-arrow-right tabMove" v-if="isScroll" @click="rightMove"></i>
         </div>
         <div class="breadcrumb">
-            <i class="el-icon-back back" @click="back"></i>
+            <el-tooltip placement="bottom" content="返回上一页">
+                <i class="el-icon-back back" @click="back"></i>
+            </el-tooltip>
             <el-dropdown @command="handleCommand">
                 <i class="el-icon-close back"></i>
                 <template #dropdown>

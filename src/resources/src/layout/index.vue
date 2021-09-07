@@ -3,14 +3,16 @@
         <sidebar v-if="sidebar.visible"></sidebar>
         <div class="main-container">
             <header-top></header-top>
-            <tags-view></tags-view>
+            <tags-view v-if="state.tagMenuMode"></tags-view>
+
             <div class="main-content" v-loading.lock="state.mainLoading">
                 <div class="header-title" v-if="state.mainTitle">
                     <div>
                         <span class="title">{{state.mainTitle}}</span>
                         <span class="desc" v-if="state.mainDescription">{{state.mainDescription}}</span>
                     </div>
-                    <breadcrumb style="margin-right: 5px" v-if="state.device != 'mobile'"></breadcrumb>
+                    <breadcrumb style="margin-right: 5px" v-if="state.topMenuMode && state.device != 'mobile'"></breadcrumb>
+                    <el-button style="margin-right: 0" v-if="!state.topMenuMode && state.device != 'mobile'" size="mini" @click="back">返回上一页</el-button>
                 </div>
                 <el-backtop target=".main-content"></el-backtop>
                 <keep-alive :include="cacheKeys">
@@ -24,7 +26,7 @@
 </template>
 
 <script>
-    import {useRoute} from 'vue-router'
+    import {useRoute, useRouter} from 'vue-router'
     import {defineComponent, inject,computed,h,getCurrentInstance,defineAsyncComponent,resolveComponent} from 'vue'
     import headerTop from './headerTop.vue'
     import Sidebar from './sidebar/sidebar.vue'
@@ -41,7 +43,9 @@
         },
         setup(){
             const route = useRoute()
+            const router = useRouter()
             const state = inject(store)
+
             let sidebar = state.sidebar
             const cacheKeys = computed(()=>{
                 return state.mainComponent.map(item=>{
@@ -69,12 +73,16 @@
                 }
 
             })
+            function back() {
+                router.back()
+            }
             return {
                 cacheKeys,
                 mainComponent,
                 route,
                 state,
                 sidebar,
+                back
             }
         }
     })
@@ -82,9 +90,10 @@
 
 <style scoped>
     .header-title .title{
-        font-weight: 400;
+        font-weight: 500;
         font-size: 20px;
-        color: #414750;
+        color: #17233d;
+
     }
     .header-title .desc{
         font-size: 14px;

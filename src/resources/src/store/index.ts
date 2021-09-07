@@ -5,6 +5,10 @@ export const store = Symbol()
 // 使用 reactive 函数完成响应式转换
 const states = reactive({
     device:'desktop',
+    //顶部菜单
+    topMenuMode:false,
+    //标签菜单
+    tagMenuMode:true,
     routerStatus: true,
     //侧边栏
     sidebar: {
@@ -109,7 +113,7 @@ const action = {
         if (index === -1) {
             // @ts-ignore
             const menu = findTree(state.menus, url.substr(1), 'url')
-            if (menu) {
+            if (menu && state.tagMenuMode) {
                 states.mainComponent.push({
                     // @ts-ignore
                     title: menu.name || url,
@@ -191,6 +195,8 @@ const action = {
                     states.info.webName = res.data.webName
                     states.info.dropdownMenu = res.data.dropdownMenu
                     states.info.init = res.data.init || []
+                    states.topMenuMode = res.data.topMenu
+                    states.tagMenuMode = res.data.tagMenu
                 }
                 resolve(res)
             }).catch((res: any) => {

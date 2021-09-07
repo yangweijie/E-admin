@@ -12,8 +12,11 @@
   .el-menu {
     border-right: 0px!important;
   }
-  .el-submenu__title {
+  .el-menu .el-submenu__title {
     background-color: $subMenuHover !important;
+  }
+  .el-menu--inline .el-submenu__title {
+    background-color: #000000 !important;
   }
   // menu hover
   .el-submenu .el-submenu__title {
@@ -44,6 +47,9 @@
   }
   .is-active>.el-submenu__title {
     border-left: 3px solid $--color-primary!important;
+  }
+  .is-active>.el-menu--inline .el-submenu__title {
+    border-left: none!important;
   }
   & .nest-menu .el-submenu>.el-submenu__title,
   & .el-menu-item {

@@ -2,12 +2,13 @@
     <div class="header-container">
         <i v-if="sidebar.visible || state.device === 'mobile'" :class="sidebar.opend?'el-icon-s-unfold hamburger':'el-icon-s-fold hamburger'"
            style="font-size: 18px" @click="collapse"/>
-        <el-menu :default-active="activeIndex" @select="selectMenu" class="menu" mode="horizontal" v-if="state.device === 'desktop'">
+        <el-menu :default-active="activeIndex" @select="selectMenu" class="menu" mode="horizontal" v-show="state.topMenuMode && state.device === 'desktop'">
             <el-menu-item v-for="item in menus" :index="item.id+''">
                 <i :class="item.icon" v-if="item.icon"></i>
                 <span slot="title">{{item.name}}</span>
             </el-menu-item>
         </el-menu>
+        <breadcrumb v-if="!state.topMenuMode && state.device != 'mobile'" style="margin-right: 5px"></breadcrumb>
         <div class="right-menu">
 
             <el-tooltip effect="dark" content="全屏" placement="bottom">
@@ -52,12 +53,13 @@
     import router from "../router";
     import screenfull from "@/components/screenfull.vue";
     import notice from "@/layout/notice.vue";
-
+    import breadcrumb from '@/components/breadcrumb.vue'
     export default defineComponent({
         name: "headerTop",
         components:{
             screenfull,
-            notice
+            notice,
+            breadcrumb
         },
         setup() {
             const route = useRoute()
