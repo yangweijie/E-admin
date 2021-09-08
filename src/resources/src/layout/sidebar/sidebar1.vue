@@ -3,8 +3,10 @@
         <logo :collapse="sidebar.opend"></logo>
         <el-scrollbar style="height: calc(100vh - 60px)">
             <el-menu :default-active="activeIndex"
+                     text-color="#FFFFFF"
                      :collapse="!sidebar.opend"
                      mode="vertical"
+                     background-color="#000000"
                      @select="select"
                      :default-openeds="defaultOpeneds"
             >

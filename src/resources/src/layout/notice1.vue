@@ -1,9 +1,9 @@
 <template>
     <el-dropdown placement="bottom" trigger="click" @visible-change="noticeShow" :style="['line-height: 1',noticeCount > 0 ? 'margin-right: 5px':'']">
         <div class="right-menu-item hover-effect">
-            <i class="el-icon-bell hover-effect" style="font-size: 16px;color: #ffffff" v-if="noticeCount === 0"/>
+            <i class="el-icon-bell hover-effect" style="font-size: 16px" v-if="noticeCount === 0"/>
             <el-badge :value="noticeCount" :max="99" type="danger" v-else>
-                <i class="el-icon-bell hover-effect" style="font-size: 16px;color: #ffffff"/>
+                <i class="el-icon-bell hover-effect" style="font-size: 16px"/>
             </el-badge>
         </div>
         <template #dropdown>
@@ -191,7 +191,7 @@
             transition: background .3s;
 
             &:hover {
-                background-color: hsla(0,0%,100%,.1);
+                background-color: #f9f9f9;
             }
         }
     }

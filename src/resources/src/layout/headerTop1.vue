@@ -2,7 +2,7 @@
     <div class="header-container">
         <i v-if="sidebar.visible || state.device === 'mobile'" :class="sidebar.opend?'el-icon-s-unfold hamburger':'el-icon-s-fold hamburger'"
            style="font-size: 18px" @click="collapse"/>
-        <el-menu :default-active="activeIndex" text-color="hsla(0,0%,100%,.7)" active-text-color="#ffffff" background-color="rgb(64, 158, 255)" @select="selectMenu" class="menu" mode="horizontal" v-show="state.topMenuMode && state.device === 'desktop'">
+        <el-menu :default-active="activeIndex" @select="selectMenu" class="menu" mode="horizontal" v-show="state.topMenuMode && state.device === 'desktop'">
             <el-menu-item v-for="item in menus" :index="item.id+''">
                 <i :class="item.icon" v-if="item.icon"></i>
                 <span slot="title">{{item.name}}</span>
@@ -25,8 +25,8 @@
                     <div class="avatar-wrapper">
                         <img :src="state.info.avatar" class="user-avatar">
                         <span class="right-menu-item" style="line-height: 1">
-                        <span style="color: #ffffff">{{ state.info.nickname }}</span>
-                        <div style="line-height: 18px"><el-badge is-dot type="success" style="top:4px;"/> <span style="color: #ffffff">{{ state.info.username }}</span></div>
+                        <span style="color: #777777">{{ state.info.nickname }}</span>
+                        <div style="line-height: 18px"><el-badge is-dot type="success" style="top:4px;"/> <span style="color: #999999">{{ state.info.username }}</span></div>
                         </span>
                         <i class="el-icon-caret-bottom" style="line-height: 30px"/>
                     </div>
@@ -183,13 +183,10 @@
         scrollbar-width:none;
         display: flex;
     }
-    .menu .el-menu-item:hover{
-        background-color: hsla(0,0%,100%,.1)!important;
-    }
     .header-container {
         display: flex;
         align-items: center;
-        background: rgb(64, 158, 255);
+        background: #FFFFFF;
         height: 60px;
         width: 100%;
         /*box-shadow: 0 1px 4px rgba(0, 21, 41, .08);*/
@@ -198,7 +195,6 @@
     .hamburger {
         padding: 0 10px;
         cursor: pointer;
-        color: #ffffff;
     }
 
     .right-menu {
@@ -208,7 +204,7 @@
         display: -webkit-flex;
         align-items: center;
         justify-content: center;
-        color: #ffffff;
+        color: #333;
 
         &:focus {
             outline: none;
@@ -225,7 +221,7 @@
                 transition: background .3s;
 
                 &:hover {
-                    background-color: hsla(0,0%,100%,.1);
+                    background-color: #f9f9f9;
                 }
             }
         }
@@ -243,14 +239,14 @@
                 display: -webkit-flex;
                 align-items: center;
                 justify-content: center;
-                color: #ffffff;
+                color: #000011;
                 position: relative;
                 padding: 0 8px;
 
                 &:hover {
                     cursor: pointer;
                     transition: background .3s;
-                    background-color: hsla(0,0%,100%,.1);
+                    background-color: #f9f9f9;
                 }
                 .el-icon-caret-bottom {
                     cursor: pointer;

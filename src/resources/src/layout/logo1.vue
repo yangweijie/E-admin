@@ -41,8 +41,7 @@
         height: 60px;
         width: 100%;
         line-height: 60px;
-        background: rgb(64, 158, 255);
-
+        border-bottom: 1px solid #101117;
         text-align: center;
         overflow: hidden;
         & .sidebar-logo-link {

@@ -1,8 +1,9 @@
 
 .sidebar-container{
   width: $sideBarWidth;
+  background-color: $subMenuBg;
   box-shadow: 0px 8px 14.72px 1.28px rgba(229, 228, 230, 0.5);
-  background: #ffffff;
+  border-right: 1px solid #e3e3e3;
   height: 100%;
   transition: width .28s ease-in-out;
   .horizontal-collapse-transition {
@@ -12,10 +13,10 @@
     border-right: 0px!important;
   }
   .el-menu .el-submenu__title {
-    //background-color: $subMenuHover !important;
+    background-color: $subMenuHover !important;
   }
   .el-menu--inline .el-submenu__title {
-   // background-color: #000000 !important;
+    background-color: #000000 !important;
   }
   // menu hover
   .el-submenu .el-submenu__title {
@@ -45,10 +46,10 @@
     background: linear-gradient(to right,$--color-primary,rgba($--color-primary,1),rgba($--color-primary,.7)) !important;
   }
   .is-active>.el-submenu__title {
-    border-right: 3px solid $--color-primary!important;
+    border-left: 3px solid $--color-primary!important;
   }
   .is-active>.el-menu--inline .el-submenu__title {
-    border-right: none!important;
+    border-left: none!important;
   }
   & .nest-menu .el-submenu>.el-submenu__title,
   & .el-menu-item {
@@ -61,7 +62,7 @@
       -webkit-transition: all 0.3s;
     }
     //min-width: $sideBarWidth !important;
-    //background-color: $subMenuBg !important;
+    background-color: $subMenuBg !important;
     &:hover {
       span {
         margin-left: 5px;
