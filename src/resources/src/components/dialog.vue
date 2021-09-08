@@ -6,7 +6,7 @@
                     <slot></slot>
             <render :data="content" :slot-props="slotProps" @success="emitSuccess()"></render>
             <template #footer v-if="footer">
-                <div v-if="footerShow">
+                <div v-if="footerShow" class="eadmin_footer">
                     <render v-for="item in action.leftAction" :data="item"></render>
                     <render v-if="action.submit" :loading="dialogRef.loading" :data="action.submit" :disabled="dialogRef.disabled"></render>
                     <render v-if="action.reset" :data="action.reset" @click="dialogRef.resetForm"></render>
@@ -147,5 +147,8 @@
     }
     .eadmin-dialog .el-dialog__body{
         overflow: auto;
+    }
+    .eadmin_footer .el-button{
+        margin-right: 10px;
     }
 </style>

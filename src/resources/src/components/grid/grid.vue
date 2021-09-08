@@ -548,7 +548,6 @@
             }
             //删除请求
             function deleteRequest(message,ids) {
-
                 ElMessageBox.confirm(message,'是否继续?',{type: 'warning'}).then(()=>{
                     let params = {}
                     if(trashed.value){
