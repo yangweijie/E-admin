@@ -178,6 +178,7 @@
 </script>
 
 <style lang="scss" scoped>
+    @import '../styles/element-variables.scss';
     .menu{
         overflow-x: auto;
         scrollbar-width:none;
@@ -189,7 +190,7 @@
     .header-container {
         display: flex;
         align-items: center;
-        background: rgb(64, 158, 255);
+        background: $--color-primary;
         height: 60px;
         width: 100%;
         /*box-shadow: 0 1px 4px rgba(0, 21, 41, .08);*/

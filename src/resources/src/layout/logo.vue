@@ -2,8 +2,8 @@
     <div class="sidebar-logo-container" :class="{'collapse':!collapse}">
         <transition name="sidebarLogoFade">
             <router-link key="collapse" class="sidebar-logo-link" to="/">
-                <img :src="state.info.webLogo" class="sidebar-logo">
-                <h1 v-if="collapse" class="sidebar-title">{{state.info.webName}}</h1>
+                <el-image :src="state.info.webLogo" fit="contain" style="width:220px;height:50px;"></el-image>
+<!--                <h1 v-if="collapse" class="sidebar-title">{{state.info.webName}}</h1>-->
             </router-link>
         </transition>
     </div>
@@ -42,7 +42,6 @@
         width: 100%;
         line-height: 60px;
         background: rgb(64, 158, 255);
-
         text-align: center;
         overflow: hidden;
         & .sidebar-logo-link {

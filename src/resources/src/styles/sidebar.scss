@@ -28,7 +28,7 @@
       -webkit-transition: all 0.3s;
     }
     &:hover {
-      border-left: 3px solid $--color-primary!important;
+      border-right: 3px solid $--color-primary!important;
       span {
         margin-left: 5px;
       }
@@ -91,7 +91,22 @@
   &  .el-menu-item.is-active {
     margin: 0!important;
     border-radius: 0 !important;
+    background: none!important;
+    box-shadow: none!important;
+    border-right: 3px solid $--color-primary!important;
+    i{
+      color: #909399 !important;
+    }
+    &:hover {
+      span {
+        color: #909399 !important;
+      }
+      i{
+        color: #909399 !important;
+      }
+    }
   }
+
 }
 .mobile .sidebar-container {
   position: fixed;

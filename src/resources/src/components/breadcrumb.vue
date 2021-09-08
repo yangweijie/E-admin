@@ -22,4 +22,10 @@
     .breadcrumb{
         white-space: nowrap;
     }
+    .breadcrumb /deep/ .el-breadcrumb__separator{
+       color: #ffffff !important;
+    }
+    .breadcrumb /deep/ .el-breadcrumb__inner{
+       color: #ffffff !important;
+    }
 </style>

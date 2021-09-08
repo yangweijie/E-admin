@@ -1,5 +1,6 @@
 <template>
     <div :class="['app-wrapper',state.device === 'mobile' ? 'mobile':'']">
+        <div style="height: 60px;background: #409eff;width: 100%;position: fixed"></div>
         <sidebar v-if="sidebar.visible"></sidebar>
         <div class="main-container">
             <header-top></header-top>
@@ -11,7 +12,7 @@
                         <span class="title">{{state.mainTitle}}</span>
                         <span class="desc" v-if="state.mainDescription">{{state.mainDescription}}</span>
                     </div>
-                    <breadcrumb style="margin-right: 5px" v-if="state.topMenuMode && state.device != 'mobile'"></breadcrumb>
+                    <breadcrumb class="indexBreadcrumb" style="margin-right: 5px" v-if="state.topMenuMode && state.device != 'mobile'"></breadcrumb>
                     <el-button style="margin-right: 0" v-if="!state.topMenuMode && state.device != 'mobile'" size="mini" @click="back">返回上一页</el-button>
                 </div>
                 <el-backtop target=".main-content"></el-backtop>
@@ -113,5 +114,11 @@
         font-size: 24px;
         font-family: Montserrat,Nunito,sans-serif;
         margin-bottom: 10px;
+    }
+    .indexBreadcrumb /deep/ .el-breadcrumb__separator{
+        color: #777777 !important;
+    }
+    .indexBreadcrumb /deep/ .el-breadcrumb__inner{
+        color: #777777 !important;
     }
 </style>
