@@ -11,7 +11,7 @@ body {
   background: #e9ecf3;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+ // font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
   padding: 0;
   margin: 0;
 }
@@ -73,5 +73,7 @@ body *::-webkit-scrollbar-thumb:hover {
 
   padding:8px;
 }
-
+.ant-table-tbody{
+  font-size:12px;
+}
 
