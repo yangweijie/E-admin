@@ -2,7 +2,7 @@
     <div class="header-container">
         <i v-if="sidebar.visible || state.device === 'mobile'" :class="sidebar.opend?'el-icon-s-unfold hamburger':'el-icon-s-fold hamburger'"
            style="font-size: 18px" @click="collapse"/>
-        <el-menu :default-active="activeIndex" text-color="hsla(0,0%,100%,.7)" active-text-color="#ffffff" background-color="rgb(64, 158, 255)" @select="selectMenu" class="menu" mode="horizontal" v-show="state.topMenuMode && state.device === 'desktop'">
+        <el-menu :default-active="activeIndex" text-color="hsla(0,0%,100%,.7)" active-text-color="#ffffff" :background-color="variables.theme" @select="selectMenu" class="menu" mode="horizontal" v-show="state.topMenuMode && state.device === 'desktop'">
             <el-menu-item v-for="item in menus" :index="item.id+''">
                 <i :class="item.icon" v-if="item.icon"></i>
                 <span slot="title">{{item.name}}</span>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-
+    import variables  from '../styles/element-variables.scss';
     import {useRoute} from 'vue-router'
     import {link, findParent, findTree,refresh} from '@/utils'
     import {defineComponent, watch, inject, computed} from 'vue'
@@ -171,14 +171,16 @@
                 sidebar,
                 menus,
                 logout,
-                refreshs
+                refreshs,
+                variables
+
             }
         }
     })
 </script>
 
 <style lang="scss" scoped>
-    @import '../styles/element-variables.scss';
+    @import '@/styles/theme.scss';
     .menu{
         overflow-x: auto;
         scrollbar-width:none;

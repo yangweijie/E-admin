@@ -57,6 +57,7 @@
         },
         emits: ['update:modelValue','update:show','update:reRender','success',],
         setup(props, ctx) {
+          console.log(props)
             const dialogRef = ref('')
             const state = reactive({
                 footer:false,

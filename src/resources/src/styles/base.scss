@@ -1,0 +1,181 @@
+@import "./theme.scss"; // 引入_themes.scss
+
+//遍历主题map
+@mixin themeify {
+
+  @each $theme-name,
+  $theme-map in $themes {
+    //!global 把局部变量强升为全局变量
+    $theme-map: $theme-map !global;
+
+    //这步是判断html的data-theme的属性值  #{}是sass的插值表达式
+    //& sass嵌套里的父容器标识   @content是混合器插槽，像vue的slot
+    [data-theme="#{$theme-name}"] & {
+      @content;
+    }
+  }
+}
+
+//声明一个根据Key获取颜色的function
+@function themed($key) {
+  @return map-get($theme-map, $key);
+}
+
+//获取背景透明度
+@mixin background($color) {
+  @include themeify {
+    background: themed($color)
+  }
+}
+
+@mixin background_imp($color) {
+  @include themeify {
+    background: themed($color) !important
+  }
+}
+
+//获取背景颜色
+@mixin background_color($color) {
+  @include themeify {
+    background-color: themed($color)
+  }
+}
+
+@mixin background_color_imp($color) {
+  @include themeify {
+    background: themed($color) !important;
+    background-color: themed($color) !important;
+  }
+}
+
+//获取字体颜色
+@mixin font_color($color) {
+  @include themeify {
+    color: themed($color);
+  }
+}
+
+@mixin font_color_imp($color) {
+  @include themeify {
+    color: themed($color) !important
+  }
+}
+
+//获取边框颜色
+@mixin border_color($color) {
+  @include themeify {
+    border-color: themed($color)
+  }
+}
+
+@mixin border_color_imp($color) {
+  @include themeify {
+    border-color: themed($color) !important
+  }
+}
+
+.app-wrapper {
+  @include background_color_imp(main-black);
+  @include font_color_imp(font);
+}
+
+.header-title .title {
+  @include font_color_imp(font);
+}
+
+.tools {
+  @include background_color_imp(black);
+}
+.filter{
+  @include border_color_imp(main-black);
+  @include background_color_imp(black);
+}
+.eadmin-form {
+  @include background_color_imp(black);
+}
+
+.ant-table, .ant-table-fixed, .ant-table-thead > tr > th, .pagination {
+  @include background_color_imp(black);
+  @include font_color_imp(font);
+  @include border_color_imp(main-black);
+}
+.ant-table-tbody> tr > td{
+  @include border_color_imp(main-black);
+}
+.ant-table-thead > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-thead > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td{
+  @include background_color_imp(main-black);
+}
+.header-container{
+  @include background_color_imp(black);
+  @include font_color_imp(font);
+}
+.menu, .menu .el-menu-item{
+  @include background_color_imp(black);
+  @include font_color_imp(font);
+}
+.sidebar-logo-container{
+  @include background_color_imp(main-black);
+}
+.sidebar-container,.sidebar-container .el-menu,.sidebar-container .el-menu .el-menu-item,.sidebar-container .el-menu .el-submenu__title{
+  @include font_color_imp(font);
+  @include background_color_imp(black);
+}
+
+.tagsView{
+  @include font_color_imp(font);
+  @include background_color_imp(black);
+  @include border_color_imp(main-black);
+}
+.back{
+  @include border_color_imp(main-black);
+}
+.tagsView .activte{
+  @include font_color_imp(font);
+  @include background_color_imp(main-black);
+}
+.el-input__inner,input{
+  @include font_color_imp(font);
+  @include background_color_imp(main-black);
+  @include border_color_imp(main-black);
+}
+.el-popper[role="tooltip"],.el-select-dropdown__item{
+  @include font_color_imp(font);
+  @include background_color_imp(black);
+  @include border_color_imp(main-black);
+}
+.el-picker-panel,.el-date-table th,.el-picker-panel__footer,.el-date-range-picker__time-header,.el-date-range-picker__content{
+  @include font_color_imp(font);
+  @include background_color_imp(black);
+  @include border_color_imp(main-black);
+}
+.el-time-panel,.el-time-panel__footer{
+  @include font_color_imp(font);
+  @include background_color_imp(main-black);
+  @include border_color_imp(black);
+}
+.el-time-spinner__item.active:not(.disabled){
+  @include font_color_imp(white);
+}
+.el-time-panel .cancel{
+  @include font_color_imp(white);
+}
+.el-time-spinner__item{
+  @include background_color_imp(main-black);
+  @include border_color_imp(black);
+}
+
+.el-tabs__item{
+  @include font_color_imp(white);
+}
+.el-tabs__item.is-active{
+  @include font_color_imp(theme);
+}
+.el-card{
+  @include background_color_imp(black);
+  @include border_color_imp(main-black);
+}
+
+
+
+
+

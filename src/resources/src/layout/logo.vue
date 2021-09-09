@@ -27,6 +27,7 @@
 </script>
 
 <style lang="scss" scoped>
+    @import '@/styles/theme.scss';
     .sidebarLogoFade-enter-active {
         transition: opacity 1.5s;
     }
@@ -41,7 +42,7 @@
         height: 60px;
         width: 100%;
         line-height: 60px;
-        background: rgb(64, 158, 255);
+        background: $--color-primary;
         text-align: center;
         overflow: hidden;
         & .sidebar-logo-link {

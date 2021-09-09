@@ -4,7 +4,8 @@
 **/
 
 /* theme color */
-$--color-primary: #409eff;
+//$--color-primary: #409eff;
+@import "./theme.scss";
 $--color-success: #13ce66;
 $--color-warning: #FFBA00;
 $--color-danger: #ff4949;

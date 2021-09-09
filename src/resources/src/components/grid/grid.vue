@@ -68,7 +68,9 @@
         </div>
         <div v-if="custom" >
             <a-list :data-source="tableData" :loading="loading" row-key="eadmin_id" v-bind="custom.attribute">
-                <template #header v-if="custom.header"><render :data="custom.header" :slot-props="grid"></render></template>
+                <template #header v-if="custom.header">
+                  <render :data="custom.header" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params" :slot-props="grid"></render>
+                </template>
                 <template #footer v-if="custom.footer"><render :data="custom.footer" :slot-props="grid"></render></template>
                 <template #renderItem="{ item }">
                     <a-list-item>
@@ -96,7 +98,7 @@
             <!--表格-->
             <a-table v-else :row-selection="rowSelection" @expand="expandChange" @change="tableChange" :columns="tableColumns" :data-source="tableData"  :expanded-row-keys="expandedRowKeys" :pagination="false" :loading="loading" v-bind="$attrs" row-key="eadmin_id" ref="dragTable">
                 <template #title v-if="header">
-                    <div class="header"><render :data="header" :slot-props="grid"></render></div>
+                    <div class="header"><render v-for="item in header" :data="item" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params"  :slot-props="grid"></render></div>
                 </template>
                 <template v-for="column in tableColumns" v-slot:[column.slots.title]>
                     <render :data="column.header" :slot-props="grid"></render>
@@ -716,9 +718,10 @@
     })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    @import '@/styles/theme.scss';
     .searchButton{
-        background:#409eff!important;
+        background-color: $--color-primary!important;
         color: #FFFFFF!important;
         border-radius:0!important;
         border-top-right-radius:4px!important;
