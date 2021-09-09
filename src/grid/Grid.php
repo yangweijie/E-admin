@@ -155,13 +155,14 @@ class Grid extends Component
      */
     public function header($header){
         if (is_string($header)) {
-            $header = Html::create()->content($header);
+            $html = Html::create()->content($header);
+            $header = [$html];
         } elseif (is_array($header)) {
-            $html = Html::create();
-            foreach ($header as $item) {
-                $html->content($item);
+            foreach ($header as &$item) {
+                if(!($item instanceof Component)){
+                    $item = Html::create($item);
+                }
             }
-            $header = $html;
         }
         //头部
         $this->attr('header', $header);
