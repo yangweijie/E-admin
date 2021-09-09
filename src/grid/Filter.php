@@ -28,6 +28,7 @@ use think\model\relation\HasOne;
 use think\model\relation\MorphMany;
 use think\model\relation\MorphOne;
 use Eadmin\form\field\Input;
+use think\model\relation\MorphTo;
 
 class Filter
 {
@@ -692,7 +693,7 @@ class Filter
     {
         if (method_exists($this->model, $relation_method)) {
             $relation = $this->model->$relation_method();
-            if ($relation instanceof Relation) {
+            if ($relation instanceof Relation && !($relation instanceof MorphTo)) {
                 $relationModel = get_class($relation->getModel());
                 $relation_table = $relation->getTable();
                 $foreignKey = $relation->getForeignKey();
@@ -713,7 +714,7 @@ class Filter
                     $sql = $this->relationModel->db()->whereRaw("{$pk}={$this->db->getTable()}.{$foreignKey}")->buildSql();
                 } else if ($relation instanceof HasOne) {
                     $sql = $this->relationModel->db()->whereRaw("{$foreignKey}={$this->db->getTable()}.{$pk}")->buildSql();
-                } else if ($relation instanceof MorphOne || $relation instanceof MorphMany) {
+                }else if ($relation instanceof MorphOne || $relation instanceof MorphMany) {
                     $reflectionClass = new \ReflectionClass($relation);
                     $propertys = ['morphKey', 'morphType', 'type'];
                     $propertyValues = [];
