@@ -9,6 +9,7 @@ use Eadmin\component\basic\Html;
 use Eadmin\component\basic\Message;
 use Eadmin\component\basic\Notification;
 use Eadmin\controller\Backup;
+use Eadmin\controller\Config;
 use Eadmin\controller\Crontab;
 use Eadmin\controller\FileSystem;
 use Eadmin\controller\Log;
@@ -48,9 +49,17 @@ class Admin
             if (is_null($value)) {
                 return '';
             } else {
-                return $value;
+                $json = json_decode($value,true);
+                if (is_null($json)) {
+                    return $value;
+                }else{
+                    return $json;
+                }
             }
         } else {
+            if(is_array($value)){
+                $value = json_encode($value,JSON_UNESCAPED_UNICODE);
+            }
             $sysconfig = Db::name('SystemConfig')->where('name', $name)->find();
             if ($sysconfig) {
                 return Db::name('SystemConfig')->where('name', $name)->update(['value' => $value]);
@@ -398,5 +407,7 @@ class Admin
         app()->route->any('crontab/clear', Crontab::class . '@clear');
         app()->route->any('crontab/exec', Crontab::class . '@exec');
         app()->route->get('crontab', Crontab::class . '@index');
+        //系统开发配置
+        app()->route->get('system_config', Config::class . '@index');
     }
 }
