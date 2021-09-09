@@ -395,7 +395,7 @@
                 return new Promise((resolve, reject) =>{
                     request({
                         url: 'eadmin/batch.rest',
-                        params:Object.assign(props.params,route.query),
+                        params:Object.assign(props.params,props.addParams,route.query),
                         method: 'put',
                         data:{
                             action:action,
