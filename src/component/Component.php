@@ -39,6 +39,24 @@ abstract class Component implements \JsonSerializable
     protected $directive = [];
     //双向绑定
     protected $modelBind = [];
+    //初始化
+    protected static $init = [];
+    public function __construct()
+    {
+        foreach (self::$init as $class =>$init){
+            if(static::class == $class){
+                call_user_func($init, $this);    
+            }
+        }
+    }
+    /**
+     * 初始化
+     * @param \Closure $closure
+     */
+    public static function init(\Closure $closure)
+    {
+        self::$init[static::class] = $closure;
+    }
     /**
      * 设置标题
      * @param string $title

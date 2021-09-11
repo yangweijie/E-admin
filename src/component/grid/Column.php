@@ -54,6 +54,7 @@ class Column extends Component
 
     public function __construct($prop, $label, $grid)
     {
+        parent::__construct();
         $this->attr('slots', ['title' => 'eadmin_' . $prop, 'customRender' => 'default']);
         if (!empty($prop)) {
             $this->prop = $prop;

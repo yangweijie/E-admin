@@ -36,6 +36,7 @@ class FormAction extends Component
     protected $rightAction = [];
     public function __construct($form)
     {
+        parent::__construct();
         $this->form = $form;
         $submitField = $this->form->bindAttr('submit');
         $this->submitButton = Button::create('保存')->sizeMedium()

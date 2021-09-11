@@ -29,6 +29,7 @@ abstract class Field extends Component
 
     public function __construct($field = null, $value = '')
     {
+        parent::__construct();
         $this->attr('data-tag', 'component');
         $this->bindValue($value, 'modelValue', $field);
     }

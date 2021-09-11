@@ -95,15 +95,14 @@ class Grid extends Component
     protected $tools = [];
     //展开行
     protected $expandRow = null;
-    //初始化
-    protected static $init = null;
+   
     //自定义列表元素
     protected $customClosure = null;
 
     protected $get = [];
     public function __construct($data)
     {
-
+        parent::__construct();
         if ($data instanceof Model) {
             $this->drive = new \Eadmin\grid\drive\Model($data);
         } elseif ($data instanceof GridInterface) {
@@ -130,9 +129,6 @@ class Grid extends Component
         $this->parseCallMethod();
         $this->bind('eadmin_description', '列表');
         $this->get = request()->get();
-        if (!is_null(self::$init)) {
-            call_user_func(self::$init, $this);
-        }
     }
     public static function create($data,\Closure $closure){
         $self  = new self($data);
@@ -444,16 +440,7 @@ class Grid extends Component
     {
         $this->pagination->pageSize($limit);
     }
-
-    /**
-     * 初始化
-     * @param \Closure $closure
-     */
-    public static function init(\Closure $closure)
-    {
-        self::$init = $closure;
-    }
-
+    
     /**
      * 添加表格列
      * @param string $field 字段

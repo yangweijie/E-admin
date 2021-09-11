@@ -25,6 +25,7 @@ class FileSystem extends Component
 
 	public function __construct($data)
 	{
+        parent::__construct();
         $this->bindAttValue('modelValue', false, true);
         $this->bindAttValue('addParams',[]);
 		$this->attr('total', count($data));

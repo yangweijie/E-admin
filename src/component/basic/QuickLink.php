@@ -18,6 +18,7 @@ class QuickLink extends Component
 
     public function __construct($text, $icon, $color)
     {
+        parent::__construct();
         $this->attr('data-tag', 'div');
         $this->content(
             Card::create([

@@ -120,13 +120,13 @@ class Form extends Component
     protected $batch = false;
     //排除字段
     protected $exceptField = [];
-    //初始化
-    protected static $init = null;
+  
 
     protected $imageUploads = [];
 
     public function __construct($data)
     {
+        parent::__construct();
         if ($data instanceof Model) {
             $this->drive = new \Eadmin\form\drive\Model($data);
         } elseif ($data instanceof FormInterface) {
@@ -149,9 +149,6 @@ class Form extends Component
         $this->validator = new ValidatorForm();
         $this->validatorBind();
         $this->description(Request::param('eadmin_description'));
-        if (!is_null(self::$init)) {
-            call_user_func(self::$init, $this);
-        }
     }
 
     public static function create($data, \Closure $closure)
@@ -161,16 +158,7 @@ class Form extends Component
         $self->setExec($closure);
         return $self;
     }
-
-    /**
-     * 初始化
-     * @param \Closure $closure
-     */
-    public static function init(\Closure $closure)
-    {
-        self::$init = $closure;
-    }
-
+    
     /**
      * 设置标题
      * @param string $title
