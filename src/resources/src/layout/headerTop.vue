@@ -20,6 +20,11 @@
                 </div>
             </el-tooltip>
             <notice></notice>
+            <el-tooltip effect="dark" :content="state.theme == 'light'?'亮色':'深色'" placement="bottom">
+              <div class="right-menu-item hover-effect" @click="changeTheme">
+                <i :class="state.theme == 'light'?'fa fa-sun-o':'fa fa-moon-o'"/>
+              </div>
+            </el-tooltip>
             <a-dropdown trigger="click" class="avatar-container" >
                 <div>
                     <div class="avatar-wrapper">
@@ -45,7 +50,7 @@
 </template>
 
 <script>
-    import variables  from '../styles/element-variables.scss';
+    import variables  from '../styles/theme.scss';
     import {useRoute} from 'vue-router'
     import {link, findParent, findTree,refresh} from '@/utils'
     import {defineComponent, watch, inject, computed} from 'vue'
@@ -163,6 +168,10 @@
             function refreshs() {
                 refresh()
             }
+            //切换深色主题
+            function changeTheme(){
+              action.changeTheme()
+            }
             return {
                 activeIndex,
                 state,
@@ -172,8 +181,8 @@
                 menus,
                 logout,
                 refreshs,
-                variables
-
+                variables,
+                changeTheme
             }
         }
     })
@@ -192,7 +201,7 @@
     .header-container {
         display: flex;
         align-items: center;
-        background: $--color-primary;
+        background: $theme;
         height: 60px;
         width: 100%;
         /*box-shadow: 0 1px 4px rgba(0, 21, 41, .08);*/

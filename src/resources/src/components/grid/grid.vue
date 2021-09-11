@@ -7,10 +7,8 @@
                     <!--快捷搜索-->
                     <el-input class="hidden-md-and-down" v-model="quickSearchValue" clearable prefix-icon="el-icon-search"
                               size="small" style="margin-right: 10px;flex: 1" :placeholder="quickSearchText" @change="handleFilter"  @keyup.enter="handleFilter">
-                        <template #append>
-                            <el-button class="hidden-md-and-down searchButton" type="primary" size="small" @click="handleFilter">搜索</el-button>
-                        </template>
                     </el-input>
+                   <el-button class="hidden-md-and-down searchButton" type="primary" size="small" @click="handleFilter">搜索</el-button>
                 </el-col>
                 <el-col :md="quickSearch ? 15:20" style="margin-bottom: 10px">
                     <!--添加-->
@@ -96,7 +94,7 @@
                 </el-row>
             </div>
             <!--表格-->
-            <a-table v-else :row-selection="rowSelection" @expand="expandChange" @change="tableChange" :columns="tableColumns" :data-source="tableData"  :expanded-row-keys="expandedRowKeys" :pagination="false" :loading="loading" v-bind="$attrs" row-key="eadmin_id" ref="dragTable">
+            <a-table v-else :row-selection="rowSelection" @expand="expandChange" @change="tableChange" :columns="tableColumns" :data-source="tableData"  :expanded-row-keys="expandedRowKeys" :pagination="false" :loading="tableLoading" v-bind="$attrs" row-key="eadmin_id" ref="dragTable">
                 <template #title v-if="header">
                     <div class="header"><render v-for="item in header" :data="item" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params"  :slot-props="grid"></render></div>
                 </template>
@@ -245,6 +243,7 @@
             let size = props.pagination.pageSize || 20
             let sortableParams = {}
             let filterInitData = null
+            let activatedLoading = false
             function globalRequestParams(){
                 let requestParams = {
                     ajax_request_data: 'page',
@@ -274,9 +273,10 @@
                 }
             })
             onActivated((e)=>{
-
                 if(!props.static){
                     loading.value = true
+                    activatedLoading = true
+                  console.log(activatedLoading)
                 }
                 if(excel.excelTimer != null){
                     clearInterval(excel.excelTimer)
@@ -501,6 +501,11 @@
                     proxyData[props.filterField] = Object.assign(proxyData[props.filterField],JSON.parse(JSON.stringify(filterInitData)))
                 }
             }
+            const tableLoading = computed(()=>{
+              const load =  loading.value && !activatedLoading
+              activatedLoading = false
+              return load
+            })
             //请求获取数据
             function loadData() {
                 http({
@@ -689,6 +694,7 @@
                 expandChange,
                 handleCurrentChange,
                 loading,
+                tableLoading,
                 tableData,
                 quickSearchValue,
                 rowSelection,
@@ -719,14 +725,6 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '@/styles/theme.scss';
-    .searchButton{
-        background-color: $--color-primary!important;
-        color: #FFFFFF!important;
-        border-radius:0!important;
-        border-top-right-radius:4px!important;
-        border-bottom-right-radius:4px!important;
-    }
     .custom{
         background: none !important;
         padding-left: 0 !important;

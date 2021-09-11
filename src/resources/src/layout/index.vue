@@ -1,6 +1,6 @@
 <template>
     <div :class="['app-wrapper',state.device === 'mobile' ? 'mobile':'']">
-        <div style="height: 60px;background: #409eff;width: 100%;position: fixed"></div>
+        <div class="headerBg" :style="{background:state.theme == 'light'?'background: #409eff':'#2c2c42'}"></div>
         <sidebar v-if="sidebar.visible"></sidebar>
         <div class="main-container">
             <header-top></header-top>
@@ -90,6 +90,9 @@
 </script>
 
 <style scoped>
+    .headerBg{
+      height: 60px;;width: 100%;position: fixed
+    }
     .header-title .title{
         font-weight: 500;
         font-size: 20px;

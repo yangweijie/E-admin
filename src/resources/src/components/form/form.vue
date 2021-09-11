@@ -1,6 +1,6 @@
 <template>
     <el-main class='eadmin-form'>
-        <el-form ref="eadminForm" :label-position="labelPosition" v-bind="$attrs" @keyup.enter.native="sumbitForm(false)">
+        <el-form ref="eadminForm" :label-position="labelPosition" v-bind="$attrs">
             <slot></slot>
             <render :data="stepResult"></render>
             <el-form-item v-if="!action.hide" v-bind="action.attr">

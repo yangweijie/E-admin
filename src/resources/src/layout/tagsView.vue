@@ -125,7 +125,7 @@
     })
 </script>
 <style lang="scss" scoped>
-    @import '../styles/element-variables.scss';
+    @import '../styles/light';
     .tagsView {
         z-index: 1;
         display: flex;

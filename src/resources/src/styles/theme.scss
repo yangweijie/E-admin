@@ -1,19 +1,6 @@
-$--color-primary: #409eff;
-$themes: (
-        light: (
-                theme: $--color-primary,
-                white: #f0f0f0,
-                font: #a8a9bb,
-                black: #223,
-                main-black: #2c2c43,
-        ),
-        dark: (
-                white: #27292d,
-                black: #fff,
-          // 主色调1
-                main-one: #00A54F,
-          // 主色调2
-                main-two: #1B88EE
-        )
-)
-
+$theme: #409EFF;
+$light: #2c2c42;
+:export {
+  theme: $theme;
+  light: $light;
+}

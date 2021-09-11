@@ -41,7 +41,7 @@ class PieChart extends EchartAbstract
     {
         $names        = array_column($data, 'name');
         $this->legend = array_merge($this->legend, $names);
-        $length       = count($this->series)+1;
+        $length       = count($this->series);
         $start        = $length * 30 + 10;
         $end          = $start + ($length + 1) * 20;
         if($end > 100){

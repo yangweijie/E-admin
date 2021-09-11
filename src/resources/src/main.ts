@@ -1,5 +1,4 @@
 import ElementPlus from "element-plus";
-import 'element-plus/lib/theme-chalk/index.css';
 import 'font-awesome/css/font-awesome.css'
 import router from './router'
 import {store,state,action} from './store'

@@ -178,7 +178,7 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '../styles/element-variables.scss';
+    @import '../styles/light';
     .right-menu-item {
 
         display: inline-block;

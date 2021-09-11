@@ -42,7 +42,7 @@
         height: 60px;
         width: 100%;
         line-height: 60px;
-        background: $--color-primary;
+        background: $theme;
         text-align: center;
         overflow: hidden;
         & .sidebar-logo-link {

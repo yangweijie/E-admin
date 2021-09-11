@@ -1,6 +1,7 @@
+// @ts-ignore
 import {reactive} from "vue";
 import request from '@/utils/axios'
-import {findTree, appendCss, setObjectValue} from '@/utils'
+import {findTree, appendCss} from '@/utils'
 export const store = Symbol()
 // 使用 reactive 函数完成响应式转换
 const states = reactive({
@@ -43,10 +44,28 @@ const states = reactive({
     menus: [],
     menuModule: '',
     breadcrumb: [],
+    theme:'',
 });
 export const state = states
 //操作方法
 const action = {
+    //切换主题
+    changeTheme(){
+        if(state.theme == 'light'){
+            state.theme = ''
+            window.document.documentElement.removeAttribute('data-theme')
+            // @ts-ignore
+            document.getElementById('theme_light').remove()
+        }else{
+            state.theme = 'light'
+            window.document.documentElement.setAttribute('data-theme','light')
+            const el = document.createElement('link')
+            el.rel='stylesheet'
+            el.id = 'theme_light'
+            el.href="theme/light/index.css"
+            document.getElementsByTagName('head')[0].appendChild(el)
+        }
+    },
     //刷新
     refresh(bool:boolean){
         states.refresh = bool

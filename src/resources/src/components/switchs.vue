@@ -68,7 +68,7 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '../styles/element-variables.scss';
+    @import '../styles/light';
     .ant-switch-checked {
         background-color: $--color-primary;
     }
