@@ -129,7 +129,7 @@ class Upload extends Field
     public function jsonSerialize()
     {
         if ($this->attr('upType') === 'local' && is_null($this->attr('finder'))) {
-            $filesystem = Admin::dispatch('/filesystem');
+            $filesystem = Admin::dispatch('/filesystem?uploadFinder=true');
             $uploadButton = clone $this;
             $uploadButton->finder(false)
                 ->attr('foreverShow', true)

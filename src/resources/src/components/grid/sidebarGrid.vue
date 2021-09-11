@@ -39,7 +39,10 @@
             gridValue: Boolean,
             header: Boolean,
             tree: Object,
-            default: [String, Number],
+            default: {
+              type:  [String, Number],
+              default:'',
+            },
             tools: [Object, Boolean],
             params:  {
                 type: Object,
@@ -53,6 +56,7 @@
         },
         emits:['update:gridValue','update:gridParams'],
         setup(props,ctx){
+            ctx.emit('update:gridParams',props.params)
             const {loading,http} = useHttp()
             const state = reactive({
                 current:props.default,
@@ -78,7 +82,7 @@
                 }else{
                     state.editUrl = ''
                 }
-                ctx.emit('update:gridParams',Object.assign(params,props.params))
+                ctx.emit('update:gridParams',Object.assign(props.params,params))
                 ctx.emit('update:gridValue',true)
             }
             function filterTree (tree, arr = []) {

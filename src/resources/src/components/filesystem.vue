@@ -5,18 +5,20 @@
             <el-row style="display: flex;align-items: center;justify-content: space-between">
                 <el-col :md="16" :xs="24" >
                     <el-button-group style="display: flex">
-                        <el-button icon="el-icon-back" size="mini" @click="back"></el-button>
-                        <div class="breadcrumb">
+                        <div v-if="!uploadFinder">
+                          <el-button icon="el-icon-back" size="mini" @click="back"></el-button>
+                          <div class="breadcrumb">
                             <el-breadcrumb separator-class="el-icon-arrow-right" style="display: flex;white-space: nowrap;">
-                                <el-breadcrumb-item @click="changePath(initPath)" style="cursor: pointer">根目录</el-breadcrumb-item>
-                                <el-breadcrumb-item v-for="item in breadcrumb" @click="changePath(item.path)"
-                                                    :style="item.path ? 'cursor: pointer':''">{{item.name}}
-                                </el-breadcrumb-item>
+                              <el-breadcrumb-item @click="changePath(initPath)" style="cursor: pointer">根目录</el-breadcrumb-item>
+                              <el-breadcrumb-item v-for="item in breadcrumb" @click="changePath(item.path)"
+                                                  :style="item.path ? 'cursor: pointer':''">{{item.name}}
+                              </el-breadcrumb-item>
                             </el-breadcrumb>
+                          </div>
                         </div>
                         <el-button icon="el-icon-refresh" size="mini" @click="loading = true"></el-button>
-                        <render :data="upload" :drop-element="filesystem"  :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
-                        <el-button  size="mini" @click="mkdir">新建文件夹</el-button>
+                        <render :data="upload" :drop-element="filesystem"  :params="addParams" :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
+                        <el-button  size="mini" @click="mkdir" v-if="!uploadFinder">新建文件夹</el-button>
                         <el-button  size="mini" type="danger" v-if="selectPaths.length > 0" @click="delSelect">删除选中</el-button>
                     </el-button-group>
                 </el-col>
@@ -112,6 +114,7 @@
     import {ElMessageBox,ElLoading} from 'element-plus';
     export default defineComponent({
         name: "EadminFileSystem",
+        inheritAttrs:false,
         props: {
             modelValue: [String, Array],
             data: Array,
@@ -138,6 +141,8 @@
                 type: String,
                 default: 'grid'
             },
+            addParams:Object,
+            uploadFinder:Boolean,
         },
         emits: ['update:modelValue','update:selection'],
         setup(props,ctx) {
@@ -196,6 +201,7 @@
             watch(() => props.modelValue, (value) => {
                 if (value) {
                     loading.value = true
+                    ctx.emit('update:modelValue', false)
                 }
             })
             watch(() => state.path, value => {
@@ -221,6 +227,7 @@
                 }
             }
             function loadData() {
+
                 const requestParams = {
                     page:state.page,
                     size:state.size,
@@ -230,7 +237,7 @@
                 }
                 http({
                     url: '/filesystem',
-                    params: requestParams
+                    params: Object.assign(requestParams,props.addParams)
                 }).then(res => {
                     state.tableData = res.data
                     state.total = res.total

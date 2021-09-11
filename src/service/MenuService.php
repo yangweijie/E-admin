@@ -61,9 +61,9 @@ class MenuService
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    public function listOptions($data = [])
+    public function listOptions($data = null)
     {
-        if (count($data) == 0) {
+        if (is_null($data)) {
             $data = Db::name('system_menu')->where('status', 1)->order('sort asc,id asc')->select();
         }
         $menusList = $this->getTreeLevel($data);

@@ -84,9 +84,9 @@
         </slot>
       </span>
     </span>
-    <el-dialog title="资源库" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
+    <el-dialog  title="资源库" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
       <keep-alive>
-        <render :data="finder" :limit="limit" :multiple="multiple" display="menu" :height="finderHeight" v-model:selection="selection"></render>
+        <render :data="finder" :limit="limit" :multiple="multiple" display="menu" :height="finderHeight" v-model:selection="selection" ></render>
       </keep-alive>
       <template #footer>
         <div :class="multiple && selection.length > 0 ? 'footer':''">
@@ -302,6 +302,9 @@ export default defineComponent({
       headers: {
         Authorization: props.token
       }
+    })
+    watch(()=>props.params,value=>{
+      uploader.opts.query = Object.assign(uploader.opts.query,value)
     })
     watch(()=>props.saveDir,value=>{
       uploader.opts.query.saveDir = value

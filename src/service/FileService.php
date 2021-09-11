@@ -8,10 +8,12 @@
 
 namespace Eadmin\service;
 
+use Eadmin\Admin;
 use Intervention\Image\ImageManagerStatic;
 use Overtrue\Flysystem\Qiniu\Plugins\UploadToken;
 use think\App;
 use think\facade\Cache;
+use think\facade\Db;
 use think\facade\Filesystem;
 use Eadmin\Service;
 use think\File;
@@ -148,13 +150,17 @@ class FileService extends Service
 		}
 
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+
 		if ($isUniqidmd5) {
             $fileName = md5((string) microtime(true)) . '.' . $ext;;
 		} elseif (empty($fileName)) {
             $fileName = $file->getOriginalName();
 		}
+        $real_name = $fileName;
         $path = trim($saveDir . '/' . $fileName, '/');
+
         if($file instanceof File){
+            $real_name = $file->getOriginalName();
             $stream = file_get_contents($file->getRealPath());
         }else{
             $stream = $file;
@@ -162,6 +168,17 @@ class FileService extends Service
         $result = Filesystem::disk($this->upType)->put($path, $stream);
 		if ($result) {
 			$filename = Filesystem::disk($this->upType)->path($path);
+            Db::name('system_file')->insert([
+                'name'=>$fileName,
+                'real_name'=> $real_name,
+                'path'=>$path,
+                'cate_id'=>request()->param('cate_id',0),
+                'file_type'=>mime_content_type($filename),
+                'file_size'=>filesize($filename),
+                'uptype'=>$this->upType,
+                'admin_id'=>Admin::id(),
+                'create_time'=>date('Y-m-d H:i:s')
+            ]);
 			$this->compressImage($filename);
 			return $this->url($path);
 		} else {

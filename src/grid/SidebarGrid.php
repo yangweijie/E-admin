@@ -35,7 +35,7 @@ class SidebarGrid extends Component
      * @param string $children 子级字段名称
      * @return static
      */
-    public static function create(Model $model, Grid $grid, $id = 'id', $name = 'name', $children = 'children')
+    public static function create(Model $model, $grid, $id = 'id', $name = 'name', $children = 'children')
     {
 
         $self =  new static($model, $grid, $id, $name, $children);
@@ -183,8 +183,7 @@ class SidebarGrid extends Component
 
     public function __construct(Model $model, $grid, $id, $name, $children)
     {
-
-        $this->tag('div');
+        $this->attr('data-tag','div');
         $this->id = $id;
         $this->model = $model;
         $this->db = $model->db();
