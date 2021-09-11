@@ -62,7 +62,7 @@ const action = {
             const el = document.createElement('link')
             el.rel='stylesheet'
             el.id = 'theme_light'
-            el.href="theme/light/index.css"
+            el.href="eadmin/theme/light/index.css"
             document.getElementsByTagName('head')[0].appendChild(el)
         }
     },
