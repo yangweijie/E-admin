@@ -14,22 +14,16 @@ use Eadmin\model\SystemFile;
 use Eadmin\model\SystemFileCate;
 use Eadmin\service\FileService;
 use Eadmin\service\FileSystemService;
+use think\db\Query;
 
 class FileSystem extends Controller
 {
     public function index($uploadFinder=false)
     {
-        if ($uploadFinder) {
-            return $this->uploadFinder();
-        } else {
-            $data = FileSystemService::instance()->getFiles($this->request->get('path'), $this->request->get('search'));
-            $fileSystem = new \Eadmin\component\basic\FileSystem($data);
-            $fileSystem->initPath(FileSystemService::instance()->getPath())->title('资源库')->description('列表');
-            return $fileSystem;
-        }
+        return $this->uploadFinder($uploadFinder);
     }
 
-    public function uploadFinder()
+    public function uploadFinder($grid = false)
     {
         $search = $this->request->get('search');
         $cate_id = $this->request->get('cate_id');
@@ -51,15 +45,32 @@ class FileSystem extends Controller
         $fileSystem = new \Eadmin\component\basic\FileSystem($data);
         $fileSystem->initPath(FileSystemService::instance()->getPath())
             ->attr('height', '350px')
+            ->attr('display','menu')
             ->uploadFinder();
-        $sidebarGrid = SidebarGrid::create(new SystemFileCate(), $fileSystem)
-            ->form($this->cateForm())
-            ->field('cate_id')
-            ->params(['uploadFinder' => true]);
-        $sidebarGrid->model()->where('status', 1)->where('admin_id',Admin::id());
+        if($grid){
+            $sidebarGrid = SidebarGrid::create(new SystemFileCate(), null,'id','label')
+                ->treePid()
+                ->form($this->cateForm())
+                ->field('cate_id')
+                ->params(['uploadFinder' => true]);
+            $sidebarGrid->sidebar()->attr('fileSystem',$fileSystem);
+        }else{
+            $sidebarGrid = SidebarGrid::create(new SystemFileCate(), $fileSystem,'id','label')
+                ->treePid()
+                ->form($this->cateForm())
+                ->field('cate_id')
+                ->params(['uploadFinder' => true]);
+
+        }
+        $sidebarGrid->model()
+            ->field('id,name as label,pid')
+            ->where('status', 1)
+            ->where(function (Query $query){
+                $query->whereOr('admin_id',Admin::id())->whereOr('per_type',0);
+            });
+
         return $sidebarGrid;
     }
-
     public function cateForm()
     {
         $form = new Form(new SystemFileCate);
@@ -68,12 +79,19 @@ class FileSystem extends Controller
             ->options([0 => '顶级分类'] + array_column($options, 'label', 'id'))
             ->required();
         $form->text('name', '分类名称')->required();
+        $form->radio('per_type', '权限')
+            ->options([1=>'仅自己',0=>'所有人'])
+            ->default(1);
         $form->switch('status', '显示')->default(1);
         $form->number('sort', '排序')->default(0);
         $form->hidden('admin_id')->default(Admin::id());
         return $form;
     }
-
+    //移动分类
+    public function moveCate($ids,$cate_id){
+        SystemFile::whereIn('id',$ids)->update(['cate_id'=>$cate_id]);
+        admin_success('成功', '文件移动成功');
+    }
     //新建文件夹
     public function mkdir($path)
     {

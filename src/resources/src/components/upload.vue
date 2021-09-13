@@ -85,9 +85,19 @@
       </span>
     </span>
     <el-dialog  title="资源库" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
-      <keep-alive>
-        <render :data="finder" :limit="limit" :multiple="multiple" display="menu" :height="finderHeight" v-model:selection="selection" ></render>
-      </keep-alive>
+      <el-row :gutter="10">
+        <el-col :md="5" :sm="7" :xs="20" :span="5">
+          <keep-alive>
+            <render :data="finder" v-model:grid-params="gridParams" v-model:grid-value="gridValue" v-model:dataSource="finerCate"></render>
+          </keep-alive>
+        </el-col>
+        <el-col :md="19" :sm="24" :xs="24" :span="19">
+          <keep-alive>
+            <render :data="finder.attribute.fileSystem" :limit="limit" :multiple="multiple" display="menu" :height="finderHeight" v-model="gridValue" :cate="finerCate" :addParams="gridParams" v-model:selection="selection"></render>
+          </keep-alive>
+        </el-col>
+      </el-row>
+
       <template #footer>
         <div :class="multiple && selection.length > 0 ? 'footer':''">
           <div v-if="multiple && selection.length > 0">已选中: {{selection.length}}</div>
@@ -215,6 +225,7 @@ export default defineComponent({
   },
   emits: ['success','update:modelValue'],
   setup(props,ctx){
+
     const state = reactive({
       styleWidth: '',
       styleHeight: '',
@@ -230,11 +241,12 @@ export default defineComponent({
       // 显示隐藏上传按钮
       showUploadBtn: true,
       oss: null,
-      finderHeight:(window.innerHeight / 2) + 'px'
+      finderHeight:(window.innerHeight / 2) + 'px',
+      gridParams:{},
+      gridValue:false,
+      finerCate:[]
     })
-    if(!Array.isArray(state.selection)){
-      state.selection = [state.selection]
-    }
+
     const instance = getCurrentInstance()
     watch(()=>props.modelValue,val=>{
       if (typeof val === 'string') {
@@ -254,7 +266,7 @@ export default defineComponent({
       } else{
         state.showUploadBtn = true
       }
-      state.selection = JSON.parse(JSON.stringify(val))
+
       if(instance.parent && instance.parent.type.name === 'ElFormItem'){
         instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val.join(',')])
       }
@@ -597,8 +609,11 @@ export default defineComponent({
     }
     function submit() {
       state.dialogVisible = false
-      state.files = state.selection
-
+      if(props.multiple){
+        state.files.push(state.selection)
+      }else{
+        state.files = state.selection
+      }
     }
     return {
       btn,

@@ -396,6 +396,7 @@ class Admin
         app()->route->post('filesystem/mkdir', FileSystem::class . '@mkdir');
         app()->route->post('filesystem/rename', FileSystem::class . '@rename');
         app()->route->delete('filesystem/del', FileSystem::class . '@del');
+        app()->route->post('filesystem/moveCate', FileSystem::class . '@moveCate');
         //系统队列
         app()->route->get('queue/progress',function (){
             $queue = new QueueService(app()->request->get('id'));

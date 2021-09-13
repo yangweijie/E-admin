@@ -52,9 +52,13 @@
             field: {
                 type: String,
                 default:'group_id',
-            }
+            },
+            dataSource :{
+              type: Array,
+              default:[],
+            },
         },
-        emits:['update:gridValue','update:gridParams'],
+        emits:['update:gridValue','update:gridParams','update:dataSource'],
         setup(props,ctx){
             ctx.emit('update:gridParams',props.params)
             const {loading,http} = useHttp()
@@ -137,7 +141,9 @@
                 })
             }
             const treeData = computed(()=>{
-                return filterTree(state.dataSource)
+              const data =  filterTree(state.dataSource)
+              ctx.emit('update:dataSource',data)
+              return data
             })
             return {
                 del,

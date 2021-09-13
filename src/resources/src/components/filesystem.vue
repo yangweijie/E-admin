@@ -1,120 +1,120 @@
 <template>
-    <div ref="filesystem">
+  <div ref="filesystem">
     <el-card class="filesystem" shadow="never">
-        <template #header>
-            <el-row style="display: flex;align-items: center;justify-content: space-between">
-                <el-col :md="16" :xs="24" >
-                    <el-button-group style="display: flex">
-                        <div v-if="!uploadFinder">
-                          <el-button icon="el-icon-back" size="mini" @click="back"></el-button>
-                          <div class="breadcrumb">
-                            <el-breadcrumb separator-class="el-icon-arrow-right" style="display: flex;white-space: nowrap;">
-                              <el-breadcrumb-item @click="changePath(initPath)" style="cursor: pointer">根目录</el-breadcrumb-item>
-                              <el-breadcrumb-item v-for="item in breadcrumb" @click="changePath(item.path)"
-                                                  :style="item.path ? 'cursor: pointer':''">{{item.name}}
-                              </el-breadcrumb-item>
-                            </el-breadcrumb>
-                          </div>
-                        </div>
-                        <el-button icon="el-icon-refresh" size="mini" @click="loading = true"></el-button>
-                        <render :data="upload" :drop-element="filesystem"  :params="addParams" :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
-                        <el-button  size="mini" @click="mkdir" v-if="!uploadFinder">新建文件夹</el-button>
-                        <el-button  size="mini" type="danger" v-if="selectPaths.length > 0" @click="delSelect">删除选中</el-button>
-                    </el-button-group>
-                </el-col>
-                <el-col :md="8" :xs="24" style="display: flex;">
-                    <!--快捷搜索-->
-                    <el-input class="hidden-md-and-down" v-model="quickSearch" clearable prefix-icon="el-icon-search"
-                              size="mini" style="margin-right: 10px;flex: 1" placeholder="请输入关键字" @change="loading = true" ></el-input>
-                    <el-button class="hidden-md-and-down" type="primary" size="mini" icon="el-icon-search" @click="loading = true">搜索</el-button>
-                    <el-tooltip v-if="showType === 'grid'" content="列表排序">
-                        <el-button icon="el-icon-s-grid"  size="mini" @click="showType='menu'"></el-button>
-                    </el-tooltip>
-                    <el-tooltip v-else content="图标排序">
-                        <el-button icon="el-icon-menu" size="mini" @click="showType='grid'"></el-button>
-                    </el-tooltip>
-                </el-col>
+      <template #header>
+        <el-row style="display: flex;align-items: center;justify-content: space-between">
+          <el-col :md="16" :xs="24" >
+            <el-button-group style="display: flex">
+              <div v-if="!uploadFinder">
+                <el-button icon="el-icon-back" size="mini" @click="back"></el-button>
+                <div class="breadcrumb">
+                  <el-breadcrumb separator-class="el-icon-arrow-right" style="display: flex;white-space: nowrap;">
+                    <el-breadcrumb-item @click="changePath(initPath)" style="cursor: pointer">根目录</el-breadcrumb-item>
+                    <el-breadcrumb-item v-for="item in breadcrumb" @click="changePath(item.path)"
+                                        :style="item.path ? 'cursor: pointer':''">{{item.name}}
+                    </el-breadcrumb-item>
+                  </el-breadcrumb>
+                </div>
+              </div>
+              <el-button icon="el-icon-refresh" size="mini" @click="loading = true"></el-button>
+              <render :data="upload" :drop-element="filesystem"  :params="addParams" :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
+              <EadminSelect size="mini" :disabled="selectIds.length == 0" v-if="uploadFinder" placeholder="文件移动至" :options="finerCate" tree clearable v-model="selectCate"></EadminSelect>
+              <el-button  size="mini" @click="mkdir" v-if="!uploadFinder">新建文件夹</el-button>
+              <el-button  size="mini" type="danger" v-if="selectPaths.length > 0" @click="delSelect">删除选中</el-button>
+            </el-button-group>
+          </el-col>
+          <el-col :md="8" :xs="24" style="display: flex;">
+            <!--快捷搜索-->
+            <el-input class="hidden-md-and-down" v-model="quickSearch" clearable prefix-icon="el-icon-search"
+                      size="mini" style="margin-right: 10px;flex: 1" placeholder="请输入关键字" @change="loading = true" ></el-input>
+            <el-button class="hidden-md-and-down" type="primary" size="mini" icon="el-icon-search" @click="loading = true">搜索</el-button>
+            <el-tooltip v-if="showType === 'grid'" content="列表排序">
+              <el-button icon="el-icon-s-grid"  size="mini" @click="showType='menu'"></el-button>
+            </el-tooltip>
+            <el-tooltip v-else content="图标排序">
+              <el-button icon="el-icon-menu" size="mini" @click="showType='grid'"></el-button>
+            </el-tooltip>
+          </el-col>
 
-            </el-row>
-        </template>
-        <div>
-            <a-table v-if="showType === 'grid'" :scroll="{y:height?height:'calc(100vh - 320px)'}" :locale="{emptyText:'暂无数据'}"  row-key="url" :pagination="false" :row-selection="rowSelection" :columns="tableColumns" :data-source="tableData" :loading="loading" :custom-row="customRow">
-                <template #name="{ text , record , index }">
-                    <div class="filename" @click="changePath(  record.path,record.dir)">
-                        <el-image :src="record.url" :preview-src-list="[record.url]"
-                                  style="width: 32px;height: 32px;margin-right: 10px">
-                            <template #error >
-                                <el-image :src="fileIcon(record.dir ? '.dir':text)"
-                                          style="width: 32px;height: 32px;margin-right: 10px">
-                                    <template #error >
-                                        <div style="display: flex; align-items: center;"><i class="el-icon-document"
-                                                                                            style="font-size: 32px"/></div>
-                                    </template>
-                                </el-image>
-                            </template>
-                        </el-image>
-                        {{ text }}
-                    </div>
+        </el-row>
+      </template>
+      <div>
+        <a-table v-if="showType === 'grid'" :scroll="{y:height?height:'calc(100vh - 320px)'}" :locale="{emptyText:'暂无数据'}"  row-key="url" :pagination="false" :row-selection="rowSelection" :columns="tableColumns" :data-source="tableData" :loading="loading" :custom-row="customRow">
+          <template #name="{ text , record , index }">
+            <div class="filename" @click="changePath(  record.path,record.dir)">
+              <el-image :src="record.url" :preview-src-list="[record.url]"
+                        style="width: 32px;height: 32px;margin-right: 10px">
+                <template #error >
+                  <el-image :src="fileIcon(record.dir ? '.dir':text)"
+                            style="width: 32px;height: 32px;margin-right: 10px">
+                    <template #error >
+                      <div style="display: flex; align-items: center;"><i class="el-icon-document"
+                                                                          style="font-size: 32px"/></div>
+                    </template>
+                  </el-image>
                 </template>
-                <template #action="{ record }" >
-                    <div v-show="mouseenterIndex == record.path">
-                        <el-button icon="el-icon-folder-opened" size="mini" round v-if="record.dir" @click="rename(record.path)">重命名</el-button>
-                        <el-button icon="el-icon-download" size="mini" round v-else @click="link(record.download)">下载</el-button>
-                        <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(record.path)">删除</el-button>
-                    </div>
-                </template>
-            </a-table>
-            <div v-else class="menuGrid" :style="{height:height?height:'calc(100vh - 280px)'}">
-                <el-row v-loading="loading">
-
-                    <el-col class="menuBox" :lg="4" :md="6" :sm="6" :xs="12" v-for="item in tableData"  @mouseenter="mouseenterIndex = item.path" @mouseleave="mouseenterIndex=''" @click="select(item.url)">
-
-                        <div :class="[selectIds.indexOf(item.url) !== -1?'selected':'','item']">
-                            <i class="el-icon-circle-check" v-if="selectIds.indexOf(item.url) !== -1"></i>
-                            <el-image :src="item.url" :preview-src-list="[item.url]"
-                                      style="width: 80px;height: 80px;margin-right: 10px" @click="changePath(item.path,item.dir )">
-                                <template #error >
-                                    <el-image :src="fileIcon(item.dir ? '.dir':item.name)"
-                                              style="width: 80px;height: 80px;margin-right: 10px" @click="changePath(item.path,item.dir )">
-                                        <template #error >
-                                            <div style="display: flex; align-items: center;"><i class="el-icon-document" style="font-size: 80px"/></div>
-                                        </template>
-                                    </el-image>
-                                </template>
-                            </el-image>
-                            <div class="text"> {{ item.name }}</div>
-                        </div>
-
-                        <div class="tool" v-show="mouseenterIndex == item.path">
-                                <el-button icon="el-icon-folder-opened" size="mini" round v-if="item.dir" @click="rename(item.path)">重命名</el-button>
-                                <el-button icon="el-icon-download" size="mini" round v-else @click="link(item.download)">下载</el-button>
-                                <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(item.path)">删除</el-button>
-                        </div>
-                    </el-col>
-
-                </el-row>
+              </el-image>
+              {{ text }}
             </div>
-            <!--分页-->
-            <el-pagination @size-change="handleSizeChange"
-                           @current-change="handleCurrentChange"
-                           layout="total, sizes, prev, pager, next, jumper"
-                           :total="total"
-                           :page-size="size"
-                           :current-page="page">
-            </el-pagination>
+          </template>
+          <template #action="{ record }" >
+            <div v-show="mouseenterIndex == record.path">
+              <el-button icon="el-icon-folder-opened" size="mini" round v-if="record.dir" @click="rename(record.path)">重命名</el-button>
+              <el-button icon="el-icon-download" size="mini" round v-else @click="link(record.download)">下载</el-button>
+              <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(record.path)">删除</el-button>
+            </div>
+          </template>
+        </a-table>
+        <div v-else class="menuGrid" :style="{height:height?height:'calc(100vh - 280px)'}">
+          <el-row v-loading="loading">
+
+            <el-col class="menuBox" :lg="4" :md="6" :sm="6" :xs="12" v-for="item in tableData"  @mouseenter="mouseenterIndex = item.path" @mouseleave="mouseenterIndex=''" @click="select(item)">
+
+              <div :class="[selectIds.indexOf(item.id) !== -1?'selected':'','item']">
+                <i class="el-icon-circle-check" v-if="selectIds.indexOf(item.id) !== -1"></i>
+                <el-image :src="item.url" :preview-src-list="[item.url]" fit="contain"
+                          style="width: 80px;height: 80px;margin-right: 10px" @click="changePath(item.path,item.dir )">
+                  <template #error >
+                    <el-image :src="fileIcon(item.dir ? '.dir':item.name)"
+                              style="width: 80px;height: 80px;margin-right: 10px" @click="changePath(item.path,item.dir )">
+                      <template #error >
+                        <div style="display: flex; align-items: center;"><i class="el-icon-document" style="font-size: 80px"/></div>
+                      </template>
+                    </el-image>
+                  </template>
+                </el-image>
+                <div class="text"> {{ item.name }}</div>
+              </div>
+
+              <div class="tool" v-show="mouseenterIndex == item.path">
+                <el-button icon="el-icon-folder-opened" size="mini" round v-if="item.dir" @click="rename(item.path)">重命名</el-button>
+                <el-button icon="el-icon-download" size="mini" round v-else @click="link(item.download)">下载</el-button>
+                <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(item.path)">删除</el-button>
+              </div>
+            </el-col>
+
+          </el-row>
         </div>
+        <!--分页-->
+        <el-pagination @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total"
+                       :page-size="size"
+                       :current-page="page">
+        </el-pagination>
+      </div>
     </el-card>
-    </div>
+  </div>
 </template>
 
 <script>
     import {computed, defineComponent, reactive, toRefs, onActivated, watch,ref} from "vue";
     import {deleteArr, fileIcon, unique,link} from '@/utils'
     import {useHttp} from "@/hooks";
-    import {ElMessageBox,ElLoading} from 'element-plus';
+    import {ElMessageBox,ElLoading,ElMessage} from 'element-plus';
     export default defineComponent({
         name: "EadminFileSystem",
-        inheritAttrs:false,
         props: {
             modelValue: [String, Array],
             data: Array,
@@ -143,15 +143,25 @@
             },
             addParams:Object,
             uploadFinder:Boolean,
+            sidebar:Object,
+            cate:{
+              type: Array,
+              default: []
+            },
         },
         emits: ['update:modelValue','update:selection'],
         setup(props,ctx) {
             onActivated(()=>{
+                ctx.emit('update:selection',[])
                 loadData()
             })
             const {loading, http} = useHttp()
             const filesystem = ref('')
-
+            const finerCate = computed(()=>{
+                const arr = JSON.parse(JSON.stringify(props.cate))
+                arr.shift()
+                return arr
+            })
             const state = reactive({
                 tableColumns: [
                     {
@@ -195,8 +205,25 @@
                 page:1,
                 size:100,
                 total:props.total,
-                selectIds:props.selection,
-                selectPaths:[]
+                selectIds:[],
+                selectPaths:[],
+                selectUrls:[],
+                selectCate:'',
+            })
+            watch(()=>state.selectCate,value=>{
+                if(value){
+                  http({
+                    url:'filesystem/moveCate',
+                    method:'post',
+                    data:{
+                      cate_id:value,
+                      ids:state.selectIds
+                    }
+                  }).then(res=>{
+                    state.selectCate = ''
+                    loadData()
+                  })
+                }
             })
             watch(() => props.modelValue, (value) => {
                 if (value) {
@@ -212,10 +239,6 @@
                     loadData()
                 }
             })
-
-            watch(()=>props.selection,value=>{
-                state.selectIds  = value
-            })
             function customRow(record){
                 return {
                     onMouseenter:event=>{
@@ -227,7 +250,6 @@
                 }
             }
             function loadData() {
-
                 const requestParams = {
                     page:state.page,
                     size:state.size,
@@ -315,21 +337,27 @@
                 })
             }
             //选择
-            function select(url) {
+            function select(item) {
 
                 if(props.multiple){
-                    if(state.selectIds.indexOf(url)  === -1){
+                    if(state.selectIds.indexOf(item.id)  === -1){
                         if(props.limit > 0 && state.selectIds.length >= props.limit){
                             return false
                         }
-                        state.selectIds.push(url)
+                        state.selectIds.push(item.id)
+                        state.selectUrls.push(item.url)
+                        state.selectPaths.push(item.path)
                     }else{
-                        deleteArr(state.selectIds,url)
+                        deleteArr(state.selectPaths, item.path)
+                        deleteArr(state.selectIds,item.id)
+                        deleteArr(state.selectUrls,item.url)
                     }
                 }else{
-                    state.selectIds = [url]
+                    state.selectPaths = [item.path]
+                    state.selectIds = [item.id]
+                    state.selectUrls = [item.url]
                 }
-                ctx.emit('update:selection',state.selectIds)
+                ctx.emit('update:selection',state.selectUrls)
             }
             const savePath = computed(()=>{
                 const path = state.path +'/'
@@ -392,10 +420,13 @@
                         //当用户手动勾选数据行的 Checkbox 时触发的事件
                         onSelect: (record, selected, selectedRows, nativeEvent) => {
                             const ids = selectedRows.map(item => {
-                                return item.url
+                                return item.id
                             })
                             const paths = selectedRows.map(item => {
                                 return item.path
+                            })
+                            const urls = selectedRows.map(item => {
+                              return item.url
                             })
                             if (selected) {
                                 if(props.multiple){
@@ -404,16 +435,18 @@
                                     }
                                     state.selectPaths =  unique(state.selectPaths.concat(paths))
                                     state.selectIds = unique(state.selectIds.concat(ids))
+                                    state.selectUrls = unique(state.selectIds.concat(urls))
                                 }else{
                                     state.selectIds = ids
                                     state.selectPaths = paths
+                                    state.selectUrls = urls
                                 }
                             } else {
+                                deleteArr(state.selectUrls, record.url)
                                 deleteArr(state.selectPaths, record.path)
-                                deleteArr(state.selectIds, record.url)
+                                deleteArr(state.selectIds, record.id)
                             }
-
-                            ctx.emit('update:selection',state.selectIds)
+                            ctx.emit('update:selection',state.selectUrls)
                         },
                         onSelectAll: (selected, selectedRows, changeRows) => {
                             const ids = selectedRows.map(item => {
@@ -422,19 +455,24 @@
                             const paths = selectedRows.map(item => {
                                 return item.path
                             })
+                            const urls = selectedRows.map(item => {
+                              return item.url
+                            })
                             if (selected) {
                                 if(props.limit > 0 && (state.selectIds.length+ids.length) >= props.limit){
                                     return false
                                 }
                                 state.selectPaths = unique(state.selectPaths.concat(paths))
                                 state.selectIds = unique(state.selectIds.concat(ids))
+                                state.selectUrls = unique(state.selectIds.concat(urls))
                             } else {
                                 changeRows.map(item => {
                                     deleteArr(state.selectPaths, item.path)
-                                    deleteArr(state.selectIds, item.url)
+                                    deleteArr(state.selectIds, item.id)
+                                    deleteArr(state.selectUrls, item.url)
                                 })
                             }
-                            ctx.emit('update:selection',state.selectIds)
+                            ctx.emit('update:selection',state.selectUrls)
                         },
                     }
                 }
@@ -471,7 +509,8 @@
                 fileIcon,
                 savePath,
                 ...toRefs(state),
-                filesystem
+                filesystem,
+                finerCate
             }
         }
     })

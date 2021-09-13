@@ -1,17 +1,28 @@
 <template>
-    <el-select v-model="value">
-        <slot></slot>
-        <template #prefix><slot name="prefix"></slot></template>
+    <el-select v-model="value" ref="selectEl" @visible-change="visibleChange">
+          <el-option v-if="treeLabel" :label="treeLabel" :value="treeValue"></el-option>
+          <template #empty v-if="tree">
+            <el-tree
+                node-key="id"
+                :data="options"
+                default-expand-all
+                :expandOnClickNode="false"
+                @node-click="handleNodeClick"
+            ></el-tree>
+          </template>
+          <slot></slot>
+         <template #prefix><slot name="prefix"></slot></template>
     </el-select>
 </template>
 
 <script>
-    import {defineComponent,watch,ref} from "vue";
+import {defineComponent, watch, ref, reactive, toRefs} from "vue";
     import request from '@/utils/axios'
     import {findTree} from '@/utils'
     export default defineComponent({
         name: "EadminSelect",
         props:{
+            tree:Boolean,
             params: Object,
             modelValue:[Object,Array,String,Number],
             loadOptionField:[Object,Array,String,Number],
@@ -20,7 +31,13 @@
         },
         emits:['update:modelValue','update:loadField','update:loadOptionField'],
         setup(props,ctx){
+            const state = reactive({
+              treeValue:'',
+              treeLabel:'',
+              select:null,
+            })
             const value = ref(props.modelValue)
+            const selectEl = ref()
             let loadFieldValue = props.loadField
             watch(()=>props.modelValue,val=>{
                 value.value = val
@@ -64,9 +81,24 @@
                     }
                 }
             }
+            function handleNodeClick(node){
+               state.treeLabel = node.label
+               state.treeValue = node.id
+               value.value = node.id
+               selectEl.value.blur()
+            }
+            function visibleChange(bool){
+              if(bool){
+                state.treeLabel = ''
+              }
+            }
             return {
+                visibleChange,
+                selectEl,
+                handleNodeClick,
                 changeHandel,
-                value
+                value,
+                ...toRefs(state)
             }
         }
     })

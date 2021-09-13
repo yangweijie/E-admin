@@ -32,6 +32,7 @@ class CreateSystemFileCate extends Migrator
         $table->addColumn(Column::string('name', 100)->setDefault('')->setComment('分类名称'));
         $table->addColumn(Column::integer('pid')->setDefault(0)->setComment('上级id'));
         $table->addColumn(Column::string('mark')->setDefault('')->setComment('标记'));
+        $table->addColumn(Column::tinyInteger('per_type')->setDefault(1)->setComment('权限类型：0所有人，1仅自己'));
         $table->addColumn(Column::boolean('status')->setDefault(1)->setComment('是否显示'));
         $table->addColumn(Column::integer('admin_id')->setComment('后台上传人员'));
         $table->addColumn(Column::integer('sort')->setDefault(0)->setComment('排序'));
