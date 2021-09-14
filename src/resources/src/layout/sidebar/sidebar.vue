@@ -71,6 +71,7 @@
                     action.sidebarOpen(!sidebar.opend)
                 }
                 let menu = findTree(state.menus, id, 'id')
+                action.gridActivatedRefresh(false)
                 link(menu.url)
             }
 

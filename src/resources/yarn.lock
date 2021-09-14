@@ -2,16 +2,6 @@
 # yarn lockfile v1
 
 
-"@ant-design-vue/use@^0.0.1-0":
-  version "0.0.1-alpha.10"
-  resolved "https://registry.nlark.com/@ant-design-vue/use/download/@ant-design-vue/use-0.0.1-alpha.10.tgz?cache=0&sync_timestamp=1621867030532&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40ant-design-vue%2Fuse%2Fdownload%2F%40ant-design-vue%2Fuse-0.0.1-alpha.10.tgz#14697ced4aa3e6d76a63008e87dbf6d3ef3e07da"
-  integrity sha1-FGl87Uqj5tdqYwCOh9v20+8+B9o=
-  dependencies:
-    async-validator "^3.4.0"
-    lodash-es "^4.17.15"
-    resize-observer-polyfill "^1.5.1"
-    vue "^3.0.0"
-
 "@ant-design/colors@^5.0.0":
   version "5.1.1"
   resolved "https://registry.npm.taobao.org/@ant-design/colors/download/@ant-design/colors-5.1.1.tgz?cache=0&sync_timestamp=1612935637470&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40ant-design%2Fcolors%2Fdownload%2F%40ant-design%2Fcolors-5.1.1.tgz#800b2186b1e27e66432e67d03ed96af3e21d8940"
@@ -1893,12 +1883,11 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
   dependencies:
     color-convert "^2.0.1"
 
-ant-design-vue@^2.2.0-beta.3:
-  version "2.2.0-beta.3"
-  resolved "https://registry.yarnpkg.com/ant-design-vue/-/ant-design-vue-2.2.0-beta.3.tgz#ef01b99b8b823a00ace4d373539bfd393b96a640"
-  integrity sha512-bFcAZK4mUaiHQwYLof+quY/6X2HBwEAYXcEEe2bOzAZZ8o3dTalpkEBAYSIPAGuQ+swdWRGGgEMIVJoeyW36oA==
+ant-design-vue@^2.2.7:
+  version "2.2.7"
+  resolved "https://registry.nlark.com/ant-design-vue/download/ant-design-vue-2.2.7.tgz?cache=0&sync_timestamp=1631110997919&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fant-design-vue%2Fdownload%2Fant-design-vue-2.2.7.tgz#d306d478003862f1a4cec3d52edb99c19064730a"
+  integrity sha1-0wbUeAA4YvGkzsPVLtuZwZBkcwo=
   dependencies:
-    "@ant-design-vue/use" "^0.0.1-0"
     "@ant-design/icons-vue" "^6.0.0"
     "@babel/runtime" "^7.10.5"
     "@simonwep/pickr" "~1.8.0"
@@ -1910,6 +1899,7 @@ ant-design-vue@^2.2.0-beta.3:
     lodash-es "^4.17.15"
     moment "^2.27.0"
     omit.js "^2.0.0"
+    resize-observer-polyfill "^1.5.1"
     scroll-into-view-if-needed "^2.2.25"
     shallow-equal "^1.0.0"
     vue-types "^3.0.0"
@@ -9498,7 +9488,7 @@ vue-types@^3.0.0:
   dependencies:
     is-plain-object "3.0.1"
 
-vue@^3.0.0, vue@^3.0.11:
+vue@^3.0.11:
   version "3.0.11"
   resolved "https://registry.nlark.com/vue/download/vue-3.0.11.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fvue%2Fdownload%2Fvue-3.0.11.tgz#c82f9594cbf4dcc869241d4c8dd3e08d9a8f4b5f"
   integrity sha1-yC+VlMv03MhpJB1MjdPgjZqPS18=

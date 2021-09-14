@@ -5,8 +5,7 @@
         <div class="main-container">
             <header-top></header-top>
             <tags-view v-if="state.tagMenuMode"></tags-view>
-
-            <div class="main-content" v-loading.lock="state.mainLoading">
+            <div class="main-content" v-loading="state.mainLoading">
                 <div class="header-title" v-if="state.mainTitle">
                     <div>
                         <span class="title">{{state.mainTitle}}</span>

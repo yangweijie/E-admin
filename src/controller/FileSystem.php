@@ -18,26 +18,25 @@ use think\db\Query;
 
 class FileSystem extends Controller
 {
-    public function index($uploadFinder=false)
-    {
-        return $this->uploadFinder($uploadFinder);
-    }
-
-    public function uploadFinder($grid = false)
+    public function index()
     {
         $search = $this->request->get('search');
         $cate_id = $this->request->get('cate_id');
+        $ext = $this->request->get('ext');
         $data = SystemFile::where('admin_id', Admin::id())
-            ->where('uptype', 'local')
+            ->where('is_delete',0)
             ->when($cate_id, ['cate_id'=>$cate_id])
             ->when($search, [['real_name', 'like', "%{$search}%"]])
+            ->when($ext,function (Query  $query) use($ext){
+                $ext = str_replace('.','',$ext);
+                $exts = explode(',',$ext);
+                $query->whereIn('ext',$exts);
+            })
             ->pages()
             ->select()->map(function ($item) {
-                $item['url'] = FileService::instance()->url($item['path'], 'local');
-                $item['path'] = \think\facade\Filesystem::disk('local')->path('/') . $item['path'];
+                $item['path'] = \think\facade\Filesystem::disk($item['uptype'])->path('/') . $item['path'];
                 $item['dir'] = false;
-                $item['size'] = $item['file_size'];
-                $item['permission'] = '';
+                $item['size'] = FileService::instance()->getSize($item['file_size']);
                 $item['author'] = AdminModel::where('id',$item['admin_id'])->value('nickname');
                 $item['update_time'] = $item['create_time'];
                 return $item;
@@ -47,21 +46,12 @@ class FileSystem extends Controller
             ->attr('height', '350px')
             ->attr('display','menu')
             ->uploadFinder();
-        if($grid){
-            $sidebarGrid = SidebarGrid::create(new SystemFileCate(), null,'id','label')
-                ->treePid()
-                ->form($this->cateForm())
-                ->field('cate_id')
-                ->params(['uploadFinder' => true]);
-            $sidebarGrid->sidebar()->attr('fileSystem',$fileSystem);
-        }else{
-            $sidebarGrid = SidebarGrid::create(new SystemFileCate(), $fileSystem,'id','label')
-                ->treePid()
-                ->form($this->cateForm())
-                ->field('cate_id')
-                ->params(['uploadFinder' => true]);
-
-        }
+        $sidebarGrid = SidebarGrid::create(new SystemFileCate(), null,'id','label')
+            ->treePid()
+            ->form($this->cateForm())
+            ->field('cate_id')
+            ->height(362);
+        $sidebarGrid->sidebar()->attr('fileSystem',$fileSystem);
         $sidebarGrid->model()
             ->field('id,name as label,pid')
             ->where('status', 1)
@@ -116,13 +106,9 @@ class FileSystem extends Controller
         admin_error_message('文件夹不存在');
     }
 
-    public function del($paths)
+    public function del($ids)
     {
-        foreach ($paths as $path){
-            $path = str_replace( \think\facade\Filesystem::disk('local')->path('/'),'',$path);
-            SystemFile::where('path',$path)->delete();
-        }
-        FileSystemService::instance()->delFiels($paths);
+        SystemFile::whereIn('id',$ids)->update(['is_delete'=>1]);
         admin_success('成功', '删除完成');
     }
 }

@@ -45,6 +45,8 @@ const states = reactive({
     menuModule: '',
     breadcrumb: [],
     theme:'',
+    //表格grid激活刷新
+    gridActivatedRefresh:true,
 });
 export const state = states
 //操作方法
@@ -65,6 +67,10 @@ const action = {
             el.href="eadmin/theme/light/index.css"
             document.getElementsByTagName('head')[0].appendChild(el)
         }
+    },
+    //表格grid刷新
+    gridActivatedRefresh(bool:boolean){
+        states.gridActivatedRefresh = bool
     },
     //刷新
     refresh(bool:boolean){

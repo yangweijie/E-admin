@@ -87,9 +87,7 @@
     <el-dialog  title="资源库" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
       <el-row :gutter="10">
         <el-col :md="5" :sm="7" :xs="20" :span="5">
-          <keep-alive>
             <render :data="finder" v-model:grid-params="gridParams" v-model:grid-value="gridValue" v-model:dataSource="finerCate"></render>
-          </keep-alive>
         </el-col>
         <el-col :md="19" :sm="24" :xs="24" :span="19">
           <keep-alive>
@@ -119,6 +117,7 @@ import {defineComponent, reactive, watch, nextTick, toRefs, ref,getCurrentInstan
 import {ElMessage, ElNotification} from 'element-plus'
 import {action} from "@/store";
 import router from "@/router";
+import request from '@/utils/axios'
 function noop() {}
 export default defineComponent({
   name: 'EadminUpload',
@@ -225,11 +224,10 @@ export default defineComponent({
   },
   emits: ['success','update:modelValue'],
   setup(props,ctx){
-
     const state = reactive({
       styleWidth: '',
       styleHeight: '',
-      selection:props.modelValue,
+      selection:[],
       files: [],
       dialogVisible: false,
       // 进度条显示
@@ -246,7 +244,6 @@ export default defineComponent({
       gridValue:false,
       finerCate:[]
     })
-
     const instance = getCurrentInstance()
     watch(()=>props.modelValue,val=>{
       if (typeof val === 'string') {
@@ -304,7 +301,7 @@ export default defineComponent({
     }
     const uploader = new Uploader({
       target: props.url,
-      query: Object.assign(props.params,{
+      query: Object.assign(JSON.parse(JSON.stringify(props.params)),{
         saveDir: props.saveDir,
         isUniqidmd5: props.isUniqidmd5,
         upType: props.disk,
@@ -393,7 +390,7 @@ export default defineComponent({
           if (!props.multiple) {
             state.files = []
           }
-          ctx.emit('success')
+          ctx.emit('success',res.data)
           state.files.push(res.data)
         }else if (res.code == 80020) {
           ElMessage({
@@ -532,12 +529,16 @@ export default defineComponent({
     // 七牛云上传
     async function qiniuMultipartUpload(file) {
       let filename = ''
+      let name = ''
       if (props.isUniqidmd5) {
-        filename = props.saveDir + uniqidMd5() + '.' + file.getExtension()
+        name = uniqidMd5() + '.' + file.getExtension()
+        filename = props.saveDir + name
       } else {
+        name = file.name
         filename = props.saveDir + file.name
       }
       state.progressShow = true
+
       var observable = qiniu.upload(file.file, filename, props.uploadToken, {
         fname: filename,
         params: {}
@@ -555,7 +556,7 @@ export default defineComponent({
             message: err.message
           })
         },
-        complete(res) {
+        async complete (res) {
           uploader.removeFile(file)
           state.progressShow = false
           const url = `${props.domain}/${filename}`
@@ -563,16 +564,30 @@ export default defineComponent({
             state.files = []
           }
           state.files.push(url)
-          ctx.emit('success')
+          const fileData = {
+            name:name,
+            real_name:name,
+            url:url,
+            cate_id:0,
+            path:filename,
+            ext:file.getExtension(),
+            file_size:file.getSize(),
+            uptype:props.upType,
+          }
+          await createUploadFile(fileData)
+          ctx.emit('success',url)
         }
       })
     }
     // 阿里云开始分片上传。
     async function ossMultipartUpload(file) {
       let filename = ''
+      let name = ''
       if (props.isUniqidmd5) {
-        filename = props.saveDir + uniqidMd5() + '.' + file.getExtension()
+        name = uniqidMd5() + '.' + file.getExtension()
+        filename = props.saveDir + name
       } else {
+        name = file.name
         filename = props.saveDir + file.name
       }
       state.progressShow = true
@@ -583,7 +598,7 @@ export default defineComponent({
           state.percentage = parseInt(percentage * 100)
           props.onProgress(state.percentage)
         }
-      }).then(result => {
+      }).then(async result => {
         // 生成文件下载地址
         uploader.removeFile(file)
         state.progressShow = false
@@ -592,7 +607,18 @@ export default defineComponent({
           state.files = []
         }
         state.files.push(url)
-        ctx.emit('success')
+        const fileData = {
+          name:name,
+          real_name:name,
+          url:url,
+          cate_id:0,
+          path:filename,
+          ext:file.getExtension(),
+          file_size:file.getSize(),
+          uptype:props.upType,
+        }
+        await createUploadFile(fileData)
+        ctx.emit('success',url)
       }).catch(err => {
         state.progressShow = false
         ElMessage({
@@ -600,6 +626,20 @@ export default defineComponent({
           message: err
         })
       })
+    }
+    function createUploadFile(fileData){
+      return new Promise((resolve,reject) => {
+        request({
+          url:'/eadmin/uploadAfter',
+          method:'post',
+          data:Object.assign(fileData,{cate_id:props.params.cate_id})
+        }).then(res=>{
+          resolve(res)
+        }).catch((res)=>{
+          resolve(res)
+        })
+      })
+
     }
     function handelBrowse() {
       if(props.finder){

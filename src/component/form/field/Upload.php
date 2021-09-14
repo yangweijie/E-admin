@@ -40,6 +40,7 @@ class Upload extends Field
         $this->url('/eadmin/upload');
         $this->attr('token', Admin::token()->get());
         $uploadType = config('admin.uploadDisks');
+
         $this->disk($uploadType);
     }
 
@@ -122,6 +123,7 @@ class Upload extends Field
             return ".{$item}";
         }, $val);
         $accept = implode(',', $val);
+        $this->attr('ext', $accept);
         $this->attr('accept', $accept);
         return $this;
     }
@@ -129,20 +131,20 @@ class Upload extends Field
     public function jsonSerialize()
     {
         if (is_null($this->attr('finder'))) {
-            $filesystem = Admin::dispatch('/filesystem?uploadFinder=true');
+            $finder = Admin::dispatch('/filesystem');
             $uploadButton = clone $this;
             $uploadButton->finder(false)
                 ->attr('foreverShow', true)
-                ->disk('local')
                 ->content(
                     Button::create('上传')
                         ->icon('el-icon-upload')
                         ->sizeMini()
                 );
             $uploadButton->bindValue('', 'modelValue', null);
-            if($filesystem instanceof Component){
+            if($finder instanceof Component){
+                $filesystem = $finder->sidebar()->attr('fileSystem');
                 $filesystem->attr('upload', $uploadButton);
-                $this->attr('finder', $filesystem);
+                $this->attr('finder', $finder);
             }
         }
         return parent::jsonSerialize();

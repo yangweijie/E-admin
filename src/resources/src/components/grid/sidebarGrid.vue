@@ -48,7 +48,10 @@
                 type: Object,
                 default:{},
             },
-            gridParams:Object,
+            gridParams:{
+              type: Object,
+              default:{},
+            },
             field: {
                 type: String,
                 default:'group_id',
@@ -86,7 +89,7 @@
                 }else{
                     state.editUrl = ''
                 }
-                ctx.emit('update:gridParams',Object.assign(props.params,params))
+                ctx.emit('update:gridParams',params)
                 ctx.emit('update:gridValue',true)
             }
             function filterTree (tree, arr = []) {

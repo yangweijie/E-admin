@@ -5,7 +5,7 @@
         <el-menu :default-active="activeIndex" text-color="hsla(0,0%,100%,.7)" active-text-color="#ffffff" :background-color="variables.theme" @select="selectMenu" class="menu" mode="horizontal" v-show="state.topMenuMode && state.device === 'desktop'">
             <el-menu-item v-for="item in menus" :index="item.id+''">
                 <i :class="item.icon" v-if="item.icon"></i>
-                <span slot="title">{{item.name}}</span>
+                <span>{{item.name}}</span>
             </el-menu-item>
         </el-menu>
         <breadcrumb v-if="!state.topMenuMode && state.device != 'mobile'" style="margin-right: 5px"></breadcrumb>
@@ -137,10 +137,10 @@
                 if(!state.menuModule){
                     selectMenuModule(index)
                 }
+                action.gridActivatedRefresh(false)
                 action.selectMenuModule(index)
                 if (!menu.children) {
                     link(menu.url)
-
                 }
             }
 
@@ -194,6 +194,9 @@
         overflow-x: auto;
         scrollbar-width:none;
         display: flex;
+    }
+    .menu .el-menu-item i{
+       color: hsla(0,0%,100%,.7)!important;
     }
     .menu .el-menu-item:hover{
         background-color: hsla(0,0%,100%,.1)!important;

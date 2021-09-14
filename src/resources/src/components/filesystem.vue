@@ -17,10 +17,10 @@
                 </div>
               </div>
               <el-button icon="el-icon-refresh" size="mini" @click="loading = true"></el-button>
-              <render :data="upload" :drop-element="filesystem"  :params="addParams" :save-dir="savePath" :on-progress="uploadProgress" @success="uploadSuccess"></render>
+              <render :data="upload" :drop-element="filesystem"  :params="addParams"  :on-progress="uploadProgress" @success="uploadSuccess"></render>
               <EadminSelect size="mini" :disabled="selectIds.length == 0" v-if="uploadFinder" placeholder="文件移动至" :options="finerCate" tree clearable v-model="selectCate"></EadminSelect>
               <el-button  size="mini" @click="mkdir" v-if="!uploadFinder">新建文件夹</el-button>
-              <el-button  size="mini" type="danger" v-if="selectPaths.length > 0" @click="delSelect">删除选中</el-button>
+              <el-button  size="mini" type="danger" v-if="selectIds.length > 0" @click="delSelect">删除选中</el-button>
             </el-button-group>
           </el-col>
           <el-col :md="8" :xs="24" style="display: flex;">
@@ -41,7 +41,7 @@
       <div>
         <a-table v-if="showType === 'grid'" :scroll="{y:height?height:'calc(100vh - 320px)'}" :locale="{emptyText:'暂无数据'}"  row-key="url" :pagination="false" :row-selection="rowSelection" :columns="tableColumns" :data-source="tableData" :loading="loading" :custom-row="customRow">
           <template #name="{ text , record , index }">
-            <div class="filename" @click="changePath(  record.path,record.dir)">
+            <div class="filename" @click="changePath(record.path,record.dir)">
               <el-image :src="record.url" :preview-src-list="[record.url]"
                         style="width: 32px;height: 32px;margin-right: 10px">
                 <template #error >
@@ -60,8 +60,8 @@
           <template #action="{ record }" >
             <div v-show="mouseenterIndex == record.path">
               <el-button icon="el-icon-folder-opened" size="mini" round v-if="record.dir" @click="rename(record.path)">重命名</el-button>
-              <el-button icon="el-icon-download" size="mini" round v-else @click="link(record.download)">下载</el-button>
-              <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(record.path)">删除</el-button>
+              <el-button icon="el-icon-download" size="mini" round v-else @click="link(record.url)">下载</el-button>
+              <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(record.id)">删除</el-button>
             </div>
           </template>
         </a-table>
@@ -88,8 +88,8 @@
 
               <div class="tool" v-show="mouseenterIndex == item.path">
                 <el-button icon="el-icon-folder-opened" size="mini" round v-if="item.dir" @click="rename(item.path)">重命名</el-button>
-                <el-button icon="el-icon-download" size="mini" round v-else @click="link(item.download)">下载</el-button>
-                <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(item.path)">删除</el-button>
+                <el-button icon="el-icon-download" size="mini" round v-else @click="link(item.url)">下载</el-button>
+                <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(item.id)">删除</el-button>
               </div>
             </el-col>
 
@@ -141,7 +141,10 @@
                 type: String,
                 default: 'grid'
             },
-            addParams:Object,
+            addParams:{
+              type: Object,
+              default: {}
+            },
             uploadFinder:Boolean,
             sidebar:Object,
             cate:{
@@ -151,6 +154,7 @@
         },
         emits: ['update:modelValue','update:selection'],
         setup(props,ctx) {
+            Object.assign(props.addParams,props.upload.attribute.params)
             onActivated(()=>{
                 ctx.emit('update:selection',[])
                 loadData()
@@ -175,9 +179,9 @@
                         dataIndex: 'size',
                     },
                     {
-                        title: '权限',
-                        width:100,
-                        dataIndex: 'permission',
+                      title: '存储',
+                      width:100,
+                      dataIndex: 'uptype',
                     },
                     {
                         title: '所有者',
@@ -206,7 +210,6 @@
                 size:100,
                 total:props.total,
                 selectIds:[],
-                selectPaths:[],
                 selectUrls:[],
                 selectCate:'',
             })
@@ -221,7 +224,9 @@
                     }
                   }).then(res=>{
                     state.selectCate = ''
-                    loadData()
+                    state.selectIds = []
+                    state.selectUrls = []
+                    ctx.emit('update:selection',[])
                   })
                 }
             })
@@ -259,26 +264,26 @@
                 }
                 http({
                     url: '/filesystem',
-                    params: Object.assign(requestParams,props.addParams)
+                    params: Object.assign(requestParams,props.addParams,{ext:props.upload.attribute.ext})
                 }).then(res => {
                     state.tableData = res.data
                     state.total = res.total
                 })
             }
             function delSelect() {
-                del(state.selectPaths)
+                del(state.selectIds)
             }
             //删除
-            function del(path) {
-                if(!Array.isArray(path)){
-                    path = [path]
+            function del(ids) {
+                if(!Array.isArray(ids)){
+                  ids = [ids]
                 }
                 ElMessageBox.confirm('确认删除? 不可恢复操作!','警告',{type:'error'}).then(()=>{
                     http({
                         url:'filesystem/del',
                         method:'delete',
                         data:{
-                            paths:path
+                            ids:ids
                         }
                     }).then(res=>{
                         loadData()
@@ -346,23 +351,17 @@
                         }
                         state.selectIds.push(item.id)
                         state.selectUrls.push(item.url)
-                        state.selectPaths.push(item.path)
                     }else{
-                        deleteArr(state.selectPaths, item.path)
                         deleteArr(state.selectIds,item.id)
                         deleteArr(state.selectUrls,item.url)
                     }
                 }else{
-                    state.selectPaths = [item.path]
                     state.selectIds = [item.id]
                     state.selectUrls = [item.url]
                 }
                 ctx.emit('update:selection',state.selectUrls)
             }
-            const savePath = computed(()=>{
-                const path = state.path +'/'
-                return path.replace(props.initPath,'')
-            })
+
             //上传进度
             let uploadProgressLoading = null
             function uploadProgress(progress) {
@@ -433,17 +432,15 @@
                                     if(props.limit > 0 && state.selectIds.length >= props.limit){
                                         return false
                                     }
-                                    state.selectPaths =  unique(state.selectPaths.concat(paths))
+
                                     state.selectIds = unique(state.selectIds.concat(ids))
                                     state.selectUrls = unique(state.selectIds.concat(urls))
                                 }else{
                                     state.selectIds = ids
-                                    state.selectPaths = paths
                                     state.selectUrls = urls
                                 }
                             } else {
                                 deleteArr(state.selectUrls, record.url)
-                                deleteArr(state.selectPaths, record.path)
                                 deleteArr(state.selectIds, record.id)
                             }
                             ctx.emit('update:selection',state.selectUrls)
@@ -462,12 +459,11 @@
                                 if(props.limit > 0 && (state.selectIds.length+ids.length) >= props.limit){
                                     return false
                                 }
-                                state.selectPaths = unique(state.selectPaths.concat(paths))
+
                                 state.selectIds = unique(state.selectIds.concat(ids))
                                 state.selectUrls = unique(state.selectIds.concat(urls))
                             } else {
                                 changeRows.map(item => {
-                                    deleteArr(state.selectPaths, item.path)
                                     deleteArr(state.selectIds, item.id)
                                     deleteArr(state.selectUrls, item.url)
                                 })
@@ -507,7 +503,6 @@
                 loading,
                 rowSelection,
                 fileIcon,
-                savePath,
                 ...toRefs(state),
                 filesystem,
                 finerCate

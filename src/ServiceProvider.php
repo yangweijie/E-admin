@@ -17,6 +17,7 @@ use Eadmin\controller\ResourceController;
 use Eadmin\controller\Queue;
 use Eadmin\facade\Schedule;
 use Eadmin\middleware\Response;
+use Eadmin\model\SystemFile;
 use Eadmin\service\BackupData;
 use Eadmin\service\MenuService;
 use Eadmin\service\QueueService;
@@ -96,8 +97,11 @@ class ServiceProvider extends Service
                 $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
                 $fileSystem->remove(app()->getRootPath().'public/upload/excel');
             })->everyDay(sysconf('database_day'));
+            Schedule::call('清理上传已删除文件',function () {
+                FileService::instance()->clear();
+            })->everyMinute();
         }catch (\Exception $exception){
-
+        
         }
     }
     public function boot()

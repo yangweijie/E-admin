@@ -47,6 +47,7 @@
             const isScroll = ref(false)
             const tabsTag = ref('')
             function clickHandel(url) {
+                action.gridActivatedRefresh(false)
                 router.push(url)
             }
             function selectTag(url) {

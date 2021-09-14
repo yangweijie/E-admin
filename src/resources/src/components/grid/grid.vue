@@ -94,7 +94,7 @@
                 </el-row>
             </div>
             <!--表格-->
-            <a-table v-else :row-selection="rowSelection" @expand="expandChange" @change="tableChange" :columns="tableColumns" :data-source="tableData"  :expanded-row-keys="expandedRowKeys" :pagination="false" :loading="tableLoading" v-bind="$attrs" row-key="eadmin_id" ref="dragTable">
+            <a-table v-else :row-selection="rowSelection" @expand="expandChange" @change="tableChange" :columns="tableColumns" :data-source="tableData"  :expanded-row-keys="expandedRowKeys" :pagination="false" :loading="loading" v-bind="$attrs" row-key="eadmin_id" ref="dragTable">
                 <template #title v-if="header">
                     <div class="header"><render v-for="item in header" :data="item" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params"  :slot-props="grid"></render></div>
                 </template>
@@ -147,9 +147,8 @@
 <script>
     import {defineComponent, ref, watch,reactive, inject,nextTick,computed,unref,onActivated,onMounted,onUnmounted} from "vue"
     import {useHttp} from '@/hooks'
-   // import {tableDefer} from '@/hooks/use-defer'
     import request from '@/utils/axios'
-    import {store} from '@/store'
+    import {store,action} from '@/store'
     import {forEach, unique, deleteArr, buildURL, debounce,treeMap} from '@/utils'
     import {ElMessageBox,ElMessage} from 'element-plus'
     import Sortable from 'sortablejs'
@@ -231,11 +230,7 @@
             if(props.static){
                 tableData.value = props.data
             }
-            // if(props.defer){
-            //     tableDefer(tableData.value,props.data)
-            // }else{
-            //     tableData.value = props.data
-            // }
+
             const total = ref(props.pagination.total || 0)
             const tools = ref(props.tools)
             const header = ref(props.header)
@@ -243,7 +238,6 @@
             let size = props.pagination.pageSize || 20
             let sortableParams = {}
             let filterInitData = null
-            let activatedLoading = false
             function globalRequestParams(){
                 let requestParams = {
                     ajax_request_data: 'page',
@@ -264,7 +258,7 @@
             }
             onMounted(()=>{
                 if(!props.static){
-                    loading.value = true
+                  loading.value = true
                 }
             })
             onUnmounted((e)=>{
@@ -273,10 +267,11 @@
                 }
             })
             onActivated((e)=>{
-                if(!props.static){
-                    loading.value = true
-                    activatedLoading = true
-                  console.log(activatedLoading)
+                if(!props.static && state.gridActivatedRefresh){
+                  loading.value = true
+                }
+                if(!state.gridActivatedRefresh){
+                  action.gridActivatedRefresh(true)
                 }
                 if(excel.excelTimer != null){
                     clearInterval(excel.excelTimer)
@@ -349,10 +344,10 @@
                             if(!item.width){
                                 let width = 0
                                 document.getElementsByClassName('EadminAction').forEach(item => {
-                                    let offsetWidth = item.offsetWidth
-                                    if (width < offsetWidth) {
-                                        width = offsetWidth
-                                    }
+                                  let offsetWidth = item.offsetWidth
+                                  if (width < offsetWidth) {
+                                    width = offsetWidth
+                                  }
                                 })
                                 item.width = width+20
                             }
@@ -501,11 +496,7 @@
                     proxyData[props.filterField] = Object.assign(proxyData[props.filterField],JSON.parse(JSON.stringify(filterInitData)))
                 }
             }
-            const tableLoading = computed(()=>{
-              const load =  loading.value && !activatedLoading
-              activatedLoading = false
-              return load
-            })
+
             //请求获取数据
             function loadData() {
                 http({
@@ -520,6 +511,7 @@
                     header.value = res.header
                     columns.value = res.columns
                     tools.value = res.tools
+                    loading.value = true
                     nextTick(()=>{
                         tableAutoWidth()
                     })
@@ -694,7 +686,6 @@
                 expandChange,
                 handleCurrentChange,
                 loading,
-                tableLoading,
                 tableData,
                 quickSearchValue,
                 rowSelection,

@@ -37,7 +37,6 @@ class FileSystem extends Component
 		$this->attr('upload', Upload::create()
 			->finder(false)
 			->attr('foreverShow', true)
-			->disk('local')
 			->content(
 				Button::create('上传')
                     ->icon('el-icon-upload')
