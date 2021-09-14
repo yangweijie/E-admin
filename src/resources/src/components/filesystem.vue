@@ -170,8 +170,8 @@
                 tableColumns: [
                     {
                         title: '文件名',
-                        dataIndex: 'name',
-                        slots: {customRender: 'name'},
+                        dataIndex: 'real_name',
+                        slots: {customRender: 'real_name'},
                     },
                     {
                         title: '大小',

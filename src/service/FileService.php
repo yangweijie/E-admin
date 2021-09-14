@@ -159,7 +159,6 @@ class FileService extends Service
         }
         $real_name = $fileName;
         $path = trim($saveDir . '/' . $fileName, '/');
-
         if ($file instanceof File) {
             $real_name = $file->getOriginalName();
             $stream = file_get_contents($file->getRealPath());
@@ -175,7 +174,7 @@ class FileService extends Service
             if(!SystemFile::where('url',$url)->find()){
                 SystemFile::create([
                     'name' => $fileName,
-                    'real_name' => $real_name,
+                    'real_name' => request()->param('filename',$real_name),
                     'url' => $url,
                     'path' => $path,
                     'cate_id' => request()->param('cate_id', 0),
