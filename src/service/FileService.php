@@ -171,19 +171,17 @@ class FileService extends Service
             $extension = pathinfo($filename)['extension'];
             $this->compressImage($filename);
             $url = $this->url($path);
-            if(!SystemFile::where('url',$url)->find()){
-                SystemFile::create([
-                    'name' => $fileName,
-                    'real_name' => request()->param('filename',$real_name),
-                    'url' => $url,
-                    'path' => $path,
-                    'cate_id' => request()->param('cate_id', 0),
-                    'ext' => $extension,
-                    'file_size' => request()->param('totalSize'),
-                    'uptype' => $this->upType,
-                    'admin_id' => Admin::id(),
-                ]);
-            }
+            SystemFile::create([
+                'name' => $fileName,
+                'real_name' => request()->param('filename',$real_name),
+                'url' => $url,
+                'path' => $path,
+                'cate_id' => request()->param('cate_id', 0),
+                'ext' => $extension,
+                'file_size' => request()->param('totalSize'),
+                'uptype' => $this->upType,
+                'admin_id' => Admin::id(),
+            ]);
             return $url;
         } else {
             return false;
@@ -366,9 +364,7 @@ class FileService extends Service
         $this->app->route->post('eadmin/uploadAfter',function (){
             $data = $this->app->request->post();
             $data['admin_id'] = Admin::id();
-            if(!SystemFile::where('url',$data['url'])->find()){
-                SystemFile::create($data);
-            }
+            SystemFile::create($data);
             return json(['code' => 200, 'message' => '上传成功']);
         });
         $this->app->route->get('eadmin/uploadConfig', function () {

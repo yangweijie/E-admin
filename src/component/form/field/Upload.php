@@ -139,7 +139,7 @@ class Upload extends Field
                     Button::create('上传')
                         ->icon('el-icon-upload')
                         ->sizeMini()
-                );
+                )->isUniqidmd5();
             $uploadButton->bindValue('', 'modelValue', null);
             if($finder instanceof Component){
                 $filesystem = $finder->sidebar()->attr('fileSystem');

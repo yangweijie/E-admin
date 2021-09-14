@@ -83,7 +83,7 @@
                     </el-image>
                   </template>
                 </el-image>
-                <div class="text"> {{ item.name }}</div>
+                <div class="text"> {{ item.real_name }}</div>
               </div>
 
               <div class="tool" v-show="mouseenterIndex == item.id">
