@@ -172,7 +172,7 @@ class FileService extends Service
             $extension = pathinfo($filename)['extension'];
             $this->compressImage($filename);
             $url = $this->url($path);
-            if(!SystemFile::where('url',$data['url'])->find()){
+            if(!SystemFile::where('url',$url)->find()){
                 SystemFile::create([
                     'name' => $fileName,
                     'real_name' => $real_name,
