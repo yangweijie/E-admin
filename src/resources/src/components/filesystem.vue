@@ -39,7 +39,7 @@
         </el-row>
       </template>
       <div>
-        <a-table v-if="showType === 'grid'" :scroll="{y:height?height:'calc(100vh - 320px)'}" :locale="{emptyText:'暂无数据'}"  row-key="url" :pagination="false" :row-selection="rowSelection" :columns="tableColumns" :data-source="tableData" :loading="loading" :custom-row="customRow">
+        <a-table v-if="showType === 'grid'" :scroll="{y:height?height:'calc(100vh - 320px)'}" :locale="{emptyText:'暂无数据'}"  row-key="id" :pagination="false" :row-selection="rowSelection" :columns="tableColumns" :data-source="tableData" :loading="loading" :custom-row="customRow">
           <template #name="{ text , record , index }">
             <div class="filename" @click="changePath(record.path,record.dir)">
               <el-image :src="record.url" :preview-src-list="[record.url]"
@@ -58,7 +58,7 @@
             </div>
           </template>
           <template #action="{ record }" >
-            <div v-show="mouseenterIndex == record.path">
+            <div v-show="mouseenterIndex == record.id">
               <el-button icon="el-icon-folder-opened" size="mini" round v-if="record.dir" @click="rename(record.path)">重命名</el-button>
               <el-button icon="el-icon-download" size="mini" round v-else @click="link(record.url)">下载</el-button>
               <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(record.id)">删除</el-button>
@@ -68,7 +68,7 @@
         <div v-else class="menuGrid" :style="{height:height?height:'calc(100vh - 280px)'}">
           <el-row v-loading="loading">
 
-            <el-col class="menuBox" :lg="4" :md="6" :sm="6" :xs="12" v-for="item in tableData"  @mouseenter="mouseenterIndex = item.path" @mouseleave="mouseenterIndex=''" @click="select(item)">
+            <el-col class="menuBox" :lg="4" :md="6" :sm="6" :xs="12" v-for="item in tableData"  @mouseenter="mouseenterIndex = item.id" @mouseleave="mouseenterIndex=''" @click="select(item)">
 
               <div :class="[selectIds.indexOf(item.id) !== -1?'selected':'','item']">
                 <i class="el-icon-circle-check" v-if="selectIds.indexOf(item.id) !== -1"></i>
@@ -86,7 +86,7 @@
                 <div class="text"> {{ item.name }}</div>
               </div>
 
-              <div class="tool" v-show="mouseenterIndex == item.path">
+              <div class="tool" v-show="mouseenterIndex == item.id">
                 <el-button icon="el-icon-folder-opened" size="mini" round v-if="item.dir" @click="rename(item.path)">重命名</el-button>
                 <el-button icon="el-icon-download" size="mini" round v-else @click="link(item.url)">下载</el-button>
                 <el-button icon="el-icon-delete"  type="danger" size="mini" round @click="del(item.id)">删除</el-button>
@@ -247,7 +247,7 @@
             function customRow(record){
                 return {
                     onMouseenter:event=>{
-                        state.mouseenterIndex = record.path
+                        state.mouseenterIndex = record.id
                     },
                     onMouseleave:event=>{
                         state.mouseenterIndex = ''
@@ -421,9 +421,6 @@
                             const ids = selectedRows.map(item => {
                                 return item.id
                             })
-                            const paths = selectedRows.map(item => {
-                                return item.path
-                            })
                             const urls = selectedRows.map(item => {
                               return item.url
                             })
@@ -434,7 +431,7 @@
                                     }
 
                                     state.selectIds = unique(state.selectIds.concat(ids))
-                                    state.selectUrls = unique(state.selectIds.concat(urls))
+                                    state.selectUrls = unique(state.selectUrls.concat(urls))
                                 }else{
                                     state.selectIds = ids
                                     state.selectUrls = urls
@@ -447,10 +444,7 @@
                         },
                         onSelectAll: (selected, selectedRows, changeRows) => {
                             const ids = selectedRows.map(item => {
-                                return item.url
-                            })
-                            const paths = selectedRows.map(item => {
-                                return item.path
+                                return item.id
                             })
                             const urls = selectedRows.map(item => {
                               return item.url
@@ -461,7 +455,7 @@
                                 }
 
                                 state.selectIds = unique(state.selectIds.concat(ids))
-                                state.selectUrls = unique(state.selectIds.concat(urls))
+                                state.selectUrls = unique(state.selectUrls.concat(urls))
                             } else {
                                 changeRows.map(item => {
                                     deleteArr(state.selectIds, item.id)

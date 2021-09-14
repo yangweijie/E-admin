@@ -34,7 +34,6 @@ class FileSystem extends Controller
             })
             ->pages()
             ->select()->map(function ($item) {
-                $item['path'] = \think\facade\Filesystem::disk($item['uptype'])->path('/') . $item['path'];
                 $item['dir'] = false;
                 $item['size'] = FileService::instance()->getSize($item['file_size']);
                 $item['author'] = AdminModel::where('id',$item['admin_id'])->value('nickname');

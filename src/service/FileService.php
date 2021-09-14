@@ -172,18 +172,19 @@ class FileService extends Service
             $extension = pathinfo($filename)['extension'];
             $this->compressImage($filename);
             $url = $this->url($path);
-            Db::name('system_file')->insert([
-                'name' => $fileName,
-                'real_name' => $real_name,
-                'url' => $url,
-                'path' => $path,
-                'cate_id' => request()->param('cate_id', 0),
-                'ext' => $extension,
-                'file_size' => request()->param('totalSize'),
-                'uptype' => $this->upType,
-                'admin_id' => Admin::id(),
-                'create_time' => date('Y-m-d H:i:s')
-            ]);
+            if(!SystemFile::where('url',$data['url'])->find()){
+                SystemFile::create([
+                    'name' => $fileName,
+                    'real_name' => $real_name,
+                    'url' => $url,
+                    'path' => $path,
+                    'cate_id' => request()->param('cate_id', 0),
+                    'ext' => $extension,
+                    'file_size' => request()->param('totalSize'),
+                    'uptype' => $this->upType,
+                    'admin_id' => Admin::id(),
+                ]);
+            }
             return $url;
         } else {
             return false;
@@ -346,9 +347,13 @@ class FileService extends Service
     {
         SystemFile::where('is_delete', 1)->chunk(100, function ($files) {
             foreach ($files as $file) {
-                $res = Filesystem::disk($file['uptype'])->delete($file['path']);
-                if ($res) {
-                    $file->delete();
+                try {
+                    $res = Filesystem::disk($file['uptype'])->delete($file['path']);
+                    if ($res) {
+                        $file->delete();
+                    }
+                }catch (\Exception $exception){
+
                 }
             }
         });
@@ -362,7 +367,9 @@ class FileService extends Service
         $this->app->route->post('eadmin/uploadAfter',function (){
             $data = $this->app->request->post();
             $data['admin_id'] = Admin::id();
-            SystemFile::create($data);
+            if(!SystemFile::where('url',$data['url'])->find()){
+                SystemFile::create($data);
+            }
             return json(['code' => 200, 'message' => '上传成功']);
         });
         $this->app->route->get('eadmin/uploadConfig', function () {
