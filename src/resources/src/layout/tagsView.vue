@@ -7,7 +7,6 @@
                     <span>{{item.title}}</span>
                     <i class="el-icon-close close" v-show="route.fullPath === item.url || select === item.url" @click.stop="close(item.url)"></i>
                 </li>
-
             </ul>
             <i class="el-icon-arrow-right tabMove" v-if="isScroll" @click="rightMove"></i>
         </div>

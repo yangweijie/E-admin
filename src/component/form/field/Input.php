@@ -95,7 +95,7 @@ class Input extends Field
      * @return $this
      */
     public function inline(){
-        $this->formItem->style(['display'=>'inline-block']);
+        $this->style(['width'=>'200px']);
         return $this;
     }
 }

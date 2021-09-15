@@ -35,6 +35,7 @@ class FormItem extends Field
     public function __construct($prop, $label, $form = null)
     {
         parent::__construct();
+        $this->removeAttrBind('modelValue');
         $this->prop($prop);
         $this->label($label);
         $this->form = $form;

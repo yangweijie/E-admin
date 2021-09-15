@@ -511,7 +511,6 @@
                     header.value = res.header
                     columns.value = res.columns
                     tools.value = res.tools
-                    loading.value = true
                     nextTick(()=>{
                         tableAutoWidth()
                     })

@@ -120,7 +120,7 @@ class Form extends Component
     protected $batch = false;
     //排除字段
     protected $exceptField = [];
-  
+
 
     protected $imageUploads = [];
 
@@ -158,7 +158,7 @@ class Form extends Component
         $self->setExec($closure);
         return $self;
     }
-    
+
     /**
      * 设置标题
      * @param string $title

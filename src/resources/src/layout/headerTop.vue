@@ -20,11 +20,11 @@
                 </div>
             </el-tooltip>
             <notice></notice>
-            <el-tooltip effect="dark" :content="state.theme == 'light'?'亮色':'深色'" placement="bottom">
-              <div class="right-menu-item hover-effect" @click="changeTheme">
-                <i :class="state.theme == 'light'?'fa fa-sun-o':'fa fa-moon-o'"/>
-              </div>
-            </el-tooltip>
+<!--            <el-tooltip effect="dark" :content="state.theme == 'light'?'亮色':'深色'" placement="bottom">-->
+<!--              <div class="right-menu-item hover-effect" @click="changeTheme">-->
+<!--                <i :class="state.theme == 'light'?'fa fa-sun-o':'fa fa-moon-o'"/>-->
+<!--              </div>-->
+<!--            </el-tooltip>-->
             <a-dropdown trigger="click" class="avatar-container" >
                 <div>
                     <div class="avatar-wrapper">
@@ -90,10 +90,12 @@
                     }
                     menuLevels.push(menu)
                     if (menu.pid === 0) {
-                        action.sidebarVisible(false)
+                        if(state.topMenuMode) {
+                          action.sidebarVisible(false)
+                        }
                         action.selectMenuModule(menu.id)
                     }
-                    if(menuLevels.length > 1){
+                    if(menuLevels.length > 1 || !state.topMenuMode){
                         action.setBreadcrumb(menuLevels)
                     }else{
                         action.setBreadcrumb([])
@@ -120,7 +122,9 @@
                         }
                         break;
                     } else {
+                      if(state.topMenuMode){
                         action.sidebarVisible(false)
+                      }
                     }
                 }
                 linkMenuBool = false

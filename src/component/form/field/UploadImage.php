@@ -28,7 +28,7 @@ class UploadImage extends Upload
     {
         parent::__construct($field, $value);
 
-        $this->displayType('image')->accept('image/*')->size(120, 120)->isUniqidmd5();
+        $this->displayType('image')->accept('image/*')->size(80, 80)->isUniqidmd5();
     }
 
     /**
