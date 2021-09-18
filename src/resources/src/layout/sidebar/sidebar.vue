@@ -36,11 +36,15 @@
             const defaultOpeneds = ref([])
             //默认展开子菜单
             state.menus.forEach(res => {
+              if(state.topMenuMode){
                 if(res.children){
-                    res.children.forEach(item=>{
-                        defaultOpeneds.value.push(item.id+'')
-                    })
+                  res.children.forEach(item=>{
+                    defaultOpeneds.value.push(item.id+'')
+                  })
                 }
+              }else{
+                defaultOpeneds.value.push(res.id+'')
+              }
             })
             //侧边栏菜单渲染
             const menus = computed(() => {

@@ -1,5 +1,5 @@
 <template>
-    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog" >
+    <component :is="dialog" v-model="visible" v-bind="$attrs" custom-class="eadmin-dialog">
                     <template #title>
                         <slot name="title"></slot>
                     </template>
@@ -148,7 +148,7 @@
     .eadmin-dialog .el-dialog__body{
         overflow: auto;
     }
-    .eadmin_footer .el-button{
-        margin-right: 10px;
+    .eadmin-dialog .el-button{
+      margin-right: 10px;
     }
 </style>
