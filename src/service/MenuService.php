@@ -19,6 +19,7 @@ use Eadmin\Service;
  */
 class MenuService
 {
+    protected static $menus = [];
     /**
      * 获取所有菜单
      * @return array|mixed
@@ -36,9 +37,32 @@ class MenuService
             ->order('sort asc,id desc')
             ->cache(10)
             ->select()->toArray();
-        return $data;
+        self::$menus = array_merge(self::$menus,$data);
+        return self::$menus;
     }
 
+    /**
+     * 添加菜单
+     * @param array $data
+     */
+    public function add(array $data){
+        self::$menus = array_merge(self::$menus,$data);
+    }
+
+    /**
+     * 获取菜单
+     * @param array $menuIds 包含的菜单id
+     * @return array|mixed
+     */
+    public function menus(array $menuIds){
+        $menus = $this->all();
+        foreach ($menus as $key=>$menu){
+            if(!in_array($menu['id'],$menuIds)){
+                unset($menus[$key]);
+            }
+        }
+        return $menus;
+    }
     /**
      * 生成树形菜单
      * @return array

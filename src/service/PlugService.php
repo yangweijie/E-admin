@@ -29,6 +29,7 @@ class PlugService extends Service
     protected $plugs = [];
     protected static $loader;
     protected static $serviceProvider;
+    protected static $plugConfig = [];
     protected $client;
     protected $loginKey = '';
     public function __construct(App $app)
@@ -127,6 +128,7 @@ class PlugService extends Service
             $file = $plugPaths . DIRECTORY_SEPARATOR . 'composer.json';
             if (is_file($file)) {
                 $arr = json_decode(file_get_contents($file), true);
+                $arr['plug_path'] = $plugPaths;
                 $psr4 = Arr::get($arr, 'autoload.psr-4');
                 $name = Arr::get($arr, 'name');
                 if (in_array($name, $plugNames)) {
@@ -139,13 +141,26 @@ class PlugService extends Service
                     $serviceProvider = Arr::get($arr, 'extra.e-admin');
                     self::$serviceProvider[$name] = $serviceProvider;
                     if ($serviceProvider) {
+                        $configPath = $plugPaths . DIRECTORY_SEPARATOR . 'src'.DIRECTORY_SEPARATOR . 'config.php';
+                        if(is_file($configPath)){
+                           self::$plugConfig[$name] =  include $configPath;
+                        }
                         $this->app->register($serviceProvider);
+
+
+                        $service = $this->app->getService($serviceProvider);
+                        $this->app->bind($serviceProvider,$service);
+                        if(method_exists($service,'withComposerProperty')){
+                            $service->withComposerProperty($arr);
+                        }
                     }
                 }
             }
         }
     }
-
+    public function setting(){
+        return self::$plugConfig;
+    }
     public function getCate()
     {
         $response = $this->client->get("Plugs/cate");

@@ -1,22 +1,20 @@
 <?php
 
-
 namespace Eadmin\form\drive;
-
 
 use Eadmin\contract\FormInterface;
 
-class Arrays implements FormInterface
+class File implements FormInterface
 {
     //主键字段
-    protected $pkField ='id';
-    //数据源
+    protected $pkField = 'id';
+    protected $file;
     protected $data = [];
-    protected $originData = [];
 
     public function __construct($data)
     {
-        $this->originData = $data;
+        $this->file = $data;
+        $this->data = include $this->file;
     }
 
     public function getData(string $field = null, $data = null)
@@ -37,10 +35,10 @@ class Arrays implements FormInterface
             return $data;
         }
     }
-    
+
     public function edit($id)
     {
-        $this->data = $this->originData;
+        
     }
 
     public function getPk()
@@ -50,16 +48,29 @@ class Arrays implements FormInterface
 
     public function save(array $data)
     {
+        unset($data['eadmin_app'],$data['eadmin_class'],$data['eadmin_function'],$data['eadmin_step_num']);
+        $content = var_export($data, true);
+        $content = <<<PHP
+<?php
+return $content;
+PHP;
+
+        return file_put_contents($this->file,$content);
+    }
+
+    public function saveAll(array $data)
+    {
         return true;
     }
-    public function saveAll(array $data){
-        return true;
-    }
+
     public function setPkField(string $field)
     {
         $this->pkField = $field;
     }
-    public function model(){
+
+    public function model()
+    {
         return null;
     }
+
 }

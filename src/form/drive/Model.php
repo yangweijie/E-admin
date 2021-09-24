@@ -131,9 +131,6 @@ class Model implements FormInterface
         }
         return $result;
     }
-    public function getDataAll(){
-        return $this->model->select();
-    }
     /**
      * 获取字段数据
      * @param string|null $field

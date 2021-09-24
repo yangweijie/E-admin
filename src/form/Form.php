@@ -35,6 +35,7 @@ use Eadmin\component\form\step\FormSteps;
 use Eadmin\component\form\step\Result;
 use Eadmin\component\layout\Row;
 use Eadmin\contract\FormInterface;
+use Eadmin\form\drive\File;
 use Eadmin\form\event\Saved;
 use Eadmin\form\event\Saving;
 use Eadmin\form\event\Validating;
@@ -129,6 +130,8 @@ class Form extends Component
         parent::__construct();
         if ($data instanceof Model) {
             $this->drive = new \Eadmin\form\drive\Model($data);
+        } elseif (is_string($data) && is_file($data)) {
+            $this->drive = new File($data);
         } elseif ($data instanceof FormInterface) {
             $this->drive = $data;
         } else {
@@ -159,7 +162,7 @@ class Form extends Component
         return $self;
     }
 
-  
+
 
     /**
      * 居中对齐

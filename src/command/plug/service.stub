@@ -3,9 +3,9 @@ declare (strict_types = 1);
 
 namespace {%namespace%};
 
-use think\Service;
-
-class {%className%} extends Service
+use Eadmin\PlugServiceProvider;
+use Eadmin\form\Form;
+class {%className%} extends PlugServiceProvider
 {
     /**
      * 注册服务
@@ -25,5 +25,21 @@ class {%className%} extends Service
     public function boot()
     {
         //
+    }
+    /**
+     * 菜单
+     * @return array
+     */
+    protected function menus(): array
+    {
+        return [];
+    }
+    /**
+     * 设置
+     * @return Form
+     */
+    public function setting(): Form
+    {
+
     }
 }
