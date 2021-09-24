@@ -155,10 +155,6 @@
         emits: ['update:modelValue','update:selection'],
         setup(props,ctx) {
             Object.assign(props.addParams,props.upload.attribute.params)
-            onActivated(()=>{
-                ctx.emit('update:selection',[])
-                loadData()
-            })
             const {loading, http} = useHttp()
             const filesystem = ref('')
             const finerCate = computed(()=>{
@@ -201,7 +197,7 @@
                         slots: {customRender: 'action'}
                     }
                 ],
-                tableData: props.data,
+                tableData: [],
                 path: props.initPath,
                 quickSearch:'',
                 mouseenterIndex:'',
@@ -213,6 +209,7 @@
                 selectUrls:[],
                 selectCate:'',
             })
+            loadData()
             watch(()=>state.selectCate,value=>{
                 if(value){
                   http({
@@ -264,7 +261,7 @@
                 }
                 http({
                     url: '/filesystem',
-                    params: Object.assign(requestParams,props.addParams,{ext:props.upload.attribute.ext})
+                    params: Object.assign(requestParams,props.addParams,{ext:props.upload.attribute.accept})
                 }).then(res => {
                     state.tableData = res.data
                     state.total = res.total

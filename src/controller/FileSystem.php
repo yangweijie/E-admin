@@ -28,9 +28,14 @@ class FileSystem extends Controller
             ->when($cate_id, ['cate_id'=>$cate_id])
             ->when($search, [['real_name', 'like', "%{$search}%"]])
             ->when($ext,function (Query  $query) use($ext){
-                $ext = str_replace('.','',$ext);
-                $exts = explode(',',$ext);
-                $query->whereIn('ext',$exts);
+                if($ext == 'image/*'){
+                    $query->whereLike('file_type',"image/%");
+                }else{
+                    $ext = str_replace('.','',$ext);
+                    $exts = explode(',',$ext);
+                    $query->whereIn('ext',$exts);
+                }
+
             })
             ->pages()
             ->select()->map(function ($item) {

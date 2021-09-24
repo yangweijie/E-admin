@@ -179,6 +179,7 @@ class FileService extends Service
                 'cate_id' => request()->param('cate_id', 0),
                 'ext' => $extension,
                 'file_size' => request()->param('totalSize'),
+                'file_type' => request()->param('file_type'),
                 'uptype' => $this->upType,
                 'admin_id' => Admin::id(),
             ]);

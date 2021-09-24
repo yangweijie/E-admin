@@ -90,9 +90,7 @@
             <render :data="finder" v-model:grid-params="gridParams" v-model:grid-value="gridValue" v-model:dataSource="finerCate"></render>
         </el-col>
         <el-col :md="19" :sm="24" :xs="24" :span="19">
-          <keep-alive>
             <render :data="finder.attribute.fileSystem" :limit="limit" :multiple="multiple" display="menu" :height="finderHeight" v-model="gridValue" :cate="finerCate" :addParams="gridParams" v-model:selection="selection"></render>
-          </keep-alive>
         </el-col>
       </el-row>
 
@@ -301,11 +299,14 @@ export default defineComponent({
     }
     const uploader = new Uploader({
       target: props.url,
-      query: Object.assign(JSON.parse(JSON.stringify(props.params)),{
-        saveDir: props.saveDir,
-        isUniqidmd5: props.isUniqidmd5,
-        upType: props.disk,
-      }),
+      query: (file)=>{
+        return Object.assign(JSON.parse(JSON.stringify(props.params)),{
+          file_type:file.fileType,
+          saveDir: props.saveDir,
+          isUniqidmd5: props.isUniqidmd5,
+          upType: props.disk,
+        })
+      },
       testChunks: props.chunk,
       chunkSize: props.chunk ? 1 * 1024 * 1024 : 500 * 1024 * 1024,
       headers: {
@@ -365,6 +366,7 @@ export default defineComponent({
       }
       if(props.displayType == 'file' && props.upType != 'local'){
         files.forEach(file=>{
+
           if (props.upType == 'oss') {
             ossMultipartUpload(file)
           } else if (props.upType == 'qiniu') {
@@ -570,6 +572,7 @@ export default defineComponent({
             url:url,
             cate_id:0,
             path:filename,
+            file_type:file.fileType,
             ext:file.getExtension(),
             file_size:file.getSize(),
             uptype:props.upType,
@@ -613,6 +616,7 @@ export default defineComponent({
           url:url,
           cate_id:0,
           path:filename,
+          file_type:file.fileType,
           ext:file.getExtension(),
           file_size:file.getSize(),
           uptype:props.upType,
