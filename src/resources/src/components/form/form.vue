@@ -249,7 +249,7 @@
                                         stepResult.value = res.data
                                         ctx.emit('update:step',++props.step)
                                     }
-                                    ctx.emit('success')
+                                    ctx.emit('success',res)
                                     ctx.emit('PopupRefresh')
                                     ctx.emit('gridRefresh')
                                 }

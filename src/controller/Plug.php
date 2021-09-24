@@ -63,18 +63,18 @@ class Plug extends Controller
         } else {
             $datas = PlugService::instance()->all($search, $cate_id, $page, $size);
         }
-
         $grid = new Grid($datas['list']);
         $grid->drive()->setTotal($datas['total']);
         $grid->title('插件管理');
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');
+        $grid->column('composer', '包名');
         $grid->column('name', '名称')->tag();
         $grid->column('desc', '描述');
         $grid->column('install_version', '版本');
         $grid->actions(function (Actions $actions, $rows) {
             $actions->hideDel();
-            $actions->column()->fixed(false);
+
             $timeLine = TimeLine::create();
             foreach ($rows['version'] as $version) {
                 $descs = explode("\n", $version['desc']);
@@ -97,6 +97,14 @@ class Plug extends Controller
                     ->dialog()
                     ->content($timeLine)
             );
+            if(isset($rows['setting'])){
+                $actions->append(
+                    Button::create('设置')
+                        ->plain()
+                        ->typePrimary()
+                        ->dialog()->form($rows['setting'])
+                );
+            }
             if ($rows['install']) {
                 if ($rows['status']) {
                     $actions->append(

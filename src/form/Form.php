@@ -159,15 +159,7 @@ class Form extends Component
         return $self;
     }
 
-    /**
-     * 设置标题
-     * @param string $title
-     * @return string
-     */
-    public function title(string $title)
-    {
-        return $this->bind('eadmin_title', $title);
-    }
+  
 
     /**
      * 居中对齐

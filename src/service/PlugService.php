@@ -9,6 +9,7 @@
 namespace Eadmin\service;
 
 use Composer\Autoload\ClassLoader;
+use Eadmin\component\basic\Button;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -27,6 +28,7 @@ class PlugService extends Service
     protected $plugPaths = [];
     protected $plugs = [];
     protected static $loader;
+    protected static $serviceProvider;
     protected $client;
     protected $loginKey = '';
     public function __construct(App $app)
@@ -135,6 +137,7 @@ class PlugService extends Service
                         }
                     }
                     $serviceProvider = Arr::get($arr, 'extra.e-admin');
+                    self::$serviceProvider[$name] = $serviceProvider;
                     if ($serviceProvider) {
                         $this->app->register($serviceProvider);
                     }
@@ -171,14 +174,17 @@ class PlugService extends Service
         $content = json_decode($content, true);
 
         $plugs = $content['data']['data'];
-
         $delNames = [];
         foreach ($plugs as &$plug) {
             $status = $this->getInfo($plug['composer'], 'status');
+            if(isset(self::$serviceProvider[$plug['composer']])){
+                $service = self::$serviceProvider[$plug['composer']];
+                if(method_exists($service,'setting')){
+                    $plug['setting'] = app()->invoke([$service,'setting']);
+                }
+            }
             $plug['status'] = $status ?? false;
-
             $plug['install_version'] = $this->getInfo($plug['composer'], 'version');
-
             $plug['install'] = is_null($status) ? false : true;
             $plug['path'] = $this->plugPathBase . '/' . $plug['composer'];
             $this->plugs[] = $plug;
@@ -239,7 +245,9 @@ class PlugService extends Service
                     'require'=>[]
                 ]
             ];
-            $installedPlugs[] = $plug;
+            if($plug['install']){
+                $installedPlugs[] = $plug;
+            }
         }
         return  [
             'list'=>$installedPlugs,

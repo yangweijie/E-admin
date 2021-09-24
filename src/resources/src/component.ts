@@ -36,9 +36,8 @@ const icon = defineAsyncComponent(() =>
 const batchAction = defineAsyncComponent(() =>
     import('./components/grid/batchAction.vue')
 )
-const confirm = defineAsyncComponent(() =>
-    import('./components/confirm.vue')
-)
+import confirm from './components/confirm.vue'
+
 const button = defineAsyncComponent(() =>
     import('./components/button.vue')
 )
