@@ -222,7 +222,7 @@ class Model implements GridInterface
                     $filter->parseFilter(null, $relationFilter . '.');
                     $wheres = $filter->db()->getOptions('where');
                     foreach ($wheres['AND'] as $where) {
-                        if ($where[1] == 'EXISTS') {
+                        if ($where[1] == 'EXISTS' && !empty($fields)) {
                             $relationWhereSqls[] = $where[2];
                             break;
                         }
