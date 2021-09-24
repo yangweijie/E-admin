@@ -26,9 +26,7 @@ const switchs = defineAsyncComponent(() =>
 const tree = defineAsyncComponent(() =>
     import('./components/tree.vue')
 )
-const button = defineAsyncComponent(() =>
-    import('./components/button.vue')
-)
+
 const grid = defineAsyncComponent(() =>
     import('./components/grid/grid.vue')
 )
@@ -38,7 +36,12 @@ const icon = defineAsyncComponent(() =>
 const batchAction = defineAsyncComponent(() =>
     import('./components/grid/batchAction.vue')
 )
-import confirm from './components/confirm.vue'
+const confirm = defineAsyncComponent(() =>
+    import('./components/confirm.vue')
+)
+const button = defineAsyncComponent(() =>
+    import('./components/button.vue')
+)
 const DropdownItem = defineAsyncComponent(() =>
     import('./components/dropdown/DropdownItem.vue')
 )

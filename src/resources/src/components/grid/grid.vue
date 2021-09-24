@@ -22,7 +22,7 @@
                             <el-dropdown-menu>
                                 <el-dropdown-item @click.native="exportData('page')">导出当前页</el-dropdown-item>
                                 <el-dropdown-item @click.native="exportData('select')" v-show="selectIds.length > 0">导出选中行</el-dropdown-item>
-                                <el-dropdown-item @click.native="exportData('all')">导出全部</el-dropdown-item>
+                                <el-dropdown-item v-if="!hideExportAll" @click.native="exportData('all')">导出全部</el-dropdown-item>
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
@@ -180,6 +180,11 @@
             hideTrashed: Boolean,
             hideTrashedDelete: Boolean,
             hideTrashedRestore: Boolean,
+            hideExportAll: Boolean,
+            queueExport: {
+              type:[Boolean,Number],
+              default:-1
+            },
             quickSearch: Boolean,
             hideDeleteSelection: Boolean,
             expandedRow: Boolean,
@@ -256,6 +261,7 @@
                 }
                 return requestParams
             }
+
             onMounted(()=>{
                 if(!props.static){
                   loading.value = true
@@ -512,7 +518,15 @@
                     columns.value = res.columns
                     tools.value = res.tools
                     nextTick(()=>{
+                      if(state.gridFirst){
+                        setTimeout(()=>{
+                          state.gridFirst = false
+                          tableAutoWidth()
+                        })
+                      }else{
                         tableAutoWidth()
+                      }
+
                     })
                 }).finally(() => {
                     ctx.emit('update:modelValue', false)
@@ -599,37 +613,37 @@
                         eadmin_ids:selectIds.value
                 }
                 requestParams = Object.assign(globalRequestParams(),requestParams)
-                if(type == 'all'){
-                    excel.progress = 0
-                    excel.file = ''
-                    request({
-                        url:'/eadmin.rest',
-                        params: Object.assign(requestParams,{eadmin_queue:true})
-                    }).then(res=>{
-                        excel.status = ''
-                        excel.excelVisible = true
-                        excel.excelTimer = setInterval(()=>{
-                            request({
-                                url: 'queue/progress',
-                                params: {
-                                    id: res.data
-                                }
-                            }).then(result=>{
-                                excel.progress = result.data.progress
-                                if(result.data.status == 4){
-                                    excel.status = 'exception'
-                                    clearInterval(excel.excelTimer)
-                                }
-                                if(result.data.status == 3){
-                                    clearInterval(excel.excelTimer)
-                                    excel.status = 'success'
-                                    excel.file = result.data.history.slice(-2)[0].message
-                                }
-                            })
-                        },500)
-                    })
+                if(props.queueExport === true || (props.queueExport == -1 && type == 'all')){
+                  excel.progress = 0
+                  excel.file = ''
+                  request({
+                    url:'/eadmin.rest',
+                    params: Object.assign(requestParams,{eadmin_queue:true})
+                  }).then(res=>{
+                    excel.status = ''
+                    excel.excelVisible = true
+                    excel.excelTimer = setInterval(()=>{
+                      request({
+                        url: 'queue/progress',
+                        params: {
+                          id: res.data
+                        }
+                      }).then(result=>{
+                        excel.progress = result.data.progress
+                        if(result.data.status == 4){
+                          excel.status = 'exception'
+                          clearInterval(excel.excelTimer)
+                        }
+                        if(result.data.status == 3){
+                          clearInterval(excel.excelTimer)
+                          excel.status = 'success'
+                          excel.file = result.data.history.slice(-2)[0].message
+                        }
+                      })
+                    },500)
+                  })
                 }else{
-                    location.href = buildURL('/eadmin.rest',requestParams)
+                  location.href = buildURL('/eadmin.rest',requestParams)
                 }
             }
             const pageLayout = computed(()=>{

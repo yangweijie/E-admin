@@ -1539,14 +1539,14 @@
 
 "@vue/reactivity@3.0.11":
   version "3.0.11"
-  resolved "https://registry.nlark.com/@vue/reactivity/download/@vue/reactivity-3.0.11.tgz#07b588349fd05626b17f3500cbef7d4bdb4dbd0b"
+  resolved "https://registry.npmmirror.com/@vue/reactivity/download/@vue/reactivity-3.0.11.tgz?cache=0&sync_timestamp=1632406840250&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2F%40vue%2Freactivity%2Fdownload%2F%40vue%2Freactivity-3.0.11.tgz#07b588349fd05626b17f3500cbef7d4bdb4dbd0b"
   integrity sha1-B7WINJ/QViaxfzUAy+99S9tNvQs=
   dependencies:
     "@vue/shared" "3.0.11"
 
 "@vue/runtime-core@3.0.11":
   version "3.0.11"
-  resolved "https://registry.nlark.com/@vue/runtime-core/download/@vue/runtime-core-3.0.11.tgz#c52dfc6acf3215493623552c1c2919080c562e44"
+  resolved "https://registry.npmmirror.com/@vue/runtime-core/download/@vue/runtime-core-3.0.11.tgz?cache=0&sync_timestamp=1632406841763&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2F%40vue%2Fruntime-core%2Fdownload%2F%40vue%2Fruntime-core-3.0.11.tgz#c52dfc6acf3215493623552c1c2919080c562e44"
   integrity sha1-xS38as8yFUk2I1UsHCkZCAxWLkQ=
   dependencies:
     "@vue/reactivity" "3.0.11"
@@ -1554,7 +1554,7 @@
 
 "@vue/runtime-dom@3.0.11":
   version "3.0.11"
-  resolved "https://registry.nlark.com/@vue/runtime-dom/download/@vue/runtime-dom-3.0.11.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40vue%2Fruntime-dom%2Fdownload%2F%40vue%2Fruntime-dom-3.0.11.tgz#7a552df21907942721feb6961c418e222a699337"
+  resolved "https://registry.npmmirror.com/@vue/runtime-dom/download/@vue/runtime-dom-3.0.11.tgz?cache=0&sync_timestamp=1632406842689&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2F%40vue%2Fruntime-dom%2Fdownload%2F%40vue%2Fruntime-dom-3.0.11.tgz#7a552df21907942721feb6961c418e222a699337"
   integrity sha1-elUt8hkHlCch/raWHEGOIippkzc=
   dependencies:
     "@vue/runtime-core" "3.0.11"
@@ -1883,10 +1883,10 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
   dependencies:
     color-convert "^2.0.1"
 
-ant-design-vue@^2.2.7:
-  version "2.2.7"
-  resolved "https://registry.nlark.com/ant-design-vue/download/ant-design-vue-2.2.7.tgz?cache=0&sync_timestamp=1631110997919&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fant-design-vue%2Fdownload%2Fant-design-vue-2.2.7.tgz#d306d478003862f1a4cec3d52edb99c19064730a"
-  integrity sha1-0wbUeAA4YvGkzsPVLtuZwZBkcwo=
+ant-design-vue@^2.2.8:
+  version "2.2.8"
+  resolved "https://registry.nlark.com/ant-design-vue/download/ant-design-vue-2.2.8.tgz#fa87cf6842d8ee9a0d8af393ff4099ecc4072f2b"
+  integrity sha1-+ofPaELY7poNivOT/0CZ7MQHLys=
   dependencies:
     "@ant-design/icons-vue" "^6.0.0"
     "@babel/runtime" "^7.10.5"
@@ -9490,7 +9490,7 @@ vue-types@^3.0.0:
 
 vue@^3.0.11:
   version "3.0.11"
-  resolved "https://registry.nlark.com/vue/download/vue-3.0.11.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fvue%2Fdownload%2Fvue-3.0.11.tgz#c82f9594cbf4dcc869241d4c8dd3e08d9a8f4b5f"
+  resolved "https://registry.npmmirror.com/vue/download/vue-3.0.11.tgz#c82f9594cbf4dcc869241d4c8dd3e08d9a8f4b5f"
   integrity sha1-yC+VlMv03MhpJB1MjdPgjZqPS18=
   dependencies:
     "@vue/compiler-dom" "3.0.11"

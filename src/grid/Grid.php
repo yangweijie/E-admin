@@ -48,6 +48,8 @@ use think\Model;
  * @method $this hideDeleteSelection(bool $bool = true) 隐藏删除选中按钮
  * @method $this hideTrashedDelete(bool $bool = true) 隐藏回收站删除按钮
  * @method $this hideTrashedRestore(bool $bool = true) 隐藏回收站恢复按钮
+ * @method $this hideExportAll(bool $bool = true) 隐藏导出全部
+ * @method $this queueExport(bool $bool = true) 是否启动队列导出
  * @method $this expandFilter(bool $bool = true) 展开筛选
  * @method $this defaultExpandAllRows(bool $bool) 是否默认展开所有行
  * @method $this static(bool $bool) 静态表格
@@ -95,7 +97,7 @@ class Grid extends Component
     protected $tools = [];
     //展开行
     protected $expandRow = null;
-   
+
     //自定义列表元素
     protected $customClosure = null;
 
@@ -440,7 +442,7 @@ class Grid extends Component
     {
         $this->pagination->pageSize($limit);
     }
-    
+
     /**
      * 添加表格列
      * @param string $field 字段
@@ -530,6 +532,13 @@ class Grid extends Component
      */
     public function exportData()
     {
+        if(Request::has('eadmin_queue')){
+            $id = sysqueue('导出excel',ExcelQueue::class,Request::get());
+            return [
+                'code' => 200,
+                'data' => $id,
+            ];
+        }
         $this->exec();
         //快捷搜索
         $keyword = Request::get('quickSearch', '', ['trim']);
@@ -552,21 +561,13 @@ class Grid extends Component
         }
         $excel->columns($columnTitle);
         if (Request::get('export_type') == 'all') {
-            if(Request::has('eadmin_queue')){
-                $id = sysqueue('导出excel',ExcelQueue::class,Request::get());
-                return [
-                    'code' => 200,
-                    'data' => $id,
-                ];
-            }else{
-                $count = $this->drive->getTotal();
-                $this->drive->db()->chunk(500, function ($datas) use ($excel,$count) {
-                    $exportData = $this->parseColumn($datas, true);
-                    $excel->rows($exportData)->queueExport($count);
-                    $this->exportData = [];
-                });
-                return true;
-            }
+            $count = $this->drive->getTotal();
+            $this->drive->db()->chunk(500, function ($datas) use ($excel,$count) {
+                $exportData = $this->parseColumn($datas, true);
+                $excel->rows($exportData)->queueExport($count);
+                $this->exportData = [];
+            });
+            return true;
         } elseif (Request::get('export_type') == 'select') {
             $data = $this->drive->model()->whereIn($this->drive->getPk(), Request::get('eadmin_ids'))->select();
         } else {

@@ -54,6 +54,8 @@ class Dialog extends Field
         $self->destroyOnClose();
         $self->width('35%');
         $self->closeOnPressEscape(false);
+        $self->closeOnClickModal(false);
+        $self->appendToBody();
         if (!is_null($content)) {
             $self->content($content, 'reference');
         }

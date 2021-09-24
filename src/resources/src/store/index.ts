@@ -47,6 +47,7 @@ const states = reactive({
     theme:'',
     //表格grid激活刷新
     gridActivatedRefresh:true,
+    gridFirst:true,
 });
 export const state = states
 //操作方法
@@ -172,7 +173,6 @@ const action = {
             //@ts-ignore
             state.mainDescription = states.mainComponent[index].description || ''
         }
-        action.loading(false)
     },
     //关闭错误页面
     errorPageClose() {

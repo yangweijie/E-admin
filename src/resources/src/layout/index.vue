@@ -5,21 +5,21 @@
         <div class="main-container">
             <header-top></header-top>
             <tags-view v-if="state.tagMenuMode"></tags-view>
-            <div class="main-content" v-loading="state.mainLoading">
-                <div class="header-title" v-if="state.mainTitle">
-                    <div>
-                        <span class="title">{{state.mainTitle}}</span>
-                        <span class="desc" v-if="state.mainDescription">{{state.mainDescription}}</span>
-                    </div>
-                    <breadcrumb class="indexBreadcrumb" style="margin-right: 5px" v-if="state.topMenuMode && state.device != 'mobile'"></breadcrumb>
-                    <el-button style="margin-right: 0" v-if="!state.topMenuMode && state.device != 'mobile'" size="mini" @click="back">返回上一页</el-button>
+            <a-spin wrapperClassName="main-content" :spinning="state.mainLoading" tip="正在刷新...">
+              <div class="header-title" v-if="state.mainTitle && !state.mainLoading">
+                <div>
+                  <span class="title">{{state.mainTitle}}</span>
+                  <span class="desc" v-if="state.mainDescription">{{state.mainDescription}}</span>
                 </div>
-                <el-backtop target=".main-content"></el-backtop>
-                <keep-alive :include="cacheKeys">
-                    <component :is="mainComponent"></component>
-                </keep-alive>
-                <render :data="state.component"></render>
-            </div>
+                <breadcrumb class="indexBreadcrumb" style="margin-right: 5px" v-if="state.topMenuMode && state.device != 'mobile'"></breadcrumb>
+                <el-button style="margin-right: 0" v-if="!state.topMenuMode && state.device != 'mobile'" size="mini" @click="back">返回上一页</el-button>
+              </div>
+              <el-backtop target=".main-content"></el-backtop>
+              <keep-alive :include="cacheKeys">
+                <component :is="mainComponent"></component>
+              </keep-alive>
+              <render :data="state.component"></render>
+            </a-spin>
         </div>
         <render v-for="init in state.info.init" :data="init"></render>
     </div>
@@ -27,7 +27,7 @@
 
 <script>
     import {useRoute, useRouter} from 'vue-router'
-    import {defineComponent, inject,computed,h,getCurrentInstance,defineAsyncComponent,resolveComponent} from 'vue'
+    import {defineComponent, inject,computed,h,getCurrentInstance,defineAsyncComponent,resolveComponent,nextTick,watch} from 'vue'
     import headerTop from './headerTop.vue'
     import Sidebar from './sidebar/sidebar.vue'
     import breadcrumb from '@/components/breadcrumb.vue'
@@ -45,7 +45,6 @@
             const route = useRoute()
             const router = useRouter()
             const state = inject(store)
-
             let sidebar = state.sidebar
             const cacheKeys = computed(()=>{
                 return state.mainComponent.map(item=>{
