@@ -24,7 +24,7 @@ class {%className%} extends PlugServiceProvider
      */
     public function boot()
     {
-        //
+        parent::boot();
     }
     /**
      * 菜单

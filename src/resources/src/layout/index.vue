@@ -1,12 +1,12 @@
 <template>
     <div :class="['app-wrapper',state.device === 'mobile' ? 'mobile':'']">
-        <div class="headerBg" :style="{background:state.theme == 'light'?'background: #409eff':'#2c2c42'}"></div>
+        <div class="headerBg" :style="{background:state.theme == 'light'?'background: #2c2c42':'#409eff'}"></div>
         <sidebar v-if="sidebar.visible"></sidebar>
         <div class="main-container">
             <header-top></header-top>
             <tags-view v-if="state.tagMenuMode"></tags-view>
             <a-spin wrapperClassName="main-content" :spinning="state.mainLoading" tip="正在刷新...">
-              <div class="header-title" v-if="state.mainTitle && !state.mainLoading">
+              <div class="header-title" v-if="state.mainTitle">
                 <div>
                   <span class="title">{{state.mainTitle}}</span>
                   <span class="desc" v-if="state.mainDescription">{{state.mainDescription}}</span>

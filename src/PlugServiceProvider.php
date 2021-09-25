@@ -2,8 +2,10 @@
 
 namespace Eadmin;
 
+use Closure;
 use Eadmin\service\PlugService;
 use think\App;
+use think\facade\Request;
 use think\helper\Arr;
 use \think\Service;
 
@@ -56,6 +58,17 @@ class PlugServiceProvider extends Service
     }
 
     /**
+     * 获取命名空间
+     * @return string
+     */
+    final public function getNamespace()
+    {
+        $psr = $this->composerProperty['autoload']['psr-4'];
+        $psr = array_flip($psr);
+        return end($psr);
+    }
+
+    /**
      * 获取或保存配置.
      * @param string $key
      * @param string $value
@@ -65,17 +78,18 @@ class PlugServiceProvider extends Service
     {
         $file = static::instance()->getPath() . '/src/config.php';
         $data = include $file;
-        if(is_null($value)){
+        if (is_null($value)) {
             return Arr::get($data, $key);
         }
-        Arr::set($data,$key,$value);
+        Arr::set($data, $key, $value);
         $content = var_export($data, true);
         $content = <<<PHP
 <?php
 return $content;
 PHP;
-        return file_put_contents($file,$content);
+        return file_put_contents($file, $content);
     }
+
     /**
      * 获取自身实例.
      *
@@ -85,38 +99,65 @@ PHP;
     {
         return app(static::class);
     }
+
     public function boot()
     {
-        $this->addMenus();
+        if($this->enabled()){
+            //插件菜单
+            $this->addMenus();
+            //注册路由
+            $this->registerRoute();
+        }
     }
+
+    /**
+     * 注册路由
+     */
+    final function registerRoute()
+    {
+        $dir = basename($this->getPath());
+        $this->app->route->group($dir, function () {
+            $namespace = $this->getNamespace();
+            $pathArr = explode('/', Request::pathinfo());
+            if ($pathArr[0] == 'api') {
+                $namespace .= 'controller\\api\\';
+                $method = Request::method();
+                $this->app->route->any('<controller>/<function>', $namespace . '<controller>@' . $method . '<function>');
+            } else {
+                $namespace .= 'controller\\';
+                $this->app->route->any('<controller>/<function>', $namespace . '<controller>@<function>');
+                $this->app->route->any('<controller>', $namespace . '<controller>@index');
+            }
+        });
+    }
+
     /**
      * 添加菜单
      * @param array $menus
      */
-    final function addMenus(array $menus = []){
-        if(count($menus) == 0){
+    final function addMenus(array $menus = [])
+    {
+        if (count($menus) == 0) {
             $menus = $this->menus();
         }
-        $names = array_column($menus,'name');
-        foreach ($menus as $key=>&$menu){
+        $names = array_column($menus, 'name');
+        foreach ($menus as $key => &$menu) {
             $menu['id'] = md5(serialize($menu));
-            if(isset($menu['pid'])){
-                $index = array_search($menu['pid'],$names);
-                if($index !== false){
+            if (isset($menu['pid'])) {
+                $index = array_search($menu['pid'], $names);
+                if ($index !== false) {
                     $pidMenu = $menus[$index];
                     unset($pidMenu['id']);
                     unset($pidMenu['pid']);
                     $menu['pid'] = md5(serialize($pidMenu));
                 }
-            }else{
+            } else {
                 $menu['pid'] = 0;
             }
-            if(!$menu['status']){
+            if (!$menu['status']) {
                 unset($menus[$key]);
             }
         }
-        if($this->enabled()){
-            Admin::menu()->add($menus);
-        }
+        Admin::menu()->add($menus);
     }
 }
