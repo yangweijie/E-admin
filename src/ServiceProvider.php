@@ -41,15 +41,16 @@ class ServiceProvider extends Service
     {
         //json压缩
         $this->zlib();
+        $this->registerService();
         //注册上传路由
         FileService::instance()->registerRoute();
         //注册插件
-        PlugService::instance()->register();
+        Admin::plug()->register();
         //视图路由
         Admin::registerRoute();
         //权限中间件
         $this->app->middleware->route(\Eadmin\middleware\Permission::class);
-        $this->registerService();
+       
     }
     //检测静态文件版本发布
     protected function publishVersion(){
@@ -76,6 +77,7 @@ class ServiceProvider extends Service
     protected function registerService()
     {
         $this->app->bind([
+            'admin.plug'         => PlugService::class,
             'admin.menu'         => MenuService::class,
             'admin.message'      => Message::class,
             'admin.notification' => Notification::class,

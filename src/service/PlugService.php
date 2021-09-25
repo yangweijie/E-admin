@@ -10,6 +10,7 @@ namespace Eadmin\service;
 
 use Composer\Autoload\ClassLoader;
 use Eadmin\component\basic\Button;
+use Eadmin\PlugServiceProvider;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -28,8 +29,7 @@ class PlugService extends Service
     protected $plugPaths = [];
     protected $plugs = [];
     protected static $loader;
-    protected static $serviceProvider;
-    protected static $plugConfig = [];
+    protected $serviceProvider;
     protected $client;
     protected $loginKey = '';
     public function __construct(App $app)
@@ -139,16 +139,12 @@ class PlugService extends Service
                         }
                     }
                     $serviceProvider = Arr::get($arr, 'extra.e-admin');
-                    self::$serviceProvider[$name] = $serviceProvider;
+
                     if ($serviceProvider) {
                         $configPath = $plugPaths . DIRECTORY_SEPARATOR . 'src'.DIRECTORY_SEPARATOR . 'config.php';
-                        if(is_file($configPath)){
-                           self::$plugConfig[$name] =  include $configPath;
-                        }
                         $this->app->register($serviceProvider);
-
-
                         $service = $this->app->getService($serviceProvider);
+                        $this->serviceProvider[] = $service;
                         $this->app->bind($serviceProvider,$service);
                         if(method_exists($service,'withComposerProperty')){
                             $service->withComposerProperty($arr);
@@ -158,8 +154,13 @@ class PlugService extends Service
             }
         }
     }
-    public function setting(){
-        return self::$plugConfig;
+
+    /**
+     * 获取注册插件服务
+     * @return PlugServiceProvider
+     */
+    public function getServiceProviders(){
+        return $this->serviceProvider;
     }
     public function getCate()
     {

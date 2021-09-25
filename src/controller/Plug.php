@@ -3,6 +3,7 @@
 
 namespace Eadmin\controller;
 
+use Eadmin\Admin;
 use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Card;
 use Eadmin\component\basic\Html;
@@ -39,7 +40,7 @@ class Plug extends Controller
     public function index(Content $content)
     {
         $tabs = Tabs::create();
-        $cates = PlugService::instance()->getCate();
+        $cates = Admin::plug()->getCate();
         $tabs->pane('全部', $this->grid());
         $tabs->pane('已安装', $this->grid(0, 1));
         foreach ($cates as $cate) {
@@ -58,10 +59,10 @@ class Plug extends Controller
         $page = $this->request->get('page',1);
         $size = $this->request->get('size',20);
         if ($type == 1) {
-            $datas = PlugService::instance()->installed($search, $page, $size);
+            $datas = Admin::plug()->installed($search, $page, $size);
 
         } else {
-            $datas = PlugService::instance()->all($search, $cate_id, $page, $size);
+            $datas = Admin::plug()->all($search, $cate_id, $page, $size);
         }
         $grid = new Grid($datas['list']);
         $grid->drive()->setTotal($datas['total']);
@@ -147,7 +148,7 @@ class Plug extends Controller
                 ->form($this->add()),
             Button::create('登录')
                 ->typeDanger()
-                ->whenShow(!PlugService::instance()->isLogin())
+                ->whenShow(!Admin::plug()->isLogin())
                 ->sizeSmall()
                 ->dialog()
                 ->form($this->login()),
@@ -163,7 +164,7 @@ class Plug extends Controller
             $form->password('password', '密码')->required();
             $form->actions()->submitButton()->content('登录');
             $form->saving(function ($post){
-               $res = PlugService::instance()->login($post['username'],$post['password']);
+               $res = Admin::plug()->login($post['username'],$post['password']);
                if($res){
                    admin_success_message('登录成功');
                }else{
@@ -191,14 +192,14 @@ class Plug extends Controller
             $formAction->hideResetButton();
         });
         $form->saving(function ($post) use ($data, $composer) {
-            if(!PlugService::instance()->isLogin()){
+            if(!Admin::plug()->isLogin()){
                 admin_error_message('请先登录插件');
             }
 
             $this->requireInstall($data, $post['id']);
             $urls = array_column($data, 'url', 'id');
             $versions = array_column($data, 'version', 'id');
-            PlugService::instance()->install($composer, $urls[$post['id']], $versions[$post['id']]);
+            Admin::plug()->install($composer, $urls[$post['id']], $versions[$post['id']]);
             admin_success_message('安装完成');
         });
         return $form;
@@ -213,7 +214,7 @@ class Plug extends Controller
     {
         $path = $this->request->put('path');
         $name = $this->request->put('id');
-        PlugService::instance()->uninstall($name, $path);
+        Admin::plug()->uninstall($name, $path);
         admin_success_message('卸载完成');
     }
     protected function getRequires($require){
@@ -242,9 +243,9 @@ class Plug extends Controller
         });
         $form->saving(function ($post) use ($composer, $path) {
             foreach ($post['requires'] as $require) {
-                PlugService::instance()->uninstall($require, PlugService::instance()->getPath() . '/' . $require);
+                Admin::plug()->uninstall($require, Admin::plug()->getPath() . '/' . $require);
             }
-            PlugService::instance()->uninstall($composer, $path);
+            Admin::plug()->uninstall($composer, $path);
             admin_success_message('卸载完成');
         });
         return $form;
@@ -293,7 +294,7 @@ class Plug extends Controller
      */
     public function enable($id, $status)
     {
-        PlugService::instance()->enable($id, $status);
+        Admin::plug()->enable($id, $status);
         admin_success_message('操作完成');
     }
 
@@ -312,7 +313,7 @@ class Plug extends Controller
         $requires = $requires[$version];
         foreach ($requires as $require) {
             if (!Db::name('system_plugs')->where('name', $require['composer'])->find()) {
-                PlugService::instance()->install($require['composer'], $require['url'], $require['version_number']);
+                Admin::plug()->install($require['composer'], $require['url'], $require['version_number']);
                 $this->requireInstall($require['version'],$require['id']);
             }
         }

@@ -20,6 +20,7 @@ use Eadmin\controller\Queue;
 use Eadmin\controller\ResourceController;
 use Eadmin\service\MenuService;
 use Eadmin\service\NodeService;
+use Eadmin\service\PlugService;
 use Eadmin\service\QueueService;
 use Eadmin\service\TokenService;
 use think\app\Url;
@@ -197,7 +198,14 @@ class Admin
     {
         return new TokenService();
     }
-
+    /**
+     * 插件
+     * @return PlugService
+     */
+    public static function plug()
+    {
+        return app('admin.plug');
+    }
     /**
      * 菜单服务
      * @return MenuService

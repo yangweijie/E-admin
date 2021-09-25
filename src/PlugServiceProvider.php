@@ -20,7 +20,7 @@ class PlugServiceProvider extends Service
      */
     final public function enabled()
     {
-        return PlugService::instance()->getInfo($this->getName(), 'status') ? true : false;
+        return Admin::plug()->getInfo($this->getName(), 'status') ? true : false;
     }
 
     /**

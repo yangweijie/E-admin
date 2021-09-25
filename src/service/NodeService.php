@@ -8,6 +8,8 @@
 
 namespace Eadmin\service;
 
+use Eadmin\Admin;
+use Eadmin\PlugServiceProvider;
 use think\route\Resource;
 use Eadmin\Service;
 
@@ -223,23 +225,17 @@ class NodeService
                 }
             }
         }
-
-        $rules  = app()->route->getGroup()->getRules();
-        $loader = PlugService::instance()->loader();
-        $psr    = $loader->getPrefixesPsr4();
-        foreach ($rules as $key => $rule) {
-            if (isset($rule[1]) && $rule[1] instanceof Resource) {
-                $resource[] = $rule[1];
-                $route      = $rule[1]->getRoute();
-                $arr        = explode('\\', $route);
-                $namespace  = array_shift($arr) . '\\';
-                if (isset($psr[$namespace])) {
-                    $file     = array_shift($psr[$namespace]);
-                    $filePath = str_replace([$namespace, '\\'], ['', '/'], $route);
-                    $file     .= $filePath . '.php';
+        $serviceProviders = Admin::plug()->getServiceProviders();
+        foreach ($serviceProviders as $serviceProvider){
+            if($serviceProvider instanceof PlugServiceProvider){
+                $reflectionClass = new \ReflectionClass($serviceProvider);
+                $module = dirname($reflectionClass->getFileName());
+                foreach (glob($module . '/controller/' . '*.php') as $file) {
                     if (is_file($file)) {
+                        $controller        = str_replace('.php', '', basename($file));
+                        $namespace         = $serviceProvider->getNamespace()."controller\\$controller";
                         $controllerFiles[] = [
-                            'namespace' => $route,
+                            'namespace' => $namespace,
                             'module'    => '',
                             'file'      => $file,
                         ];
@@ -247,7 +243,6 @@ class NodeService
                 }
             }
         }
-
         return $controllerFiles;
     }
 }
