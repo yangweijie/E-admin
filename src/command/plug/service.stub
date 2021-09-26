@@ -30,7 +30,7 @@ class {%className%} extends PlugServiceProvider
      * 菜单
      * @return array
      */
-    protected function menus(): array
+    public function menus(): array
     {
         return [];
     }
@@ -40,6 +40,8 @@ class {%className%} extends PlugServiceProvider
      */
     public function setting(): Form
     {
-
+        $form = new Form(__DIR__.'/config.php');
+        $form->title('配置');
+        return $form;
     }
 }

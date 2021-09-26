@@ -9,10 +9,11 @@ use think\facade\Request;
 use think\helper\Arr;
 use \think\Service;
 
-class PlugServiceProvider extends Service
+abstract class PlugServiceProvider extends Service
 {
     protected $composerProperty;
-
+    abstract public function menus();
+    abstract public function setting();
     /**
      * 判断扩展是否启用.
      *
@@ -140,24 +141,26 @@ PHP;
         if (count($menus) == 0) {
             $menus = $this->menus();
         }
-        $names = array_column($menus, 'name');
-        foreach ($menus as $key => &$menu) {
-            $menu['id'] = md5(serialize($menu));
-            if (isset($menu['pid'])) {
-                $index = array_search($menu['pid'], $names);
-                if ($index !== false) {
-                    $pidMenu = $menus[$index];
-                    unset($pidMenu['id']);
-                    unset($pidMenu['pid']);
-                    $menu['pid'] = md5(serialize($pidMenu));
+        if(!empty($menus)){
+            $names = array_column($menus, 'name');
+            foreach ($menus as $key => &$menu) {
+                $menu['id'] = md5(serialize($menu));
+                if (isset($menu['pid'])) {
+                    $index = array_search($menu['pid'], $names);
+                    if ($index !== false) {
+                        $pidMenu = $menus[$index];
+                        unset($pidMenu['id']);
+                        unset($pidMenu['pid']);
+                        $menu['pid'] = md5(serialize($pidMenu));
+                    }
+                } else {
+                    $menu['pid'] = 0;
                 }
-            } else {
-                $menu['pid'] = 0;
+                if (!$menu['status']) {
+                    unset($menus[$key]);
+                }
             }
-            if (!$menu['status']) {
-                unset($menus[$key]);
-            }
+            Admin::menu()->add($menus);
         }
-        Admin::menu()->add($menus);
     }
 }

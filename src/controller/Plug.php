@@ -17,6 +17,7 @@ use Eadmin\Controller;
 use Eadmin\form\drive\Config;
 use Eadmin\grid\Actions;
 use Eadmin\grid\Grid;
+use Symfony\Component\Process\Process;
 use think\facade\Console;
 use think\facade\Db;
 use Eadmin\controller\BaseAdmin;
@@ -93,6 +94,12 @@ class Plug extends Controller
                 $html->content($space);
                 $timeLine->item($html)->timestamp($version['version']);
             }
+
+            $actions->append(
+                Button::create('更新到git')
+                    ->save(['path'=>$rows['path'],'git_remote'=>$rows['git_remote']],'plug/uploadGit','git commit')->input()
+                    ->whenShow(!empty($rows['git_remote']))
+            );
             $actions->append(
                 Button::create('历史版本')
                     ->dialog()
@@ -173,7 +180,34 @@ class Plug extends Controller
             });
         });
     }
+    public function uploadGit($path,$git_remote,$inputValue){
+        if(empty($inputValue)){
+            admin_error_message('commit 不能为空');
+        }
+        $girDir = $path.DIRECTORY_SEPARATOR.'.git';
+        if(!is_dir($girDir)){
+            $cmd = "cd $path && git init && git remote rm origin";
+            exec($cmd,$out,$result);
+            $cmd = "cd $path && git init && git checkout -b eadmin";
+            exec($cmd,$out,$result);
+            $cmd = "cd $path && git remote add origin $git_remote";
+            exec($cmd,$out,$result);
+        }
 
+        $cmd = "git config user.name 'eadmin' && git config user.email 'eadmin@eadmin.com' && git add . && git commit -m $inputValue";
+        $process = new Process($cmd,$path);
+        $process->run();
+        if(!$process->isSuccessful()){
+            admin_error($process->getOutput(),$process->getErrorOutput());
+        }
+        $process = new Process('git push origin eadmin',$path);
+        $process->run();
+        if($process->isSuccessful()){
+            admin_success_message('git上传成功');
+        }else{
+            admin_error($process->getOutput(),$process->getErrorOutput());
+        }
+    }
     /**
      * 安装
      * @param $composer

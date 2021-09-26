@@ -43,6 +43,8 @@ class Plug extends Command
         if(!is_dir($plugNameDir)) mkdir($plugNameDir);
         //src目录
         $plugSrc = $plugNameDir.'src'.DIRECTORY_SEPARATOR;
+        //config文件
+        file_put_contents($plugSrc.'config.php','<?php');
         if(!is_dir($plugSrc)) mkdir($plugSrc);
         $res =  $this->composerFile($plugNameDir);
         if($res){

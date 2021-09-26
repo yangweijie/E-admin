@@ -25,11 +25,23 @@ use Eadmin\Service;
 
 class PlugService extends Service
 {
+    /**
+     * 插件基础目录
+     * @var string
+     */
     protected $plugPathBase = '';
+    /**
+     * 插件目录集合
+     * @var array
+     */
     protected $plugPaths = [];
     protected $plugs = [];
     protected static $loader;
-    protected $serviceProvider;
+    /**
+     * 插件服务集合
+     * @var array
+     */
+    protected $serviceProvider = [];
     protected $client;
     protected $loginKey = '';
     public function __construct(App $app)
@@ -144,7 +156,7 @@ class PlugService extends Service
                         $configPath = $plugPaths . DIRECTORY_SEPARATOR . 'src'.DIRECTORY_SEPARATOR . 'config.php';
                         $this->app->register($serviceProvider);
                         $service = $this->app->getService($serviceProvider);
-                        $this->serviceProvider[] = $service;
+                        $this->serviceProvider[$name] = $service;
                         $this->app->bind($serviceProvider,$service);
                         if(method_exists($service,'withComposerProperty')){
                             $service->withComposerProperty($arr);
@@ -188,13 +200,12 @@ class PlugService extends Service
 
         $content = $response->getBody()->getContents();
         $content = json_decode($content, true);
-
         $plugs = $content['data']['data'];
         $delNames = [];
         foreach ($plugs as &$plug) {
             $status = $this->getInfo($plug['composer'], 'status');
-            if(isset(self::$serviceProvider[$plug['composer']])){
-                $service = self::$serviceProvider[$plug['composer']];
+            if(isset($this->serviceProvider[$plug['composer']])){
+                $service = $this->serviceProvider[$plug['composer']];
                 if(method_exists($service,'setting')){
                     $plug['setting'] = app()->invoke([$service,'setting']);
                 }
