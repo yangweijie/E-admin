@@ -1,6 +1,6 @@
 <template>
   <div ref="filesystem">
-    <el-card class="filesystem" shadow="never">
+    <el-card class="filesystem" shadow="never" :body-style="{padding:'0px'}">
       <template #header>
         <el-row style="display: flex;align-items: center;justify-content: space-between">
           <el-col :md="16" :xs="24" >
@@ -66,24 +66,31 @@
           </template>
         </a-table>
         <div v-else class="menuGrid" :style="{height:height?height:'calc(100vh - 280px)'}">
-          <el-row v-loading="loading">
+          <el-row v-loading="loading" :gutter="15" style="padding: 0px 20px">
 
             <el-col class="menuBox" :lg="4" :md="6" :sm="6" :xs="12" v-for="item in tableData"  @mouseenter="mouseenterIndex = item.id" @mouseleave="mouseenterIndex=''" @click="select(item)">
 
               <div :class="[selectIds.indexOf(item.id) !== -1?'selected':'','item']">
                 <i class="el-icon-circle-check" v-if="selectIds.indexOf(item.id) !== -1"></i>
                 <el-image :src="item.url" :preview-src-list="[item.url]" fit="contain"
-                          style="width: 80px;height: 80px;margin-right: 10px" @click="changePath(item.path,item.dir )">
+                          style="width: 80px;height: 80px;" @click="changePath(item.path,item.dir )">
                   <template #error >
                     <el-image :src="fileIcon(item.dir ? '.dir':item.name)"
-                              style="width: 80px;height: 80px;margin-right: 10px" @click="changePath(item.path,item.dir )">
+                              style="width: 80px;height: 80px;" @click="changePath(item.path,item.dir )">
                       <template #error >
                         <div style="display: flex; align-items: center;"><i class="el-icon-document" style="font-size: 80px"/></div>
                       </template>
                     </el-image>
                   </template>
                 </el-image>
-                <div class="text"> {{ item.real_name }}</div>
+
+              </div>
+              <div>
+                <div class="textBox">
+                  <el-tooltip :content="item.real_name" placement="bottom-start"  effect="dark"><div class="text">{{ item.real_name }}</div></el-tooltip>
+<!--                  <i class="el-icon-edit" style="cursor: pointer"></i>-->
+                </div>
+
               </div>
 
               <div class="tool" v-show="mouseenterIndex == item.id">
@@ -95,16 +102,17 @@
 
           </el-row>
         </div>
-        <!--分页-->
-        <el-pagination @size-change="handleSizeChange"
-                       @current-change="handleCurrentChange"
-                       layout="total, sizes, prev, pager, next, jumper"
-                       :total="total"
-                       :page-size="size"
-                       :current-page="page">
-        </el-pagination>
+
       </div>
     </el-card>
+    <!--分页-->
+    <el-pagination style="margin-top: 10px" @size-change="handleSizeChange"
+                   @current-change="handleCurrentChange"
+                   layout="total, sizes, prev, pager, next, jumper"
+                   :total="total"
+                   :page-size="size"
+                   :current-page="page">
+    </el-pagination>
   </div>
 </template>
 
@@ -525,21 +533,31 @@
         width: 100%;
         height: calc(100vh - 280px);
         overflow-y: auto;
+        overflow-x: hidden;
     }
     .menuBox .item{
+        margin-top: 30px;
         text-align: center;
-        margin-bottom: 30px;
         cursor: pointer;
         transition: 0.3s all;
         position: relative;
     }
-    .menuBox .item .text{
+    .menuBox .textBox{
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .menuBox .text{
+
+        text-align: center;
         overflow: hidden;
+        white-space:nowrap;
         text-overflow: ellipsis;
+
     }
     .menuBox .tool{
         display: flex;
-        margin-bottom: 30px;
+
     }
     .menuBox .item:hover{
         background: #F8F9FB;
@@ -547,8 +565,10 @@
         padding: 10px;
         margin-bottom: 5px;
         border-radius: 5px;
+        margin-top: 20px;
     }
     .menuGrid .selected{
+        margin-top: 20px;
         background: #F8F9FB;
         border: solid 1px #A7D0FB;
         padding: 10px;

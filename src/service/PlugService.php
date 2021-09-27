@@ -251,15 +251,14 @@ class PlugService extends Service
             }
         }
         $onlinePlugNames = array_column($installedPlugs, 'composer');
-
         $plugnames = array_column($plugs, 'name');
-
         $names = array_diff($plugnames, $onlinePlugNames);
         foreach ($names as $name) {
             $index = array_search($name,$plugnames);
             $plug = [];
             $status = $this->getInfo($name, 'status');
             $plug['name']=  $plugs[$index]['description'];
+            $plug['desc']=  '';
             $plug['status'] = $status ?? false;
             $plug['install_version'] = '本地插件';
             $plug['install'] = is_null($status) ? false : true;

@@ -57,8 +57,8 @@ class Plug extends Controller
     public function grid($cate_id = 0, $type = 0)
     {
         $search = $this->request->get('quickSearch');
-        $page = $this->request->get('page',1);
-        $size = $this->request->get('size',20);
+        $page = $this->request->get('page', 1);
+        $size = $this->request->get('size', 20);
         if ($type == 1) {
             $datas = Admin::plug()->installed($search, $page, $size);
 
@@ -70,9 +70,14 @@ class Plug extends Controller
         $grid->title('插件管理');
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');
-        $grid->column('composer', '包名');
-        $grid->column('name', '名称')->tag();
-        $grid->column('desc', '描述');
+        $grid->column('composer', '包名')->display(function ($val, $data) {
+            return Html::div()->content([
+                Html::div()->content(Tag::create($data['name'])->size('mini')->effect('dark')),
+                Html::div()->content($data['composer']),
+                Html::div()->content($data['desc']),
+            ]);
+        });
+
         $grid->column('install_version', '版本');
         $grid->actions(function (Actions $actions, $rows) {
             $actions->hideDel();
@@ -94,18 +99,18 @@ class Plug extends Controller
                 $html->content($space);
                 $timeLine->item($html)->timestamp($version['version']);
             }
-
-            $actions->append(
-                Button::create('更新到git')
-                    ->save(['path'=>$rows['path'],'git_remote'=>$rows['git_remote']],'plug/uploadGit','git commit')->input()
-                    ->whenShow(!empty($rows['git_remote']))
-            );
+            if (!empty($rows['git_remote'])) {
+                $actions->append(
+                    Button::create('更新到git')
+                        ->save(['path' => $rows['path'], 'git_remote' => $rows['git_remote']], 'plug/uploadGit', 'git commit')->input()
+                );
+            }
             $actions->append(
                 Button::create('历史版本')
                     ->dialog()
                     ->content($timeLine)
             );
-            if(isset($rows['setting'])){
+            if (isset($rows['setting'])) {
                 $actions->append(
                     Button::create('设置')
                         ->plain()
@@ -170,44 +175,47 @@ class Plug extends Controller
             $form->text('username', '账号')->required();
             $form->password('password', '密码')->required();
             $form->actions()->submitButton()->content('登录');
-            $form->saving(function ($post){
-               $res = Admin::plug()->login($post['username'],$post['password']);
-               if($res){
-                   admin_success_message('登录成功');
-               }else{
-                   admin_error_message('登录失败，账号密码错误');
-               }
+            $form->saving(function ($post) {
+                $res = Admin::plug()->login($post['username'], $post['password']);
+                if ($res) {
+                    admin_success_message('登录成功');
+                } else {
+                    admin_error_message('登录失败，账号密码错误');
+                }
             });
         });
     }
-    public function uploadGit($path,$git_remote,$inputValue){
-        if(empty($inputValue)){
+
+    public function uploadGit($path, $git_remote, $inputValue)
+    {
+        if (empty($inputValue)) {
             admin_error_message('commit 不能为空');
         }
-        $girDir = $path.DIRECTORY_SEPARATOR.'.git';
-        if(!is_dir($girDir)){
+        $girDir = $path . DIRECTORY_SEPARATOR . '.git';
+        if (!is_dir($girDir)) {
             $cmd = "cd $path && git init && git remote rm origin";
-            exec($cmd,$out,$result);
+            exec($cmd, $out, $result);
             $cmd = "cd $path && git init && git checkout -b eadmin";
-            exec($cmd,$out,$result);
+            exec($cmd, $out, $result);
             $cmd = "cd $path && git remote add origin $git_remote";
-            exec($cmd,$out,$result);
+            exec($cmd, $out, $result);
         }
 
         $cmd = "git config user.name 'eadmin' && git config user.email 'eadmin@eadmin.com' && git add . && git commit -m $inputValue";
-        $process = new Process($cmd,$path);
+        $process = new Process($cmd, $path);
         $process->run();
-        if(!$process->isSuccessful()){
-            admin_error($process->getOutput(),$process->getErrorOutput());
+        if (!$process->isSuccessful()) {
+            admin_error($process->getOutput(), $process->getErrorOutput());
         }
-        $process = new Process('git push origin eadmin',$path);
+        $process = new Process('git push origin eadmin', $path);
         $process->run();
-        if($process->isSuccessful()){
+        if ($process->isSuccessful()) {
             admin_success_message('git上传成功');
-        }else{
-            admin_error($process->getOutput(),$process->getErrorOutput());
+        } else {
+            admin_error($process->getOutput(), $process->getErrorOutput());
         }
     }
+
     /**
      * 安装
      * @param $composer
@@ -226,7 +234,7 @@ class Plug extends Controller
             $formAction->hideResetButton();
         });
         $form->saving(function ($post) use ($data, $composer) {
-            if(!Admin::plug()->isLogin()){
+            if (!Admin::plug()->isLogin()) {
                 admin_error_message('请先登录插件');
             }
 
@@ -251,15 +259,18 @@ class Plug extends Controller
         Admin::plug()->uninstall($name, $path);
         admin_success_message('卸载完成');
     }
-    protected function getRequires($require){
+
+    protected function getRequires($require)
+    {
         $options = array_column($require, 'title', 'composer');
-        foreach ($require as $req){
-            foreach ($req['version'] as $row){
-                $options = array_merge($options,$this->getRequires($row['require']));
+        foreach ($require as $req) {
+            foreach ($req['version'] as $row) {
+                $options = array_merge($options, $this->getRequires($row['require']));
             }
         }
         return $options;
     }
+
     /**
      * 卸载
      * @auth false
@@ -348,7 +359,7 @@ class Plug extends Controller
         foreach ($requires as $require) {
             if (!Db::name('system_plugs')->where('name', $require['composer'])->find()) {
                 Admin::plug()->install($require['composer'], $require['url'], $require['version_number']);
-                $this->requireInstall($require['version'],$require['id']);
+                $this->requireInstall($require['version'], $require['id']);
             }
         }
     }
