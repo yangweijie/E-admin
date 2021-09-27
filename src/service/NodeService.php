@@ -169,7 +169,6 @@ class NodeService
                                     $data[] = $nodeData;
                                     $methodNode[] = $nodeData;
                                 }
-
                             }
                         }
                     }

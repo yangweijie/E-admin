@@ -104,7 +104,6 @@ class Grid extends Component
     protected $get = [];
     public function __construct($data)
     {
-        parent::__construct();
         if ($data instanceof Model) {
             $this->drive = new \Eadmin\grid\drive\Model($data);
         } elseif ($data instanceof GridInterface) {
@@ -112,8 +111,6 @@ class Grid extends Component
         } else {
             $this->drive = new \Eadmin\grid\drive\Arrays($data);
         }
-
-
         $this->hideTrashed(!$this->drive->trashed());
         //分页初始化
         $this->pagination = new Pagination();
@@ -131,6 +128,7 @@ class Grid extends Component
         $this->parseCallMethod();
         $this->bind('eadmin_description', '列表');
         $this->get = request()->get();
+        parent::__construct();
     }
     public static function create($data,\Closure $closure){
         $self  = new self($data);
@@ -630,6 +628,7 @@ class Grid extends Component
         $this->attr('tools', $this->tools);
         //快捷搜索
         $keyword = Request::get('quickSearch', '', ['trim']);
+
         $this->drive->quickFilter($keyword, $this->column);
         //查询视图
         if (!is_null($this->filter)) {

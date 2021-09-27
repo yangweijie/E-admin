@@ -127,7 +127,7 @@ class Form extends Component
 
     public function __construct($data)
     {
-        parent::__construct();
+        
         if ($data instanceof Model) {
             $this->drive = new \Eadmin\form\drive\Model($data);
         } elseif (is_string($data) && is_file($data)) {
@@ -137,6 +137,7 @@ class Form extends Component
         } else {
             $this->drive = new \Eadmin\form\drive\Arrays($data);
         }
+        
         $field = Str::random(15, 3);
         $this->attr('exceptField', $this->exceptField);
         $this->bindAttr('model', $field);
@@ -152,6 +153,7 @@ class Form extends Component
         $this->validator = new ValidatorForm();
         $this->validatorBind();
         $this->description(Request::param('eadmin_description'));
+        parent::__construct();
     }
 
     public static function create($data, \Closure $closure)

@@ -34,7 +34,6 @@ class Detail extends Component
     protected $labelWidth = 100;
     public function __construct($data, $id = null)
     {
-        parent::__construct();
         $this->attr('data-tag','div');
         $this->data = $data;
         $this->id = $id;
@@ -43,6 +42,7 @@ class Detail extends Component
         $this->card = $this->createCard();
         $this->bind('eadmin_description', '详情');
         $this->attr('class','eadmin-detail');
+        parent::__construct();
     }
 
     /**
