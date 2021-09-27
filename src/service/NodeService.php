@@ -74,7 +74,7 @@ class NodeService
         if (count($commentsLine) > 0) {
             $auth = false;
             $login = false;
-            $plugAuth = true;
+            $authPlug = true;
             $title = array_shift($commentsLine);
             foreach ($commentsLine as $line) {
                 $line = trim($line);
@@ -85,17 +85,14 @@ class NodeService
                 } elseif (preg_match('/@plugConfig\s(.*)/i', $line,$arr) && isset($arr[1]) && $plug) {
                     $field = trim($arr[1]);
                     if(!$plug::config($field)){
-                        $plugAuth = false;
+                        $authPlug = false;
                     }
                 }
-            }
-            if(!$plugAuth){
-                $auth = false;
             }
         } else {
             return false;
         }
-        return [trim($title), $auth, $login];
+        return [trim($title), $auth, $login,$authPlug];
 
     }
 
@@ -115,12 +112,16 @@ class NodeService
                 $moduleName = $item['module'];
             }
             $namespace = $item['namespace'];
+            $plug = $item['plug'] ?? false;
             $class = new \ReflectionClass($namespace);
-            $res = $this->parseDocComment($class->getDocComment());
-            if ($res === false) {
+            $classDoc = $this->parseDocComment($class->getDocComment(),$plug);
+            if ($classDoc === false) {
                 $title = $controller;
             } else {
-                $title = array_shift($res);
+                $title = array_shift($classDoc);
+                if(empty($title)){
+                    $title = $controller;
+                }
             }
             $this->treeArr[$moduleName]['children'][$key] = [
                 'label' => $title,
@@ -130,12 +131,12 @@ class NodeService
             $methodNode = [];
             foreach ($class->getMethods() as $method) {
                 $doc = $method->getDocComment();
-                $res = $this->parseDocComment($doc,$item['plug'] ?? false);
+                $res = $this->parseDocComment($doc,$plug);
                 if ($method->class == $namespace && $method->isPublic()) {
                     $action = $method->getName();
                     $reflectionNamedType = $method->getReturnType();
                     if ($res !== false) {
-                        list($title, $auth, $login) = $res;
+                        list($title, $auth, $login,$authPlug) = $res;
                         $nodeData = [
                             'label' => $title,
                             'class' => $namespace,
@@ -145,7 +146,7 @@ class NodeService
                             'method' => 'get',
                             'id' => md5($namespace . $action . 'get'),
                         ];
-                        if ($auth) {
+                        if ($auth && $authPlug) {
                             if ($reflectionNamedType && $reflectionNamedType->getName() == 'Eadmin\form\Form') {
                                 $label = $nodeData['label'];
                                 $nodeData['label'] = $label . '添加';
@@ -175,7 +176,8 @@ class NodeService
                 }
             }
             $this->treeArr[$moduleName]['children'][$key]['children'] = $methodNode;
-            if (count($this->treeArr[$moduleName]['children'][$key]['children']) == 0) {
+            list($auth, $login,$authPlug) = $classDoc;
+            if (count($this->treeArr[$moduleName]['children'][$key]['children']) == 0 || !$authPlug) {
                 unset($this->treeArr[$moduleName]['children'][$key]);
             }
             $this->treeArr[$moduleName]['children'] = array_values($this->treeArr[$moduleName]['children']);
