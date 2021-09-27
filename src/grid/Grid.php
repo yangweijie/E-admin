@@ -4,6 +4,7 @@
 namespace Eadmin\grid;
 
 
+use app\common\facade\Token;
 use Eadmin\Admin;
 use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Html;
@@ -532,6 +533,7 @@ class Grid extends Component
     public function exportData()
     {
         if(Request::has('eadmin_queue')){
+           
             $id = sysqueue('导出excel',ExcelQueue::class,Request::get());
             return [
                 'code' => 200,
@@ -563,10 +565,15 @@ class Grid extends Component
             $count = $this->drive->getTotal();
             $this->drive->db()->chunk(500, function ($datas) use ($excel,$count) {
                 $exportData = $this->parseColumn($datas, true);
-                $excel->rows($exportData)->queueExport($count);
+                $excel->rows($exportData);
+                Request::has('eadmin_queue_export')?$excel->queueExport($count):$excel->export();
                 $this->exportData = [];
             });
-            return true;
+            if(Request::has('eadmin_queue_export')){
+                return true;
+            }else{
+                exit;
+            }
         } elseif (Request::get('export_type') == 'select') {
             $data = $this->drive->model()->whereIn($this->drive->getPk(), Request::get('eadmin_ids'))->select();
         } else {
@@ -575,8 +582,15 @@ class Grid extends Component
             $data = $this->drive->getData($this->hidePage, $page, $size);
         }
         $exportData = $this->parseColumn($data, true);
-        $excel->rows($exportData)->export();
-        exit;
+        $excel->rows($exportData);
+        if(Request::has('eadmin_queue_export')){
+            $count = count($exportData);
+            $excel->queueExport($count);
+            return true;
+        }else{
+            $excel->export();
+            exit;
+        }
     }
     protected function parseData(){
         //总条数

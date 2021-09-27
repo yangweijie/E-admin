@@ -4,6 +4,7 @@
 namespace Eadmin\grid\excel;
 
 
+use app\common\facade\Token;
 use Eadmin\Queue;
 class ExcelQueue extends Queue
 {
@@ -16,6 +17,7 @@ class ExcelQueue extends Queue
     public function handle($data): bool
     {
         unset($data['eadmin_queue']);
+        $data['eadmin_queue_export'] = true;
         request()->withGet($data);
         $class    = request()->get('eadmin_class');
         $action   = request()->get('eadmin_function');

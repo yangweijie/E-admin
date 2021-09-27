@@ -9,10 +9,14 @@
 namespace Eadmin\grid\excel;
 
 
+use app\common\facade\Token;
+use Eadmin\Admin;
+use Eadmin\service\NoticeService;
 use Eadmin\service\QueueService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use think\facade\Filesystem;
 
 /**
@@ -133,7 +137,9 @@ class Excel extends AbstractExporter
             $filesystem = new \Symfony\Component\Filesystem\Filesystem;
             $filesystem->mkdir($path);
             $writer->save($path.DIRECTORY_SEPARATOR.$this->fileName . '.xls');
-            $queue->progress('/upload/excel/' . $this->fileName . '.xls');
+            $filename = '/upload/excel/' . $this->fileName . '.xls';
+            NoticeService::instance()->pushIcon(Admin::id(),$this->fileName,"<a href='$filename'>下载文件</a>",'el-icon-message');
+            $queue->progress($filename);
         }
     }
     public function export()
@@ -188,6 +194,7 @@ class Excel extends AbstractExporter
         $tmpMergeIndex = $this->rowIndex +1;
         $rowCount = count($this->data) + 1;
         $tmpMergeCondition = '';
+        $index = 0;
         foreach ($this->data as $key => &$val) {
             $this->rowIndex++;
             if ($this->mapCallback instanceof \Closure) {
