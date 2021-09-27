@@ -123,7 +123,16 @@ PHP;
             if ($pathArr[0] == 'api') {
                 $namespace .= 'controller\\api\\';
                 $method = Request::method();
-                $this->app->route->any('<controller>/<function>', $namespace . '<controller>@' . $method . '<function>');
+                //兼容快捷路由和按请求方式访问
+                $function = '';
+                $rule = '';
+                if (count($pathArr) > 3) {
+                    $function = '<function>';
+                    $rule = '/';
+                }
+                $route ='<controller>/' . $method . $function;
+                $rule = '<controller>' . $rule . $function;
+                $this->app->route->any($rule, $namespace . $route);
             } else {
                 $namespace .= 'controller\\';
                 $this->app->route->any('<controller>/<function>', $namespace . '<controller>@<function>');
