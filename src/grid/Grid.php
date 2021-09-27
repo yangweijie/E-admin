@@ -35,6 +35,7 @@ use think\Model;
  * 表格
  * Class Grid
  * @package Eadmin\grid
+ * @method $this fontSize(int $size)	表格字体大小
  * @method $this size(string $size)	表格大小 default | middle | small
  * @method $this tableLayout(string $value) auto / fixed
  * @method $this scroll(array $height) { x: number | true, y: number }

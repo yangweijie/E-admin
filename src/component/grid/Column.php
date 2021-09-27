@@ -227,7 +227,12 @@ class Column extends Component
 				])
 			)->content($value)->placement('top');
 		}
-		return Html::create($value)->attr('class', 'eadmin_table_td_' . $this->attr('prop'));
+        $fontSize = $this->grid->attr('fontSize');
+		$html =  Html::create($value)->attr('class', 'eadmin_table_td_' . $this->attr('prop'));
+        if($fontSize){
+            $html->style(['fontSize'=>$fontSize.'px']);
+        }
+        return $html;
 	}
 
 	public function getExportData()
