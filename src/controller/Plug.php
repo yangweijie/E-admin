@@ -70,7 +70,7 @@ class Plug extends Controller
         $grid->title('插件管理');
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');
-        $grid->column('composer', '包名')->display(function ($val, $data) {
+        $grid->column('composer', '名称')->display(function ($val, $data) {
             return Html::div()->content([
                 Html::div()->content(Tag::create($data['name'])->size('mini')->effect('dark')),
                 Html::div()->content($data['composer']),

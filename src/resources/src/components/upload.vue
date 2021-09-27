@@ -261,8 +261,7 @@ export default defineComponent({
       } else{
         state.showUploadBtn = true
       }
-
-      if(instance.parent && instance.parent.type.name === 'ElFormItem'){
+      if(instance.parent && instance.parent.provides && instance.parent.provides.elFormItem){
         instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val.join(',')])
       }
       ctx.emit('update:modelValue', val.join(','))
