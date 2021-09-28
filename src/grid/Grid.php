@@ -533,8 +533,9 @@ class Grid extends Component
     public function exportData()
     {
         if(Request::has('eadmin_queue')){
-
-            $id = sysqueue('导出excel',ExcelQueue::class,Request::get());
+            $data = Request::get();
+            $data['eadmin_domain'] = Request::domain();
+            $id = sysqueue('导出excel',ExcelQueue::class,$data);
             return [
                 'code' => 200,
                 'data' => $id,

@@ -155,25 +155,22 @@ class Excel extends AbstractExporter
                 $zip = new \ZipArchive;
                 $path = Filesystem::disk('local')->path('excel');
                 $zipFileName = $path.DIRECTORY_SEPARATOR.$this->fileName.'.zip';
-                if($zip->open($zipFileName,\ZipArchive::CREATE)){
-                    foreach ($this->compressFiles as $file){
-                        $zip->addFile($file,basename($file));
-                    }
-                    $zip->close();
-                    foreach ($this->compressFiles as $file){
-                        unlink($file);
-                    }
-                    $filename = Filesystem::disk('local')->getConfig()->get('url') . '/excel/' . $this->fileName.'.zip';
-                    $queue->progress($filename);
-                    NoticeService::instance()->pushIcon(Admin::id(), $this->fileName, "<a href='$filename'>下载文件</a>", 'el-icon-message');
-                }else{
+                if(!$zip->open($zipFileName,\ZipArchive::CREATE)){
                     $queue->error('压缩失败');
                 }
+                foreach ($this->compressFiles as $file){
+                    $zip->addFile($file,basename($file));
+                }
+                $zip->close();
+                foreach ($this->compressFiles as $file){
+                    unlink($file);
+                }
+                $filename = Filesystem::disk('local')->getConfig()->get('url') . '/excel/' . $this->fileName.'.zip';
             }else{
                 $filename = $this->save($this->fileName);
-                $queue->progress($filename);
-                NoticeService::instance()->pushIcon(Admin::id(), $this->fileName, "<a href='$filename'>下载文件</a>", 'el-icon-message');
             }
+            $queue->progress($filename);
+            NoticeService::instance()->pushIcon(Admin::id(),'导出下载',  '【下载文件】'.$this->fileName, 'el-icon-message','',request()->get('eadmin_domain').'/'.$filename);
         }
     }
 

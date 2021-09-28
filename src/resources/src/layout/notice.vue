@@ -17,9 +17,9 @@
                             </div>
                             <el-tooltip :open-delay="1500" effect="dark" :content="item.content" placement="top-start">
                                 <div class="content">
-                                    <div v-if="item.is_read == 1" class="title">{{ item.content }}</div>
+                                    <div v-if="item.is_read == 1" class="title" v-html="item.content"></div>
                                     <el-badge v-else is-dot type="danger">
-                                        <div class="title">{{ item.content }}</div>
+                                        <div class="title" v-html="item.content"></div>
                                     </el-badge>
                                     <div class="time">
                                         {{ item.create_time }}

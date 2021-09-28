@@ -55,7 +55,8 @@ class Csv extends AbstractExporter
         $queue->percentage($count,$this->rowIndex-1,'正在导出');
         if($this->rowIndex >= $count){
             $filename = '/upload/excel/' . $this->fileName . '.csv';
-            NoticeService::instance()->pushIcon(Admin::id(),$this->fileName,"<a href='$filename'>下载文件</a>",'el-icon-message');
+            
+            NoticeService::instance()->pushIcon(Admin::id(),'导出下载', '【下载文件】'.$this->fileName, 'el-icon-message','',request()->get('eadmin_domain').'/'.$filename);
             $queue->progress($filename);
         }
     }
