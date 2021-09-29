@@ -9,6 +9,7 @@
 namespace Eadmin\service;
 
 use Eadmin\Admin;
+use Eadmin\model\SystemMenu;
 use think\facade\Db;
 use Eadmin\Service;
 
@@ -19,7 +20,7 @@ use Eadmin\Service;
  */
 class MenuService
 {
-    protected static $menus = [];
+   
     /**
      * 获取所有菜单
      * @return array|mixed
@@ -37,8 +38,8 @@ class MenuService
             ->order('sort asc,id desc')
             ->cache(10)
             ->select()->toArray();
-        self::$menus = array_merge(self::$menus,$data);
-        return self::$menus;
+        
+        return $data;
     }
 
     /**
@@ -46,7 +47,7 @@ class MenuService
      * @param array $data
      */
     public function add(array $data){
-        self::$menus = array_merge(self::$menus,$data);
+        SystemMenu::create($data);
     }
 
     /**

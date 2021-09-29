@@ -3,6 +3,8 @@
 namespace Eadmin;
 
 use Closure;
+use Eadmin\form\Form;
+use Eadmin\model\SystemMenu;
 use Eadmin\service\PlugService;
 use think\App;
 use think\facade\Request;
@@ -12,8 +14,11 @@ use \think\Service;
 abstract class PlugServiceProvider extends Service
 {
     protected $composerProperty;
+
     abstract public function menus();
+
     abstract public function setting();
+
     /**
      * 判断扩展是否启用.
      *
@@ -103,14 +108,32 @@ PHP;
 
     public function boot()
     {
-        if($this->enabled()){
-            //插件菜单
-            $this->addMenus();
+        if ($this->enabled()) {
             //注册路由
             $this->registerRoute();
+            $form = $this->setting();
+            if($form instanceof Form){
+                $form->saved(function (){
+                    //刷新菜单状态
+                    $this->refreshMenu();
+                });
+            }
         }
     }
 
+    /**
+     * 刷新菜单状态
+     */
+    protected function refreshMenu(){
+        $menus = $this->menus();
+        if(!empty($menus)){
+            foreach ($menus as $menu){
+                SystemMenu::where('mark',$this->getName())
+                    ->where('name',$menu['name'])
+                    ->update(['status'=>$menu['status']]);
+            }
+        }
+    }
     /**
      * 注册路由
      */
@@ -132,7 +155,7 @@ PHP;
                     $function = '<function>';
                     $rule = '/';
                 }
-                $route ='<controller>/' . $method . $function;
+                $route = '<controller>/' . $method . $function;
                 $rule = '<controller>' . $rule . $function;
                 $this->app->route->any($rule, $namespace . $route);
             } else {
@@ -147,31 +170,21 @@ PHP;
      * 添加菜单
      * @param array $menus
      */
-    final function addMenus(array $menus = [])
+    final function addMenus()
     {
-        if (count($menus) == 0) {
-            $menus = $this->menus();
-        }
-        if(!empty($menus)){
-            $names = array_column($menus, 'name');
-            foreach ($menus as $key => &$menu) {
-                $menu['id'] = md5(serialize($menu));
+        $menus = $this->menus();
+        if (!empty($menus)) {
+            foreach ($menus as $key => $menu) {
                 if (isset($menu['pid'])) {
-                    $index = array_search($menu['pid'], $names);
-                    if ($index !== false) {
-                        $pidMenu = $menus[$index];
-                        unset($pidMenu['id']);
-                        unset($pidMenu['pid']);
-                        $menu['pid'] = md5(serialize($pidMenu));
-                    }
-                } else {
-                    $menu['pid'] = 0;
+                    $menu['pid'] = SystemMenu::where('mark', $this->getName())
+                        ->where('name', $menu['pid'])->value('id');
                 }
-                if (!$menu['status']) {
-                    unset($menus[$key]);
+                if (!isset($menu['sort'])) {
+                    $menu['sort'] = SystemMenu::max('sort') + 1;
                 }
+                $menu['mark'] = $this->getName();
+                Admin::menu()->add($menu);
             }
-            Admin::menu()->add($menus);
         }
     }
 }

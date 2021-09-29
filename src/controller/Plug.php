@@ -322,10 +322,6 @@ class Plug extends Controller
                 array_push($cmd, "--namespace={$namespace}");
             }
             Console::call('eadmin:plug', $cmd);
-            Db::name('system_plugs')->insert([
-                'name' => trim($name),
-                'version' => '1.0.0'
-            ]);
             admin_success_message('添加成功');
         });
         return $form;

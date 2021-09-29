@@ -44,6 +44,7 @@ class PlugService extends Service
     protected $serviceProvider = [];
     protected $client;
     protected $loginKey = '';
+    protected $table = 'system_plugs';
     public function __construct(App $app)
     {
         parent::__construct($app);
@@ -61,6 +62,7 @@ class PlugService extends Service
                 }
             }
         }
+
         $this->loginKey = md5(Request::header('Authorization').'plug');
     }
 
@@ -125,21 +127,21 @@ class PlugService extends Service
         foreach ($this->plugPaths as $plugPaths) {
             $file = $plugPaths . DIRECTORY_SEPARATOR . 'composer.json';
             if (is_file($file)) {
-                $arr = json_decode(file_get_contents($file), true);
+                $arr = $this->parseComposer($file);
                 $plugs[] = $arr;
             }
         }
         $names = array_column($plugs, 'name');
 
         try {
-            $plugNames = Db::name('system_plugs')->whereIn('name', $names)->where('status', 1)->column('name');
+            $plugNames = Db::name($this->table)->whereIn('name', $names)->where('status', 1)->column('name');
         } catch (\Exception $exception) {
             $plugNames = [];
         }
         foreach ($this->plugPaths as $plugPaths) {
             $file = $plugPaths . DIRECTORY_SEPARATOR . 'composer.json';
             if (is_file($file)) {
-                $arr = json_decode(file_get_contents($file), true);
+                $arr = $this->parseComposer($file);
                 $arr['plug_path'] = $plugPaths;
                 $psr4 = Arr::get($arr, 'autoload.psr-4');
                 $name = Arr::get($arr, 'name');
@@ -168,11 +170,23 @@ class PlugService extends Service
     }
 
     /**
+     * @param $file
+     * @return mixed
+     */
+    protected function parseComposer($file){
+        return json_decode(file_get_contents($file), true);
+    }
+
+    /**
      * 获取注册插件服务
+     * @param null $name 插件名称
      * @return PlugServiceProvider
      */
-    public function getServiceProviders(){
-        return $this->serviceProvider;
+    public function getServiceProviders($name = null){
+        if(empty($name)){
+            return $this->serviceProvider;
+        }
+        return $this->serviceProvider[$name];
     }
     public function getCate()
     {
@@ -220,7 +234,7 @@ class PlugService extends Service
                 $delNames[] = trim($plug['composer']);
             };
         }
-        Db::name('system_plugs')->whereIn('name', $delNames)->delete();
+        Db::name($this->table)->whereIn('name', $delNames)->delete();
         return [
             'list'=>$this->plugs,
             'total'=>$content['data']['total']
@@ -234,7 +248,7 @@ class PlugService extends Service
      */
     public function installed($search = '', $page = 1, $size = 20)
     {
-        $names = Db::name('system_plugs')->column('name');
+        $names = Db::name($this->table)->column('name');
         if (count($names) == 0) {
             return  [
                 'list'=>[],
@@ -290,7 +304,7 @@ class PlugService extends Service
     public function getInfo($name, $field = 'status')
     {
         try {
-            return Db::name('system_plugs')->where('name', $name)->value($field);
+            return Db::name($this->table)->where('name', $name)->value($field);
         } catch (\Exception $exception) {
             return false;
         }
@@ -306,7 +320,7 @@ class PlugService extends Service
     public function enable($name, $status)
     {
         Db::name('system_menu')->where('mark',$name)->update(['status' => $status]);
-        return Db::name('system_plugs')->where('name', $name)->update(['status' => $status]);
+        return Db::name($this->table)->where('name', $name)->update(['status' => $status]);
     }
 
     /**
@@ -359,6 +373,7 @@ class PlugService extends Service
      */
     public function install($name, $path, $version)
     {
+
         try {
             $client = new Client(['verify' => false]);
             $plugZip = app()->getRootPath() . 'plug' . time() . '.zip';
@@ -395,10 +410,17 @@ class PlugService extends Service
                 if (is_dir($seed)) {
                     Console::call('seed:eadmin', ['path' => $seed]);
                 }
-                Db::name('system_plugs')->insert([
+
+                //插件注册
+                Db::name($this->table)->insert([
                     'name' => trim($name),
                     'version' => $version
                 ]);
+                $this->register();
+                //添加菜单
+                $file = $path. DIRECTORY_SEPARATOR . 'composer.json';
+                $serviceProvider = $this->getServiceProviders($name);
+                $serviceProvider->addMenus();
                 return true;
             } else {
                 return false;
@@ -417,7 +439,7 @@ class PlugService extends Service
     {
         $this->dataMigrate('rollback', $path);
         FileSystemService::instance()->delFiels($path);
-        Db::name('system_plugs')->where('name', $name)->delete();
+        Db::name($this->table)->where('name', $name)->delete();
         Db::name('system_menu')->where('mark', $name)->delete();
         Db::name('system_config')->where('mark', $name)->delete();
         Db::name('system_config_cate')->where('mark', $name)->delete();
