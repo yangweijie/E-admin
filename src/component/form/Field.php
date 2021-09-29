@@ -125,7 +125,7 @@ abstract class Field extends Component
 
     /**
      * 帮助内容
-     * @param string $content 内容
+     * @param mixed $content 内容
      * @return $this
      */
     public function help($content)

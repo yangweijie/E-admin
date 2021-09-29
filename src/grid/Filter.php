@@ -30,6 +30,10 @@ use think\model\relation\MorphOne;
 use Eadmin\form\field\Input;
 use think\model\relation\MorphTo;
 
+/**
+ * 筛选过滤器
+ * @mixin \Eadmin\component\form\field\Input
+ */
 class Filter
 {
     //模型
@@ -766,7 +770,12 @@ class Filter
     {
         $this->hideAction = $bool;
     }
-
+    public function __call($name, $arguments)
+    {
+        $components = $this->form->itemComponent();
+        $component = end($components);
+        call_user_func_array([$component,$name],$arguments);
+    }
     /**
      * 返回db对象
      * @return Db

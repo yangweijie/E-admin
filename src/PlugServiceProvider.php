@@ -119,7 +119,9 @@ PHP;
         $dir = basename($this->getPath());
         $this->app->route->group($dir, function () {
             $namespace = $this->getNamespace();
-            $pathArr = explode('/', Request::pathinfo());
+            $pathinfo = strpos(Request::server('REQUEST_URI'), '?') ? strstr(Request::server('REQUEST_URI'), '?', true) : Request::server('REQUEST_URI');
+            $pathinfo = ltrim($pathinfo, '/');
+            $pathArr = explode('/', $pathinfo);
             if ($pathArr[0] == 'api') {
                 $namespace .= 'controller\\api\\';
                 $method = Request::method();
