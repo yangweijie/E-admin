@@ -171,18 +171,20 @@ class FileService extends Service
             $extension = pathinfo($filename)['extension'];
             $this->compressImage($filename);
             $url = $this->url($path);
-            SystemFile::create([
-                'name' => $fileName,
-                'real_name' => request()->param('filename',$real_name),
-                'url' => $url,
-                'path' => $path,
-                'cate_id' => request()->param('cate_id', 0),
-                'ext' => $extension,
-                'file_size' => request()->param('totalSize'),
-                'file_type' => request()->param('file_type'),
-                'uptype' => $this->upType,
-                'admin_id' => Admin::id(),
-            ]);
+            if(Admin::id()){
+                SystemFile::create([
+                    'name' => $fileName,
+                    'real_name' => request()->param('filename',$real_name),
+                    'url' => $url,
+                    'path' => $path,
+                    'cate_id' => request()->param('cate_id', 0),
+                    'ext' => $extension,
+                    'file_size' => request()->param('totalSize'),
+                    'file_type' => request()->param('file_type'),
+                    'uptype' => $this->upType,
+                    'admin_id' => Admin::id(),
+                ]);
+            }
             return $url;
         } else {
             return false;

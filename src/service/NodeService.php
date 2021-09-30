@@ -163,7 +163,7 @@ class NodeService
                                 $data[] = $nodeData;
                                 $methodNode[] = $nodeData;
                                 if ($reflectionNamedType && $reflectionNamedType->getName() == 'Eadmin\grid\Grid') {
-                                    $nodeData['label'] = '删除权限';
+                                    $nodeData['label'] = '删除';
                                     $nodeData['method'] = 'delete';
                                     $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
                                     $data[] = $nodeData;

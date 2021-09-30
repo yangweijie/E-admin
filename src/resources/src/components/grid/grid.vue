@@ -554,7 +554,7 @@
                         data: Object.assign({eadmin_ids: selectIds.value},props.params,{delete_time:null}),
                         method:'put',
                     }).then(res=>{
-                        loadData()
+                        loading.value = true
                     })
                 })
             }
@@ -571,7 +571,7 @@
                         method:'delete',
                     }).then(res=>{
                         selectIds.value = []
-                        loadData()
+                        loading.value = true
                     })
                 })
             }
