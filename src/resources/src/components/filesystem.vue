@@ -17,7 +17,7 @@
                 </div>
               </div>
               <el-button icon="el-icon-refresh" size="mini" @click="loading = true"></el-button>
-              <render :data="upload" :drop-element="filesystem"  :params="addParams"  :on-progress="uploadProgress" @success="uploadSuccess"></render>
+              <render :data="upload" :drop-element="filesystem"  :params="finderParam"  :on-progress="uploadProgress" @success="uploadSuccess"></render>
               <EadminSelect size="mini" :disabled="selectIds.length == 0" v-if="uploadFinder" placeholder="文件移动至" :options="finerCate" tree clearable v-model="selectCate"></EadminSelect>
               <el-button  size="mini" @click="mkdir" v-if="!uploadFinder">新建文件夹</el-button>
               <el-button  size="mini" type="danger" v-if="selectIds.length > 0" @click="delSelect">删除选中</el-button>
@@ -120,7 +120,7 @@
     import {computed, defineComponent, reactive, toRefs, onActivated, watch,ref} from "vue";
     import {deleteArr, fileIcon, unique,link} from '@/utils'
     import {useHttp} from "@/hooks";
-    import {ElMessageBox,ElLoading,ElMessage} from 'element-plus';
+    import {ElMessageBox,ElLoading} from 'element-plus';
     export default defineComponent({
         name: "EadminFileSystem",
         props: {
@@ -162,13 +162,18 @@
         },
         emits: ['update:modelValue','update:selection'],
         setup(props,ctx) {
-            Object.assign(props.addParams,props.upload.attribute.params)
+
             const {loading, http} = useHttp()
             const filesystem = ref('')
             const finerCate = computed(()=>{
                 const arr = JSON.parse(JSON.stringify(props.cate))
                 arr.shift()
                 return arr
+            })
+            let finderParam =  ref({})
+            finderParam.value = Object.assign(JSON.parse(JSON.stringify(props.addParams)),props.upload.attribute.params)
+            watch(()=>props.addParams,value=>{
+              finderParam.value = Object.assign(JSON.parse(JSON.stringify(props.addParams)),props.upload.attribute.params)
             })
             const state = reactive({
                 tableColumns: [
@@ -269,7 +274,7 @@
                 }
                 http({
                     url: '/filesystem',
-                    params: Object.assign(requestParams,props.addParams,{ext:props.upload.attribute.accept})
+                    params: Object.assign(requestParams,finderParam.value,{ext:props.upload.attribute.accept})
                 }).then(res => {
                     state.tableData = res.data
                     state.total = res.total
@@ -485,6 +490,7 @@
                 loading.value = true
             }
             return {
+                finderParam,
                 handleSizeChange,
                 handleCurrentChange,
                 customRow,
