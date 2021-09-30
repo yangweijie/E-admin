@@ -21,9 +21,8 @@ use think\facade\Console;
 use think\facade\Db;
 use think\facade\Request;
 use think\helper\Arr;
-use Eadmin\Service;
 
-class PlugService extends Service
+class PlugService
 {
     /**
      * 插件基础目录
@@ -45,9 +44,13 @@ class PlugService extends Service
     protected $client;
     protected $loginKey = '';
     protected $table = 'system_plugs';
-    public function __construct(App $app)
+    public function __construct()
     {
-        parent::__construct($app);
+        $this->initialize();;
+    }
+    protected function initialize()
+    {
+        $this->app  = app();
         $this->client = new Client([
             'base_uri' => 'https://eadmin.togy.com.cn/api/',
             'verify' => false,
@@ -416,6 +419,7 @@ class PlugService extends Service
                     'name' => trim($name),
                     'version' => $version
                 ]);
+                $this->initialize();
                 $this->register();
                 //添加菜单
                 $file = $path. DIRECTORY_SEPARATOR . 'composer.json';
