@@ -12,6 +12,7 @@ namespace Eadmin\form;
 use Eadmin\Admin;
 use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Card;
+use Eadmin\component\basic\Divider;
 use Eadmin\component\basic\Html;
 use Eadmin\component\basic\Step;
 use Eadmin\component\basic\Steps;
@@ -547,8 +548,9 @@ class Form extends Component
             $row->gutter($gutter);
         }
         $formItems = $this->collectFields($closure);
+
         if (!empty($title)) {
-            $this->push("<h4 style='font-size:16px;'>{$title}</h4>");
+            $this->push(Divider::create()->content($title)->contentPosition('left'));
         }
         foreach ($formItems as $item) {
             $column = $row->column($item, $item->md ?? 24);
