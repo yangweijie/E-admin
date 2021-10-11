@@ -143,7 +143,7 @@ class Detail extends Component
      * @param string $label 标签
      * @return Column
      */
-    public function userInfo($avatar = 'headimg', $nickname = 'nickname', $label = '用户信息')
+    public function userInfo($avatar = 'avatar', $nickname = 'nickname', $label = '用户信息')
     {
         $field = $this->field($avatar, $label);
         return $field->display(function ($val, $data) use ($nickname) {
