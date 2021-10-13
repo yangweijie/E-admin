@@ -26,7 +26,7 @@
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
-                    <el-button plain size="small" icon="el-icon-delete" v-if="((!hideDeleteButton && !trashed) || (trashed && !hideTrashedDelete)) && selectIds.length > 0" @click="deleteSelect">删除选中</el-button>
+                    <el-button plain size="small" icon="el-icon-delete" v-if="((!hideDeleteSelection && !trashed) || (trashed && !hideTrashedDelete)) && selectIds.length > 0" @click="deleteSelect">删除选中</el-button>
                     <el-button plain size="small" icon="el-icon-help" v-if="!hideTrashedRestore && trashed && selectIds.length > 0" @click="recoverySelect">恢复选中</el-button>
                     <el-button type="danger" size="small" icon="el-icon-delete" v-if="(!hideDeleteButton && !trashed)|| (trashed && !hideTrashedDelete)" @click="deleteAll()">{{trashed && !hideTrashed?'清空回收站':'清空数据'}}</el-button>
 

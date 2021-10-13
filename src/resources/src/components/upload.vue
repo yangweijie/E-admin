@@ -69,20 +69,25 @@
           <i class="el-icon-close" @click="fileDelete(index)" /><i class="el-icon-close-tip" />
         </div>
       </div>
-      <span @click="handelBrowse" v-if="displayType == 'file'" v-show="showUploadBtn || foreverShow" ref="btn" >
+      <div class="fileButtonBox" v-if="displayType == 'file'" v-show="showUploadBtn || foreverShow" >
+        <div style="margin-right: 5px;width: 100%">
+            <el-input v-model="inputValue" @change="changeInput"></el-input>
+        </div>
+        <span @click="handelBrowse" ref="btn">
         <slot>
           <el-progress v-show="progressShow" style="margin: 13px 0px" :text-inside="true" :stroke-width="15" :percentage="percentage" />
-          <label class="fileButton" >
           <template v-if="drag">
-            <i class="el-icon-upload" />
-            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+             <label class="fileButton" >
+              <i class="el-icon-upload" />
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+             </label>
           </template>
           <template v-else>
-            <i class="el-icon-upload" /> 上传文件
+            <el-button icon="el-icon-upload">上传文件</el-button>
           </template>
-          </label>
         </slot>
       </span>
+      </div>
     </span>
     <el-dialog  title="资源库" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
       <el-row :gutter="10">
@@ -240,7 +245,8 @@ export default defineComponent({
       finderHeight:(window.innerHeight / 2) + 'px',
       gridParams:{},
       gridValue:false,
-      finerCate:[]
+      finerCate:[],
+      inputValue:'',
     })
     const instance = getCurrentInstance()
     watch(()=>props.modelValue,val=>{
@@ -253,6 +259,7 @@ export default defineComponent({
         state.files = val
       }
     })
+
     watch(()=>state.files,val=>{
       if (!props.multiple && val.length === 1) {
         state.showUploadBtn = false
@@ -264,7 +271,8 @@ export default defineComponent({
       if(instance.parent && instance.parent.provides && instance.parent.provides.elFormItem){
         instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val.join(',')])
       }
-      ctx.emit('update:modelValue', val.join(','))
+      state.inputValue = val.join(',')
+      ctx.emit('update:modelValue', state.inputValue)
     },{deep:true})
     if (props.width != 'auto') {
       state.styleWidth = props.width + 'px'
@@ -482,8 +490,12 @@ export default defineComponent({
         })
       }
     })
-
-
+    function changeInput(val){
+      state.files = val.split(',')
+      state.files = state.files.filter(function(s) {
+        return s && s.trim()
+      })
+    }
     function uniqidMd5() {
       const rand = ('0000' + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4)
       return md5(rand)
@@ -659,6 +671,7 @@ export default defineComponent({
       }
     }
     return {
+      changeInput,
       btn,
       submit,
       lastName,
@@ -806,5 +819,9 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+  .fileButtonBox{
+    display: flex;
+    width: 100%;
   }
 </style>
