@@ -10,6 +10,7 @@ namespace Eadmin\service;
 
 use Eadmin\Admin;
 use Eadmin\PlugServiceProvider;
+use Symfony\Component\Finder\Finder;
 use think\route\Resource;
 use Eadmin\Service;
 
@@ -210,7 +211,7 @@ class NodeService
                 ];
             }
         }
-
+        $finder = new Finder();
         //扫描存在配置权限模块控制器下所有文件
         foreach ($modules as $module) {
             $moduleName = basename($module);
@@ -222,16 +223,17 @@ class NodeService
                     'label' => $authModuleTitle,
                     'id' => md5($moduleName),
                 ];
-                foreach (glob($module . '/controller/' . '*.php') as $file) {
-                    if (is_file($file)) {
-                        $controller = str_replace('.php', '', basename($file));
-                        $namespace = "app\\$moduleName\\controller\\$controller";
-                        $controllerFiles[] = [
-                            'namespace' => $namespace,
-                            'module' => $moduleName,
-                            'file' => $file,
-                        ];
-                    }
+                foreach ($finder->files()->in($module . '/controller')->name('*.php') as $file) {
+                    $controller = str_replace('.php', '', $file->getRealPath());
+                    $controller = strstr($controller,'controller'.DIRECTORY_SEPARATOR);
+                    $controller = explode(DIRECTORY_SEPARATOR,$controller);
+                    $controller = implode('\\',$controller);
+                    $namespace = "app\\$moduleName\\$controller";
+                    $controllerFiles[] = [
+                        'namespace' => $namespace,
+                        'module' => $moduleName,
+                        'file' => $file,
+                    ];
                 }
             }
         }
