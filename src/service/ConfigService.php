@@ -54,6 +54,7 @@ class ConfigService extends Service
     }
     public function configForm(){
         $form = new Form(new Config());
+        $form->labelPosition('top');
         foreach ($this->data as $row){
             $type =  $row['type'];
             $component = $form->$type($row['name'],$row['label']);
