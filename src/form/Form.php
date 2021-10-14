@@ -128,7 +128,7 @@ class Form extends Component
 
     public function __construct($data)
     {
-        
+
         if ($data instanceof Model) {
             $this->drive = new \Eadmin\form\drive\Model($data);
         } elseif (is_string($data) && is_file($data)) {
@@ -138,7 +138,7 @@ class Form extends Component
         } else {
             $this->drive = new \Eadmin\form\drive\Arrays($data);
         }
-        
+
         $field = Str::random(15, 3);
         $this->attr('exceptField', $this->exceptField);
         $this->bindAttr('model', $field);
@@ -164,7 +164,6 @@ class Form extends Component
         $self->setExec($closure);
         return $self;
     }
-
 
 
     /**
@@ -506,9 +505,12 @@ class Form extends Component
         $this->formItem = array_slice($this->formItem, 0, $offset);
         return $formItems;
     }
-    public function getFormItems(){
+
+    public function getFormItems()
+    {
         return $this->formItem;
     }
+
     public function push($item)
     {
         $this->formItem[] = $item;
@@ -766,25 +768,27 @@ class Form extends Component
      */
     public function saved(\Closure $closure)
     {
-        Event::listen(Saved::class,function ($data) use($closure){
-            $closure($data,$this->drive->model());
+        Event::listen(Saved::class, function ($data) use ($closure) {
+            $closure($data, $this->drive->model());
         });
     }
+
     /**
      * 验证前回调
      * @param \Closure $closure
      */
     public function validating(\Closure $closure)
     {
-        Event::listen(Validating::class,$closure);
+        Event::listen(Validating::class, $closure);
     }
+
     /**
      * 保存前回调
      * @param \Closure $closure
      */
     public function saving(\Closure $closure)
     {
-        Event::listen(Saving::class,$closure);
+        Event::listen(Saving::class, $closure);
     }
 
     /**
@@ -867,7 +871,7 @@ class Form extends Component
     {
         $this->exec();
         //上传图片处理
-        if($response = $this->handleUploadFile()){
+        if ($response = $this->handleUploadFile()) {
             return $response;
         }
         //监听watch
@@ -876,7 +880,7 @@ class Form extends Component
         $validatorMode = $this->isEdit() ? 2 : 1;
         $this->validator->check($data, $validatorMode);
         //保存前回调
-        $beforeData = Event::until(Saving::class,$data);
+        $beforeData = Event::until(Saving::class, $data);
         if (is_array($beforeData)) {
             $data = $beforeData;
         }
@@ -887,14 +891,14 @@ class Form extends Component
         }
 
         //保存回后调
-        Event::until(Saved::class,$data);
+        Event::until(Saved::class, $data);
         //步骤表单
         if (isset($data['eadmin_step'])) {
             $id = $this->drive->model()[$this->drive->getPk()];
             call_user_func_array($this->steps->getClosure(), [new Result($data, $result, $id)]);
         }
         if ($result !== false) {
-            $url      = $this->redirectUrl;
+            $url = $this->redirectUrl;
             admin_success('操作完成', '数据保存成功')->redirect($url);
         } else {
             admin_error_message('数据保存失败');
@@ -952,6 +956,12 @@ class Form extends Component
                         }
                     }
                 }
+            } elseif ($item->attr('setpItem')) {
+                foreach ($item->content['default'] as $content) {
+                    if ($content instanceof FormMany) {
+                        $this->valueModel($content);
+                    }
+                }
             }
         }
         foreach ($this->itemComponent as $component) {
@@ -960,7 +970,7 @@ class Form extends Component
         }
         $field = $this->bindAttr('model');
         $this->data = array_merge($this->callMethod, $this->data);
-        $this->attr('callMethod',$this->callMethod);
+        $this->attr('callMethod', $this->callMethod);
         //主键值
         if ($this->isEdit) {
             $pk = $this->drive->getPk();
@@ -1015,10 +1025,10 @@ class Form extends Component
     public function handleUploadFile()
     {
 
-        foreach ($this->imageUploads as $imageUpload){
+        foreach ($this->imageUploads as $imageUpload) {
             $res = $imageUpload->handelUpload();
 
-            if($res){
+            if ($res) {
                 return $res;
             }
         }
