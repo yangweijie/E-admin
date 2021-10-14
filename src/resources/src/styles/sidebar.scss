@@ -50,7 +50,7 @@
   .is-active>.el-menu--inline .el-submenu__title {
     border-right: none!important;
   }
-  .el-menu-item:hover{
+  .el-submenu__title:hover,.el-menu-item:hover{
     background-color: rgba($--color-primary,.1)!important;
   }
   & .nest-menu .el-submenu>.el-submenu__title,
