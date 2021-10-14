@@ -46,5 +46,10 @@ return [
     //开关顶部菜单
     'topMenu'=> true,
     //开关标签菜单（缓存）
-    'tagMenu'=> true
+    'tagMenu'=> true,
+    //主题
+    'theme'=>[
+        //主题色
+        'color'=>'#00AF66'
+    ]
 ];

@@ -21,8 +21,10 @@ use Eadmin\model\SystemFile;
 use Eadmin\service\BackupData;
 use Eadmin\service\MenuService;
 use Eadmin\service\QueueService;
+use Symfony\Component\Finder\Finder;
 use think\facade\Console;
 use think\facade\Db;
+
 use think\route\Resource;
 use think\Service;
 use Eadmin\controller\Backup;
@@ -50,19 +52,45 @@ class ServiceProvider extends Service
         Admin::registerRoute();
         //权限中间件
         $this->app->middleware->route(\Eadmin\middleware\Permission::class);
-       
+
     }
     //检测静态文件版本发布
     protected function publishVersion(){
-        $file = __DIR__.'/../version.txt';
-        $system_version = file_get_contents($file);
-        $file = app()->getRootPath().'public/eadmin/version.txt';
-        $version = '';
+        $file = __DIR__.'/../.env';
+        $systemEnv = Env::load($file);
+        $envFile = app()->getRootPath().'public/eadmin/.env';
         if(is_file($file)){
-            $version = file_get_contents($file);
-            if($system_version != $version){
+            $env =  Env::load($envFile);
+            //版本检测
+            if($systemEnv->get('VERSION') != $env->get('VERSION')){
                 Console::call('eadmin:publish',['-f','-p']);
-                file_put_contents($file,$system_version);
+                $env->set('VERSION',$systemEnv->get('VERSION'));
+                $env->save($envFile);
+            }
+            //主题色切换
+            $color = config('admin.theme.color');
+            if($color != $env->get('THEME_COLOR')){
+                $finder = new Finder();
+                $dir = app()->getRootPath().'public/eadmin/static/';
+                foreach ($finder->in($dir)->name(['*.css','*.js']) as $file) {
+                    $filePath = $file->getRealPath();
+                    $content = file_get_contents($filePath);
+                    $theme = $env->get('THEME_COLOR','#409EFF');
+                    $themeRgb= hex2rgba($theme);
+                    $themeRgb = implode(',',$themeRgb);
+                    $rgb= hex2rgba($color);
+                    $rgb = implode(',',$rgb);
+                    $findArr = [$theme,$themeRgb];
+                    $replaceArr = [$color,$rgb];
+                    for ($i=10;$i<=90;$i+=10){
+                        $findArr[] = color_mix('#FFFFFF',$theme,$i);
+                        $replaceArr[] = color_mix('#FFFFFF',$color,$i);
+                    }
+                    $content = str_ireplace($findArr,$replaceArr,$content);
+                    $res = file_put_contents($filePath,$content);
+                }
+                $env->set('THEME_COLOR',$color);
+                $env->save($envFile);
             }
         }
     }
@@ -103,7 +131,7 @@ class ServiceProvider extends Service
                 FileService::instance()->clear();
             })->everyMinute();
         }catch (\Exception $exception){
-        
+
         }
     }
     public function boot()
