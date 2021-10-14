@@ -204,7 +204,7 @@
     }
     .activte{
         color: $--color-primary !important;
-        background: #e8f4ff !important;
+        background: rgba($--color-primary,.1) !important;
     }
     .breadcrumb{
         display: flex;
