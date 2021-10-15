@@ -115,7 +115,7 @@ class Plug extends Controller
                     Button::create('设置')
                         ->plain()
                         ->typePrimary()
-                        ->dialog()->form($rows['setting'])->whenShow(!empty($rows['setting']))
+                        ->dialog()->content($rows['setting'])->whenShow(!empty($rows['setting']))
                 );
             }
             if ($rows['install']) {

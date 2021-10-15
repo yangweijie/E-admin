@@ -2,7 +2,7 @@
 declare (strict_types = 1);
 
 namespace {%namespace%};
-
+use Eadmin\component\Component;
 use Eadmin\PlugServiceProvider;
 use Eadmin\form\Form;
 class {%className%} extends PlugServiceProvider
@@ -36,9 +36,9 @@ class {%className%} extends PlugServiceProvider
     }
     /**
      * 设置
-     * @return Form
+     * @return Component
      */
-    public function setting(): Form
+    public function setting()
     {
         $form = new Form(__DIR__.'/config.php');
         $form->title('配置');
