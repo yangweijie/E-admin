@@ -92,6 +92,7 @@ use think\Model;
  * @method \Eadmin\component\form\field\Checktag checkTag($field, $label = '') check标签
  * @method \Eadmin\component\form\field\Spec spec($field, $label = '') 规格
  * @method \Eadmin\component\form\field\Display display($field, $label = '') 显示
+ * @method \Eadmin\component\form\field\mdEditor mdEditor($field, $label = '') md编辑器
  */
 class Form extends Component
 {

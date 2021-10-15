@@ -17,6 +17,7 @@ use Eadmin\component\form\field\Email;
 use Eadmin\component\form\field\Icon;
 use Eadmin\component\form\field\Input;
 use Eadmin\component\form\field\Map;
+use Eadmin\component\form\field\MdEditor;
 use Eadmin\component\form\field\Mobile;
 use Eadmin\component\form\field\Money;
 use Eadmin\component\form\field\Number;
@@ -74,5 +75,6 @@ trait ComponentForm
         'display' => Display::class,
         'money' => Money::class,
         'checkTag' => Checktag::class,
+        'mdEditor' => MdEditor::class,
     ];
 }
