@@ -8,7 +8,7 @@ import './component'
 import './directive'
 import zhLocale from 'element-plus/lib/locale/lang/zh-cn'
 import request from '@/utils/axios'
-import { Switch ,Table ,Dropdown,Menu,Steps,Result,List,Popover} from "ant-design-vue";
+import { Switch ,Table ,Dropdown,Menu,Steps,Result,List,Popover,Spin} from "ant-design-vue";
 import VueMarkdownEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
 import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js';
@@ -20,6 +20,7 @@ VueMarkdownEditor.use(vuepressTheme, {
     Prism
 })
 app.use(VueMarkdownEditor)
+app.use(Spin)
 app.use(Popover)
 app.use(List)
 app.use(Result)
