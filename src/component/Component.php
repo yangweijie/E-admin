@@ -307,6 +307,12 @@ abstract class Component implements \JsonSerializable
             return $this;
         }
     }
+    public function getContent($name=null){
+        if(is_null($name)){
+            return $this->content;
+        }
+        return $this->content[$name];
+    }
     public function clearContent(){
         $this->content = [];
     }

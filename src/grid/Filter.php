@@ -21,6 +21,7 @@ use Eadmin\constant\Style;
 use Eadmin\form\Form;
 use think\db\Query;
 use think\facade\Db;
+use think\facade\Request;
 use think\Model;
 use think\model\Relation;
 use think\model\relation\BelongsTo;
@@ -63,6 +64,9 @@ class Filter
             $this->tableFields = $this->db->getTableFields();
         }
         $this->form = new Form([]);
+        if(Request::has('eadminFilterField')){
+            $this->form->bindAttr('model',Request::get('eadminFilterField'));
+        }
         $this->form->inline()
             ->removeAttr('labelWidth')
             ->removeAttr('setAction')
@@ -789,6 +793,12 @@ class Filter
     /**
      * @return Form
      */
+    public function form(){
+        return $this->form;
+    }
+    /**
+     * @return Form
+     */
     public function render()
     {
         $actions = Html::create([
@@ -823,6 +833,7 @@ class Filter
         } else {
             $this->form->push($actions);
         }
+
         return $this->form;
     }
 }

@@ -341,6 +341,7 @@ class Form extends Component
      */
     private function valueModel($component, $data = null)
     {
+
         foreach ($component->bindAttribute as $attr => $field) {
             $value = $this->drive->getData($field, $data);
 
@@ -393,7 +394,9 @@ class Form extends Component
             } else {
                 $this->setData($field, $value ?? '');
             }
+
             if (is_null($data)) {
+
                 $component->bindAttr($attr, $this->bindAttr('model') . '.' . $field, true);
             }
             $component->removeBind($field);
@@ -1037,7 +1040,6 @@ class Form extends Component
 
     public function jsonSerialize()
     {
-
         $this->exec();
         $this->parseComponent();
         $this->parseSteps();

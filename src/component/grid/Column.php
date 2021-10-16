@@ -21,6 +21,7 @@ use Eadmin\component\form\field\Switchs;
 use Eadmin\component\layout\Content;
 use Eadmin\detail\Field;
 use Eadmin\grid\Grid;
+use Eadmin\traits\ColumnFilter;
 
 /**
  * Class Column
@@ -35,6 +36,7 @@ use Eadmin\grid\Grid;
  */
 class Column extends Component
 {
+    use ColumnFilter;
 	protected $name = 'ElTableColumn';
 	protected $prop;
 	protected $closure = null;
@@ -45,7 +47,7 @@ class Column extends Component
 	//映射标签颜色主题
 	protected $tagTheme = 'light';
 	protected $tag = null;
-	protected $grid;
+	protected Grid $grid;
 	protected $tip = false;
 	protected $hide = false;
 	protected $exportClosure = null;
@@ -623,5 +625,5 @@ class Column extends Component
 	{
 		return $this->closure;
 	}
-
+    
 }

@@ -101,6 +101,14 @@
                 <template v-for="column in tableColumns" v-slot:[column.slots.title]>
                     <render :data="column.header" :slot-props="grid"></render>
                 </template>
+                <template #filterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
+                    <render :data="column.eadminFilterDropdown"></render>
+                </template>
+                <template v-for="column in tableColumns" v-slot:[column.slots.filterIcon]>
+                  <div style="display: flex;align-items: center;justify-content: center">
+                    <i class="fa fa-filter" :style="{ color: proxyData[filterField][column.prop] ? variables.theme : undefined }" />
+                  </div>
+                </template>
                 <template #expandedRowRender="{ record  }" v-if="expandedRow">
                     <render :data="record.EadminExpandRow" :slot-props="grid"></render>
                 </template>
@@ -145,6 +153,7 @@
 </template>
 
 <script>
+    import variables  from '@/styles/theme.scss';
     import {defineComponent, ref, watch,reactive, inject,nextTick,computed,unref,onActivated,onMounted,onUnmounted} from "vue"
     import {useHttp} from '@/hooks'
     import request from '@/utils/axios'
@@ -255,7 +264,7 @@
                         delete filterData[key]
                     }
                 })
-                requestParams = Object.assign(requestParams, filterData,{quickSearch:quickSearchValue.value},route.query,props.params,props.addParams,sortableParams)
+                requestParams = Object.assign(requestParams, filterData,{quickSearch:quickSearchValue.value,eadminFilterField:props.filterField},route.query,props.params,props.addParams,sortableParams)
                 if(trashed.value){
                     requestParams = Object.assign(requestParams ,{eadmin_deleted:true})
                 }
@@ -723,12 +732,14 @@
                 selectRadio,
                 changeSelect,
                 excelVisibleClose,
+                variables
             }
         }
     })
 </script>
 
 <style lang="scss" scoped>
+    @import '@/styles/theme.scss';
     .custom{
         background: none !important;
         padding-left: 0 !important;

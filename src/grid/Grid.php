@@ -654,6 +654,10 @@ class Grid extends Component
             //排除筛选多余字段
             $this->attr('filterExceptField', $form->attr('exceptField'));
             $this->attr('filter', $form);
+            //列筛选需要此操作先解析
+            if(Request::has('eadminFilterField')){
+                json_encode($form);
+            }
             $this->attr('filterField', $form->bindAttr('model'));
         }
 
