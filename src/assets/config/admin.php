@@ -50,6 +50,6 @@ return [
     //主题
     'theme'=>[
         //主题色
-        'color'=>'#00AF66'
+        'color'=>'#409EFF'
     ]
 ];
