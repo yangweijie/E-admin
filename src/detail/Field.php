@@ -9,10 +9,12 @@
 namespace Eadmin\detail;
 
 
+use Eadmin\component\basic\Button;
 use Eadmin\component\basic\DownloadFile;
 use Eadmin\component\basic\Html;
 use Eadmin\component\basic\Image;
 use Eadmin\component\basic\Link;
+use Eadmin\component\basic\Popover;
 use Eadmin\component\basic\Tag;
 use Eadmin\component\basic\Tip;
 use Eadmin\component\basic\Video;
@@ -142,6 +144,28 @@ class Field extends Column
 		return $this;
 	}
 
+	/**
+	 * 弹出框
+	 * @param string $field 指定字段
+	 * @param string $label 按钮名称
+	 * @param string $width 宽度
+	 * @param string $tigger 触发方式  click/focus/hover/manual
+	 * @param string $placement 出现位置 top/top-start/top-end/bottom/bottom-start/bottom-end/left/left-start/left-end/right/right-start/right-end
+	 */
+	public function popover($field = '', $label = '查看', $width = '500px', $tigger = 'hover', $placement = 'top')
+	{
+		$this->display(function ($val, $data) use ($field, $label, $width, $tigger, $placement) {
+			$valueData = $field ? $data[$field] : $val;
+			if (empty($valueData)) return '';
+			return Popover::create(Button::create($label))
+				->content($this->getTags($valueData))
+				->width($width)
+				->trigger($tigger)
+				->placement($placement);
+		});
+		return $this;
+	}
+
     /**
      * 标签显示
      * @param string $color 标签颜色：success，info，warning，danger
@@ -153,6 +177,49 @@ class Field extends Column
         $this->tag = Tag::create()->type($color)->size($size)->effect($theme);
         return $this;
     }
+
+	/**
+	 * 多个标签
+	 * @param string $field 指定字段
+	 * @param string $type 类型 success / info / warning / danger
+	 * @param string $size 尺寸   medium / small / mini
+	 * @return $this
+	 */
+	public function tags($field = '', $type = 'primary', $size = 'small')
+	{
+		$this->display(function ($val, $data) use ($field, $type, $size) {
+			$valueData = $field ? $data[$field] : $val;
+			if (empty($valueData) || !is_array($valueData)) return '';
+			return $this->getTags($valueData, $type, $size);
+		});
+		return $this;
+	}
+
+	/**
+	 * 标签组组装
+	 * @param array  $value 数据
+	 * @param string $type 类型 success / info / warning / danger
+	 * @param string $size 尺寸    medium / small / mini
+	 * @return Html
+	 */
+	public function getTags(array $value = [], $type = 'primary', $size = 'small')
+	{
+		$html = Html::create()
+			->tag('div')
+			->style(['display' => 'flex', 'flexWrap' => 'wrap']);
+		foreach ($value as $apartment) {
+			$html->content(
+				Html::create(
+					Tag::create($apartment)
+						->type($type)
+						->size($size)
+				)
+					->tag('div')
+					->style(['marginRight' => '5px', 'marginBottom' => '5px'])
+			);
+		}
+		return $html;
+	}
 
     /**
      * 评分显示
