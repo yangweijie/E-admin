@@ -86,6 +86,8 @@ class ServiceProvider extends Service
                         $findArr[] = color_mix('#FFFFFF',$theme,$i);
                         $replaceArr[] = color_mix('#FFFFFF',$color,$i);
                     }
+                    $findArr[] = color_mix('#000000',$theme,10);
+                    $replaceArr[] = color_mix('#000000',$color,10);
                     $content = str_ireplace($findArr,$replaceArr,$content);
                     $res = file_put_contents($filePath,$content);
                 }
