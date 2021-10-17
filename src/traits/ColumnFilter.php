@@ -5,337 +5,89 @@ namespace Eadmin\traits;
 use Eadmin\component\basic\Html;
 use Eadmin\grid\Filter;
 
+/**
+ * Trait ColumnFilter
+ * @package Eadmin\traits
+ * @method Filter filter($field = null) 等于查询
+ * @method Filter filterNeq($field = null) 不等于查询
+ * @method Filter filterGt($field = null) 大于查询
+ * @method Filter filterElt($field = null) 小于等于查询
+ * @method Filter filterLt($field = null) 小于查询
+ * @method Filter filterGqt($field = null) 大于等于查询
+ * @method Filter filterBetween($field = null) 区间查询
+ * @method Filter filterNotBetween($field = null) NOT区间查询
+ * @method Filter filterLike($field = null) 模糊查询
+ * @method Filter filterJson($node, $field = null) json查询
+ * @method Filter filterJsonLike($node, $field = null) json模糊查询
+ * @method Filter filterJsonArrLike($node, $field = null) json数组模糊查询
+ * @method Filter filterIn($field = null) in查询
+ * @method Filter filterNotIn($field = null) not in查询
+ * @method Filter filterFindIn($field = null) findIn查询
+ * @method Filter filterDate($field = null) 日期筛选
+ * @method Filter filterTime($field = null) 时间筛选
+ * @method Filter filterDatetime($field = null) 日期时间筛选
+ * @method Filter filterDatetimeRange($field = null) 日期时间范围筛选
+ * @method Filter filterDateRange($field = null) 日期范围筛选
+ * @method Filter filterTimeRange($field = null) 时间范围筛选
+ * @method Filter filterYear($field = null) 年日期筛选
+ * @method Filter filterMonth($field = null) 月日期筛选
+ * @method Filter filterCascader(...$field) 级联筛选
+ * @method Filter filterCheckbox($options,$field = null) 多选框筛选
+ * @method Filter filterRadio($options,$field = null) 单选框筛选
+ * @method Filter filterRadioButton($options,$field = null) 单选框按钮筛选
+ * @method Filter filterSelect($options,$field = null) 下拉框筛选
+ * @method Filter filterSelectGroup($options,$field = null) 下拉框分组筛选
+ */
 trait ColumnFilter
 {
-    protected $filterDropdown = [];
-
-    protected function addFilterDropdown(\Closure $closure)
+    
+    
+    /**
+     * 筛选方法解析
+     * @param string $method 方法
+     * @param string $arguments 参数
+     * @return Filter
+     */
+    public function filterMethod($method, $arguments)
     {
-        $filter = $this->grid->getFilter();
-        call_user_func($closure, $filter, $this->attr('prop'));
-        $this->filterDropdown[] = $filter->form()->getLastItem()->getContent('default');
-        if (count($this->filterDropdown) > 0) {
-            $prop = $this->attr('prop');
-            $this->attr('eadminFilterDropdown', Html::div()->content($this->filterDropdown)->style(['padding' => '8px']));
-            $this->attr('slots', array_merge($this->attr('slots'), ['filterIcon' => 'filterIcon_' . $prop, 'filterDropdown' => 'filterDropdown']));
+        $method = lcfirst($method);
+        if (empty($method)) {
+            $method = 'eq';
         }
-
-    }
-    /**
-     * 不等于查询
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterNeq($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->neq($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 大于
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterGt($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->gt($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 小于等于
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterElt($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->elt($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 小于
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterLt($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->lt($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 区间查询
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterBetween($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->between($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * NOT区间查询
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterNotBetween($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->notBetween($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 大于等于
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterGqt($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->egt($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 等于查询
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filter($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->eq($field)->hide();
-        });
-        return $this;
-    }
-
-    /**
-     * 模糊查询
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterLike($field)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->like($field)->hide();
-        });
-        return $this;
-    }
-
-    /**
-     * 模糊查询
-     * @param string $field 字段
-     * @param string $node json属性字段
-     * @return $this
-     */
-    public function filterJson($field,$node)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->like($field, $node)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 模糊查询
-     * @param string $field 字段
-     * @param string $node json属性字段
-     * @return $this
-     */
-    public function filterJsonLike($field,$node)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->jsonLike($field, $node)->hide();
-        });
-        return $this;
-    }
-    /**
-     * json数组模糊查询
-     * @param string $field 字段
-     * @param string $node json属性字段
-     * @return $this
-     */
-    public function filterJsonArrLike($field,$node)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->jsonArrLike($field, $node)->hide();
-        });
-        return $this;
-    }
-    /**
-     * in查询
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterIn($field)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->in($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * not in查询
-     * @param string $field 字段
-     * @return $this
-     */
-    public function  filterNotIn($field)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->in($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * findIn查询
-     * @param string $field 字段
-     * @return $this
-     */
-    public function  filterFindIn($field)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->findIn($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 日期筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterDate($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->date($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 时间筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterTime($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->time($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 日期时间筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterDatetime($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->datetime($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 日期时间范围筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterDatetimeRange($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->datetimeRange($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 日期时间范围筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterDateRange($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->dateRange($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 时间范围筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterTimeRange($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->timeRange($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 年日期筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterYear($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->year($field)->hide();
-        });
-        return $this;
-    }
-    /**
-     * 月日期筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterMonth($field = null)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $field = is_null($field)?$prop:$field;
-            $filter->month($field)->hide();
-        });
-        return $this;
-    }
-
-    /**
-     * 级联筛选
-     * @param string $field 字段
-     * @return $this
-     */
-    public function filterCascader(...$field)
-    {
-        $this->addFilterDropdown(function (Filter $filter, $prop) use($field) {
-            $filter->cascader($field)->hide();
-        });
-        return $this;
+        $filter = $this->grid->getFilter();
+        $field = $this->attr('prop');
+        $arg_num = count($arguments);
+        if ($method == 'cascader') {
+            $filter->$method(...$arguments)->hide();
+        } elseif ($method == 'checkbox') {
+            if ($arg_num == 2) {
+                $field = $arguments[1];
+            }
+            $checkbox = $filter->in($field)->checkbox($arguments[0])
+                ->horizontal()
+                ->onCheckAll();
+        } elseif (strpos($method, 'select') === 0 || strpos($method, 'radio') === 0) {
+            if ($arg_num == 2) {
+                $field = $arguments[1];
+            }
+            $filter->eq($field)->$method($arguments[0])->popperAppendToBody(false);
+        } elseif (strpos($method, 'json') === 0) {
+            if ($arg_num == 1) {
+                $node = $arguments[0];
+            }
+            if ($arg_num == 2) {
+                $field = $arguments[1];
+            }
+            $filter->$method($field, $arguments[0]);
+        } else {
+            if ($arg_num == 1) {
+                $field = $arguments[0];
+            }
+            $filter->$method($field);
+        }
+        $filter->hide();
+        $this->attr('eadminFilterDropdown', Html::div()->content($filter->form()->getLastItem()->getContent('default')));
+        $this->attr('slots', array_merge($this->attr('slots'), ['filterIcon' => 'filterIcon_' . $field, 'filterDropdown' => 'filterDropdown']));
+        return $filter;
     }
 }

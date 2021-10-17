@@ -252,4 +252,11 @@ export function randomCoding(length){
     }
     return idvalue;
 }
-
+export function empty(value) {
+    if(!value && value !== 0){
+        return true
+    }
+    if(Array.isArray(value) && value.length == 0){
+        return true
+    }
+}

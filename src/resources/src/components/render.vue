@@ -223,7 +223,11 @@
                     if (slotProps && slotProps.row) {
                         mapData =  slotProps.row[field] || []
                     }else{
-                       eval('mapData = modelValue.'+field + ' || []')
+                        try {
+                            eval('mapData = modelValue.'+field + ' || []')
+                        }catch (e) {
+
+                        }
                     }
                     if(!Array.isArray(mapData)){
                         mapData = []

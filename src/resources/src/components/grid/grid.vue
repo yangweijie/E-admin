@@ -102,11 +102,20 @@
                     <render :data="column.header" :slot-props="grid"></render>
                 </template>
                 <template #filterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
-                    <render :data="column.eadminFilterDropdown"></render>
+                    <div style="padding: 8px">
+                        <render :data="column.eadminFilterDropdown"></render>
+                        <div v-if="!filter.attribute.hideAction">
+                            <div style="background-color: #DCDFE6;height: 1px;margin: 10px 0"></div>
+                            <div style="margin-top: 5px">
+                                <el-button size="mini" type="primary" @click="columnFilter(confirm)">确定</el-button>
+                                <el-button size="mini" @click="columnFilterReset(column.prop)">重置</el-button>
+                            </div>
+                        </div>
+                    </div>
                 </template>
                 <template v-for="column in tableColumns" v-slot:[column.slots.filterIcon]>
                   <div style="display: flex;align-items: center;justify-content: center">
-                    <i class="fa fa-filter" :style="{ color: proxyData[filterField][column.prop] ? variables.theme : undefined }" />
+                    <i class="fa fa-filter" :style="{ color: empty(proxyData[filterField][column.prop]) ?  undefined :variables.theme  }" />
                   </div>
                 </template>
                 <template #expandedRowRender="{ record  }" v-if="expandedRow">
@@ -158,7 +167,7 @@
     import {useHttp} from '@/hooks'
     import request from '@/utils/axios'
     import {store,action} from '@/store'
-    import {forEach, unique, deleteArr, buildURL, debounce,treeMap} from '@/utils'
+    import {forEach, unique, deleteArr, buildURL, debounce,treeMap,empty,findTree} from '@/utils'
     import {ElMessageBox,ElMessage} from 'element-plus'
     import Sortable from 'sortablejs'
     import {useRoute} from 'vue-router'
@@ -239,6 +248,7 @@
                 status:'',
             })
             const quickSearchText = ctx.attrs.quickSearchText || '请输入关键字'
+            const originColumns = JSON.parse(JSON.stringify(props.columns))
             const columns = ref(props.columns)
             const tableData = ref([])
             if(props.static){
@@ -304,7 +314,7 @@
                     loadData()
                 }
             })
-            if(props.filterField){
+            if(props.filterField && props.filter.attribute.hideAction){
                 const filterDebounce = debounce(()=>{
                     loading.value = true
                 },300)
@@ -524,7 +534,12 @@
                     tableData.value = res.data
                     total.value = res.total
                     header.value = res.header
-                    columns.value = res.columns
+
+                    let action = findTree(originColumns,'EadminAction','prop')
+                    if(action && !action.width){
+                        action = findTree(columns.value,'EadminAction','prop')
+                        delete action.width
+                    }
                     tools.value = res.tools
                     nextTick(()=>{
                       if(state.gridFirst){
@@ -693,6 +708,18 @@
                 }
                 ctx.emit('update:selection',selectIds.value)
             }
+            function columnFilter(confirm) {
+                loading.value = true
+                confirm()
+            }
+            //列筛选重置
+            function columnFilterReset(field) {
+                if(Array.isArray(field)){
+                    proxyData[props.filterField][field] = []
+                }else{
+                    proxyData[props.filterField][field] = ''
+                }
+            }
             return {
                 isMobile,
                 grid,
@@ -732,7 +759,10 @@
                 selectRadio,
                 changeSelect,
                 excelVisibleClose,
-                variables
+                variables,
+                empty,
+                columnFilter,
+                columnFilterReset
             }
         }
     })
@@ -780,11 +810,13 @@
     }
     .customEadminAction{
         margin-top: 10px;
-        display: flex;align-items: center;
+        display: flex;
+        align-items: center;
         justify-content: space-between;
     }
     .customEadminAction .el-radio{
         margin-right: 0;
+
     }
 
 </style>

@@ -119,6 +119,7 @@ class Grid extends Component
         $this->pagination->pageSize(20);
         //操作列
         $this->actionColumn = new Actions($this);
+     
         $this->bindAttValue('modelValue', false, true);
         $this->bindAttValue('addParams',[]);
         $this->attr('eadmin_grid_param', $this->bindAttr('addParams'));
@@ -654,10 +655,6 @@ class Grid extends Component
             //排除筛选多余字段
             $this->attr('filterExceptField', $form->attr('exceptField'));
             $this->attr('filter', $form);
-            //列筛选需要此操作先解析
-            if(Request::has('eadminFilterField')){
-                json_encode($form);
-            }
             $this->attr('filterField', $form->bindAttr('model'));
         }
 
@@ -682,7 +679,7 @@ class Grid extends Component
                 'data' => $data,
                 'header'=> $this->attr('header'),
                 'tools'=> $this->attr('tools'),
-                'columns'=> $columns,
+               // 'columns'=> $columns,
                 'total' => $this->pagination->attr('total')
             ];
         } else {

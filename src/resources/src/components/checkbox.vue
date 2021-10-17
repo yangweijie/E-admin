@@ -1,6 +1,7 @@
 <template>
     <el-checkbox v-if="onCheckAll" :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
-    <el-checkbox-group v-model="value" @change="handleCheckedCitiesChange">
+    <el-divider></el-divider>
+    <el-checkbox-group v-bind="$attrs" v-model="value" @change="handleCheckedCitiesChange" :class="horizontal?'horizontal':''">
         <slot></slot>
     </el-checkbox-group>
 </template>
@@ -15,6 +16,7 @@
             checkAll:Boolean,
             onCheckAll:Boolean,
             checkTag:Boolean,
+            horizontal:Boolean,
         },
         emits: ['update:modelValue'],
         setup(props, ctx) {
@@ -53,5 +55,11 @@
 </script>
 
 <style scoped>
-
+    .el-divider--horizontal {
+        margin: 10px 0;
+    }
+    .horizontal{
+        display: flex;
+        flex-direction: column;
+    }
 </style>

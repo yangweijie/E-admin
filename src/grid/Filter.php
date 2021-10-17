@@ -64,9 +64,6 @@ class Filter
             $this->tableFields = $this->db->getTableFields();
         }
         $this->form = new Form([]);
-        if(Request::has('eadminFilterField')){
-            $this->form->bindAttr('model',Request::get('eadminFilterField'));
-        }
         $this->form->inline()
             ->removeAttr('labelWidth')
             ->removeAttr('setAction')
@@ -774,6 +771,7 @@ class Filter
     public function hideAction(bool $bool = true)
     {
         $this->hideAction = $bool;
+        $this->form->attr('hideAction',true);
     }
     public function __call($name, $arguments)
     {
