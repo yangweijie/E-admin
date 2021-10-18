@@ -41,14 +41,16 @@ abstract class Component implements \JsonSerializable
     protected $modelBind = [];
     //初始化
     protected static $init = [];
+
     public function __construct()
     {
-        foreach (self::$init as $class =>$init){
-            if(static::class == $class){
-                call_user_func($init, $this);    
+        foreach (self::$init as $class => $init) {
+            if (static::class == $class) {
+                call_user_func($init, $this);
             }
         }
     }
+
     /**
      * 初始化
      * @param \Closure $closure
@@ -57,6 +59,7 @@ abstract class Component implements \JsonSerializable
     {
         self::$init[static::class] = $closure;
     }
+
     /**
      * 设置标题
      * @param string $title
@@ -188,8 +191,8 @@ abstract class Component implements \JsonSerializable
 
     /**
      * @param string $name 指令名称
-     * @param string $value 值
-     * @param string $argument 参数(可选)
+     * @param string|array $value 值
+     * @param string|array $argument 参数(可选)
      * @return $this
      */
     public function directive($name, $value, $argument = '')
@@ -197,15 +200,31 @@ abstract class Component implements \JsonSerializable
         $this->directive[] = ['name' => $name, 'argument' => $argument, 'value' => $value];
         return $this;
     }
+
     /**
      * 移除事件
      * @param $name
      */
-    public function removeEvent($name){
+    public function removeEvent($name)
+    {
         $name = ucfirst($name);
         unset($this->event[$name]);
         return $this;
     }
+
+    /**
+     * 改变事件触发ajax
+     * @param string $url 请求url
+     * @param array $data 请求数据
+     * @param string $method 请求方法
+     * @return $this
+     */
+    public function changeAjax($url, array $data, $method = 'post')
+    {
+        $this->event('changeAjax', ['url' => 'admin/admin', 'method' => $method, 'data' => $data]);
+        return $this;
+    }
+
     public function event($name, array $value)
     {
         $name = ucfirst($name);
@@ -222,10 +241,12 @@ abstract class Component implements \JsonSerializable
      * @param array $params 附加请求参数
      * @return $this
      */
-    public function gridRefresh(array $params){
-        $this->event('click',['gridRefresh'=>$params]);
+    public function gridRefresh(array $params)
+    {
+        $this->event('click', ['gridRefresh' => $params]);
         return $this;
     }
+
     /**
      * 跳转路径
      * @param string $url
@@ -234,7 +255,7 @@ abstract class Component implements \JsonSerializable
      */
     public function redirect($url, array $params = [])
     {
-        if($url instanceof Url){
+        if ($url instanceof Url) {
             $url = $url->build();
         }
         if ($params) {
@@ -260,7 +281,7 @@ abstract class Component implements \JsonSerializable
         }
         if (is_array($content)) {
             foreach ($content as $item) {
-                $this->content($item,$name);
+                $this->content($item, $name);
             }
         } else {
             if (!($content instanceof Component)) {
@@ -272,16 +293,15 @@ abstract class Component implements \JsonSerializable
                 $content->eventSuccess([$field => false]);
             }
             if ($content instanceof Component) {
-                if($content->componentVisible){
+                if ($content->componentVisible) {
                     $this->content[$name][] = $content;
                 }
-            }else{
+            } else {
                 $this->content[$name][] = $content;
             }
         }
         return $this;
     }
-
 
 
     /**
@@ -307,25 +327,34 @@ abstract class Component implements \JsonSerializable
             return $this;
         }
     }
-    public function getContent($name=null){
-        if(is_null($name)){
+
+    public function getContent($name = null)
+    {
+        if (is_null($name)) {
             return $this->content;
         }
         return $this->content[$name];
     }
-    public function clearContent(){
+
+    public function clearContent()
+    {
         $this->content = [];
     }
-    public function getName(){
+
+    public function getName()
+    {
         return $this->name;
     }
-    public function setName($name){
+
+    public function setName($name)
+    {
         $this->name = $name;
     }
+
     public function jsonSerialize()
     {
         $this->attribute['key'] = Str::random(30, 3);
-        if($this->componentVisible){
+        if ($this->componentVisible) {
             return [
                 'name' => $this->name,
                 'where' => $this->where,

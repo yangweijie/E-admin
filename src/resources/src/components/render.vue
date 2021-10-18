@@ -3,6 +3,7 @@
     import {splitCode} from '@/utils/splitCode'
     import {setObjectValue} from '@/utils'
     import dayjs from 'dayjs'
+    import request from '@/utils/axios'
     export default defineComponent({
         name: "render",
         props: {
@@ -161,8 +162,15 @@
                         data.attribute.onGridRefresh = (e)=>{
                             modelValue[slotProps.grid] = true
                         }
+                    }else if(event === 'ChangeAjax'){
+                        data.attribute['onChange'] = (e)=>{
+                          request({
+                            url:eventBind.url,
+                            method: eventBind.method,
+                            data:eventBind.data
+                          })
+                        }
                     }else{
-
                         data.attribute['on'+event] = (e)=>{
                             for (let field in eventBind) {
                                 if(field == 'gridRefresh'){

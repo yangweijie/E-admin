@@ -37,6 +37,7 @@ class FileSystem extends Component
         $this->attr('upload', Upload::create()
             ->finder(false)
             ->inputShow(false)
+            ->multiple()
             ->attr('foreverShow', true)
             ->content(
                 Button::create('上传')
