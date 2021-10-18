@@ -163,12 +163,15 @@
                             modelValue[slotProps.grid] = true
                         }
                     }else if(event === 'ChangeAjax'){
-                        data.attribute['onChange'] = (e)=>{
-                          request({
-                            url:eventBind.url,
-                            method: eventBind.method,
-                            data:eventBind.data
-                          })
+                        data.attribute['onChange'] = (value)=>{
+                            if(eventBind.data.field){
+                                eventBind.data[eventBind.data.field] = value
+                            }
+                            request({
+                                url:eventBind.url,
+                                method: eventBind.method,
+                                data:eventBind.data
+                            })
                         }
                     }else{
                         data.attribute['on'+event] = (e)=>{

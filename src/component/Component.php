@@ -195,7 +195,7 @@ abstract class Component implements \JsonSerializable
      * @param string|array $argument 参数(可选)
      * @return $this
      */
-    public function directive($name, $value, $argument = '')
+    public function directive($name, $value='', $argument = '')
     {
         $this->directive[] = ['name' => $name, 'argument' => $argument, 'value' => $value];
         return $this;
@@ -221,7 +221,7 @@ abstract class Component implements \JsonSerializable
      */
     public function changeAjax($url, array $data, $method = 'post')
     {
-        $this->event('changeAjax', ['url' => 'admin/admin', 'method' => $method, 'data' => $data]);
+        $this->event('changeAjax', ['url' => $url, 'method' => $method, 'data' => $data]);
         return $this;
     }
 

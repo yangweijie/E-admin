@@ -55,7 +55,7 @@ trait ColumnFilter
             $method = 'eq';
         }
         $filter = $this->grid->getFilter();
-        $field = $this->attr('prop');
+        $field = $this->prop;
         $arg_num = count($arguments);
         if ($method == 'cascader') {
             $filter->$method(...$arguments)->hide();
