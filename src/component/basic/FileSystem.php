@@ -34,14 +34,15 @@ class FileSystem extends Component
 		$page = ($page - 1) * $size;
 		$data = array_slice($data, $page, $size);
 		$this->data($data);
-		$this->attr('upload', Upload::create()
-			->finder(false)
-			->attr('foreverShow', true)
-			->content(
-				Button::create('上传')
+        $this->attr('upload', Upload::create()
+            ->finder(false)
+            ->inputShow(false)
+            ->attr('foreverShow', true)
+            ->content(
+                Button::create('上传')
                     ->icon('el-icon-upload')
-					->sizeMini()
-			));
+                    ->sizeMini()
+            ));
 	}
 
 	public function jsonSerialize()

@@ -70,7 +70,7 @@
         </div>
       </div>
       <div class="fileButtonBox" v-if="displayType == 'file'" v-show="showUploadBtn || foreverShow" >
-        <div style="margin-right: 5px;width: 100%">
+        <div style="margin-right: 5px;width: 100%" v-if="inputShow">
             <el-input v-model="inputValue" @change="changeInput"></el-input>
         </div>
         <span @click="handelBrowse" ref="btn">
@@ -203,6 +203,7 @@ export default defineComponent({
       default: false
     },
     foreverShow:Boolean,
+    inputShow:Boolean,
     onProgress: {
       type: Function,
       default: noop

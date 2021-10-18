@@ -168,7 +168,7 @@ abstract class Component implements \JsonSerializable
      * @param bool $model 是否双向绑定
      * @return string
      */
-    protected function bindAttValue($name, $value, $model = false)
+    public function bindAttValue($name, $value, $model = false)
     {
         $field = Str::random(30, 3);
         $this->bind($field, $value);
