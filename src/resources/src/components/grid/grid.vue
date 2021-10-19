@@ -559,6 +559,7 @@
                       }else{
                         tableAutoWidth()
                       }
+
                     })
                 }).finally(() => {
                     ctx.emit('update:modelValue', false)
