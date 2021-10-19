@@ -307,7 +307,7 @@ class PlugService
     public function getInfo($name, $field = 'status')
     {
         try {
-            return Db::name($this->table)->where('name', $name)->value($field);
+            return Db::name($this->table)->where('name', $name)->cache(60)->value($field);
         } catch (\Exception $exception) {
             return false;
         }

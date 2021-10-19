@@ -162,7 +162,7 @@ class Admin
 
         $permissionsKey = 'eadmin_permissions' . self::id();
         $nodes = Cache::get($permissionsKey);
-        if ($nodes) {
+        if ($nodes && !env('APP_DEBUG')) {
             return $nodes;
         }
         $nodes = self::node()->all();
@@ -308,7 +308,7 @@ class Admin
         return [$eadmin_class, $eadmin_function];
     }
 
-    
+
     /**
      * 添加队列任务
      * @param string $title 标题

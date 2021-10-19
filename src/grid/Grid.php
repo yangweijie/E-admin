@@ -46,6 +46,7 @@ use think\Model;
  * @method $this hideDeleteButton(bool $bool = true) 隐藏删除按钮
  * @method $this hideTrashed(bool $bool = true) 隐藏回收站
  * @method $this hideTools(bool $bool = true) 隐藏工具栏
+ * @method $this autoHeight(bool $bool = true) 自适应高度
  * @method $this hideSelection(bool $bool = true) 隐藏选择框
  * @method $this hideDeleteSelection(bool $bool = true) 隐藏删除选中按钮
  * @method $this hideTrashedDelete(bool $bool = true) 隐藏回收站删除按钮
@@ -119,7 +120,7 @@ class Grid extends Component
         $this->pagination->pageSize(20);
         //操作列
         $this->actionColumn = new Actions($this);
-     
+
         $this->bindAttValue('modelValue', false, true);
         $this->bindAttValue('addParams',[]);
         $this->attr('eadmin_grid_param', $this->bindAttr('addParams'));
@@ -595,7 +596,7 @@ class Grid extends Component
             exit;
         }
     }
-    protected function parseData(){
+    public function parseData(){
         //总条数
         $this->pagination->total($this->drive->getTotal());
         //排序
@@ -679,7 +680,6 @@ class Grid extends Component
                 'data' => $data,
                 'header'=> $this->attr('header'),
                 'tools'=> $this->attr('tools'),
-               // 'columns'=> $columns,
                 'total' => $this->pagination->attr('total')
             ];
         } else {

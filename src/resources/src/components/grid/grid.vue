@@ -82,7 +82,7 @@
                 </template>
             </a-list>
         </div>
-        <div v-else>
+        <div ref="tableBox" v-else>
             <div v-if="isMobile" style="background: #ffffff;overflow: auto" v-loading="loading">
                 <el-row v-for="row in tableData" :key="row.eadmin_id" style="border-top: 1px solid rgb(240, 240, 240);">
                     <el-col :span="24" >
@@ -167,7 +167,7 @@
     import {useHttp} from '@/hooks'
     import request from '@/utils/axios'
     import {store,action} from '@/store'
-    import {forEach, unique, deleteArr, buildURL, debounce,treeMap,empty,findTree} from '@/utils'
+    import {forEach, unique, deleteArr, buildURL, debounce,treeMap,empty,findTree,offsetTop} from '@/utils'
     import {ElMessageBox,ElMessage} from 'element-plus'
     import Sortable from 'sortablejs'
     import {useRoute} from 'vue-router'
@@ -194,6 +194,7 @@
                 type:Array,
                 default:[]
             },
+            autoHeight: Boolean,
             hideDeleteButton: Boolean,
             hideTrashed: Boolean,
             hideTrashedDelete: Boolean,
@@ -222,12 +223,13 @@
             custom:[Object, Boolean],
         },
         inheritAttrs: false,
-        emits: ['update:modelValue','update:selection'],
+        emits: ['update:modelValue','update:selection','update:data'],
         setup(props, ctx) {
             const route = useRoute()
             const state = inject(store)
             const proxyData = props.proxyData
             const dragTable = ref('')
+            const tableBox = ref('')
             const grid = {grid:ctx.attrs.eadmin_grid, gridParam:ctx.attrs.eadmin_grid_param}
             const {loading,http} = useHttp()
             const selectRadio = ref(false)
@@ -251,6 +253,7 @@
             const originColumns = JSON.parse(JSON.stringify(props.columns))
             const columns = ref(props.columns)
             const tableData = ref([])
+            proxyData[ctx.attrs.eadmin_grid+'data'] = tableData
             if(props.static){
                 tableData.value = props.data
             }
@@ -335,6 +338,12 @@
             nextTick(()=>{
                 if(proxyData[props.filterField]){
                     filterInitData = JSON.parse(JSON.stringify(proxyData[props.filterField]))
+                }
+                if(props.autoHeight){
+                  //自适应最大高度
+                  if(!ctx.attrs.scroll.y){
+                    ctx.attrs.scroll.y = window.innerHeight - offsetTop(tableBox.value) - 65
+                  }
                 }
                 dragSort()
             })
@@ -745,6 +754,7 @@
                 deleteAll,
                 selectIds,
                 dragTable,
+                tableBox,
                 sortTop,
                 sortBottom,
                 sortInput,
@@ -808,6 +818,7 @@
     .filterCustom{
         margin-bottom: 10px;
     }
+
     .customEadminAction{
         margin-top: 10px;
         display: flex;
@@ -816,7 +827,7 @@
     }
     .customEadminAction .el-radio{
         margin-right: 0;
-
     }
+
 
 </style>

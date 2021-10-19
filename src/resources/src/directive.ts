@@ -23,9 +23,12 @@ app.directive('highlight', function (el) {
 app.directive('focus', {
     mounted(el, binding) {
         if(binding.value){
+            try {
+                // @ts-ignore
+                binding.instance.$refs[binding.value].focus()
+            }catch (e){
 
-            // @ts-ignore
-            binding.instance.$refs[binding.value].focus()
+            }
         }else{
             el.focus()
         }

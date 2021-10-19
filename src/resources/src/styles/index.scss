@@ -78,5 +78,31 @@ body *::-webkit-scrollbar-thumb:hover {
 .eadmin_table .ant-table-tbody{
   font-size:12px;
 }
-
-
+.eadmin-editable-cell{
+  position: relative;
+  min-height: 30px;
+}
+.eadmin-editable-cell .editable-cell-icon{
+  position: absolute;
+  right: 0;
+  width: 20px;
+  cursor: pointer;
+}
+.eadmin-editable-cell .editable-cell-icon {
+  margin-top: 4px;
+  display: none;
+}
+.eadmin-editable-cell:hover .editable-cell-icon{
+  display: inline-block;
+}
+.eadmin-editable-cell .editable-cell-icon:hover {
+  margin-top: 4px;
+  color: $--color-primary;
+}
+.eadmin-horizontal{
+  display: flex;
+  flex-direction: column;
+}
+.eadmin-horizontal .el-radio{
+  line-height: 2
+}

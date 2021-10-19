@@ -62,8 +62,8 @@ class CheckboxGroup extends Field
                 $disabled = false;
             }
             $options[] = [
-                'value'    => $value,
-                'label'    => $label,
+                'value' => $value,
+                'label' => $label,
                 'disabled' => $disabled,
             ];
         }
@@ -74,12 +74,15 @@ class CheckboxGroup extends Field
         }
         $mapField = Str::random(30, 3);
         $this->bindValue($options, 'options', $mapField);
-        $this->formItem->form()->except([$mapField]);
-        if (empty($this->formItem->form()->manyRelation())) {
+        if ($this->formItem) {
+            $this->formItem->form()->except([$mapField]);
+        }
+
+        if ($this->formItem && empty($this->formItem->form()->manyRelation())) {
             $mapField = $this->formItem->form()->bindAttr('model') . '.' . $mapField;
         }
         $checkboxOption = $checkbox
-            ->map($options,$mapField)
+            ->map($options, $mapField)
             ->mapAttr('label', 'value')
             ->mapAttr('key', 'value')
             ->mapAttr('slotDefault', 'label')

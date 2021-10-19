@@ -3,6 +3,7 @@
 namespace Eadmin;
 
 use Closure;
+use Eadmin\form\drive\File;
 use Eadmin\form\Form;
 use Eadmin\model\SystemMenu;
 use Eadmin\service\PlugService;
@@ -113,9 +114,13 @@ PHP;
             $this->registerRoute();
             $form = $this->setting();
             if($form instanceof Form){
-                $form->saved(function (){
-                    //刷新菜单状态
-                    $this->refreshMenu();
+                $form->saved(function () use($form){
+                    $callMehod = $form->getCallMethod();
+                    $param = $this->app->request->param();
+                    if($callMehod['eadmin_class'] == $param['eadmin_class'] && $callMehod['eadmin_function'] == $param['eadmin_function']){
+                        //刷新菜单状态
+                        $this->refreshMenu();
+                    }
                 });
             }
         }

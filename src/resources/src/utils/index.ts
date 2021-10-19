@@ -260,3 +260,11 @@ export function empty(value) {
         return true
     }
 }
+export function offsetTop(el) {
+    console.log(el)
+    console.log(el.offsetTop)
+    if(el.parentElement) {
+        return offsetTop(el.parentElement) + el.offsetTop
+    }
+    return el.offsetTop
+}
