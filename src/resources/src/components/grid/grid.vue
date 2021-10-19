@@ -98,8 +98,8 @@
                 <template #title v-if="header">
                     <div class="header"><render v-for="item in header" :data="item" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params"  :slot-props="grid"></render></div>
                 </template>
-                <template v-for="column in tableColumns" v-slot:[column.slots.title]>
-                    <render :data="column.header" :slot-props="grid"></render>
+                <template v-for="column in columnHeader" v-slot:[column.slots.title]>
+                    <render  :data="column.header" :slot-props="grid"></render>
                 </template>
                 <template #filterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
                     <div style="padding: 8px">
@@ -113,7 +113,7 @@
                         </div>
                     </div>
                 </template>
-                <template v-for="column in tableColumns" v-slot:[column.slots.filterIcon]>
+                <template v-for="column in columnHeader" v-slot:[column.slots.filterIcon]>
                   <div style="display: flex;align-items: center;justify-content: center">
                     <i class="fa fa-filter" :style="{ color: empty(proxyData[filterField][column.prop]) ?  undefined :variables.theme  }" />
                   </div>
@@ -329,6 +329,20 @@
             const checkboxColumn = ref(props.columns.map(item => {
                 return item.prop
             }))
+            const columnHeader = computed(()=>{
+              return recursionColumn(computedColumn())
+            })
+            function recursionColumn(columns){
+              let data = []
+              columns.map(item=>{
+                data.push(item)
+                if(item.children){
+
+                  data = data.concat(recursionColumn(item.children))
+                }
+              })
+              return data
+            }
             function computedColumn() {
                 return columns.value.filter(item=>{
                     return checkboxColumn.value.indexOf(item.prop) >= 0 && !item.hide
@@ -772,7 +786,8 @@
                 variables,
                 empty,
                 columnFilter,
-                columnFilterReset
+                columnFilterReset,
+                columnHeader
             }
         }
     })
