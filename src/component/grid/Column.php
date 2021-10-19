@@ -235,7 +235,7 @@ class Column extends Component
         if(!is_null($this->editable)){
             $value = $this->editableCall($value,$data);
         }
-        $html = Html::div()->content($value)->attr('class', 'eadmin_table_td_' . $this->attr('prop'));
+        $html = Html::create($value)->attr('class', 'eadmin_table_td_' . $this->attr('prop'));
         if ($fontSize) {
             $html->style(['fontSize' => $fontSize . 'px']);
         }

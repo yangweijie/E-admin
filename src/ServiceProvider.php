@@ -68,14 +68,14 @@ class ServiceProvider extends Service
                 $env->save($envFile);
             }
             //主题色切换
-            $color = config('admin.theme.color');
-            if($color != $env->get('THEME_COLOR')){
+            $color = config('admin.theme.color','#409EFF');
+            if($color != $env->get('THEME_COLOR','#409EFF')){
                 $finder = new Finder();
                 $dir = app()->getRootPath().'public/eadmin/static/';
                 foreach ($finder->in($dir)->name(['*.css','*.js']) as $file) {
                     $filePath = $file->getRealPath();
                     $content = file_get_contents($filePath);
-                    $theme = $env->get('THEME_COLOR','#409EFF');
+                    $theme = $env->get('THEME_COLOR');
                     $themeRgb= hex2rgba($theme);
                     $themeRgb = implode(',',$themeRgb);
                     $rgb= hex2rgba($color);

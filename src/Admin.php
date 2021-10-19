@@ -162,11 +162,10 @@ class Admin
 
         $permissionsKey = 'eadmin_permissions' . self::id();
         $nodes = Cache::get($permissionsKey);
-        if ($nodes && !env('APP_DEBUG')) {
+        if ($nodes) {
             return $nodes;
         }
         $nodes = self::node()->all();
-
         if (self::id()) {
             $permissions = self::user()->permissions();
             $nodeIds = array_column($permissions, 'node_id');
@@ -180,7 +179,6 @@ class Admin
                 }
             }
         }
-
         Cache::tag('eadmin_permissions')->set($permissionsKey, $nodes);
         return $nodes;
     }
