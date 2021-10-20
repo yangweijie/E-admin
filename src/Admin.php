@@ -166,7 +166,6 @@ class Admin
             return $nodes;
         }
         $nodes = self::node()->all();
-
         if (self::id()) {
             $permissions = self::user()->permissions();
             $nodeIds = array_column($permissions, 'node_id');
@@ -180,7 +179,6 @@ class Admin
                 }
             }
         }
-
         Cache::tag('eadmin_permissions')->set($permissionsKey, $nodes);
         return $nodes;
     }
@@ -308,7 +306,7 @@ class Admin
         return [$eadmin_class, $eadmin_function];
     }
 
-    
+
     /**
      * 添加队列任务
      * @param string $title 标题

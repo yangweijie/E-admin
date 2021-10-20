@@ -1,11 +1,11 @@
 <template>
     <el-card shadow="hover">
-        <template #header>
+        <template #header v-if="!hideTools || title">
             <el-row style="display: flex;align-items: center">
                 <el-col :xs="24" :sm="24" :md="4" :span="4">
                     <div>{{title}}</div>
                 </el-col>
-                <el-col :xs="24" :sm="24" :md="20" :span="20" style="text-align: right">
+                <el-col :xs="24" :sm="24" :md="20" :span="20" style="text-align: right" v-if="!hideTools">
                     <el-button-group >
                         <el-button v-if="params.date_type == 'yesterday'" size="small" type="primary" @click="requestData('yesterday')">昨天</el-button>
                         <el-button v-else plain size="small" @click="requestData('yesterday')">昨天</el-button>
@@ -56,9 +56,14 @@
             header: [Object, Boolean],
             footer: [Object, Boolean],
             filter: [Object, Boolean],
+            hideTools: Boolean,
             modelValue: Boolean,
             filterField:String,
             proxyData:Object,
+            rangeDate:{
+              type:Array,
+              default:[]
+            },
         },
         emits: ['update:modelValue'],
         setup(props,ctx){
@@ -76,7 +81,7 @@
             const chart = ref(props.echart)
             const header = ref(props.header)
             const footer = ref(props.footer)
-            const rangeDate = ref([])
+            const rangeDate = ref(props.rangeDate)
             watch(rangeDate,(value)=>{
                 if(value == null){
                     requestData('today')

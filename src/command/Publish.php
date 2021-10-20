@@ -37,6 +37,8 @@ class Publish extends Command
         $assetsDir = __DIR__ . '/../assets/public';
         $this->copyDir($assetsDir, app()->getRootPath() . 'public/eadmin', $force);
         $assetsDir = __DIR__ . '/../assets/admin/view/index.vue';
+        $file = __DIR__.'/../../.env';
+        copy($file,app()->getRootPath().'public/eadmin/.env');
         copy($assetsDir, app()->getAppPath() . 'admin/view/index.vue');
     }
     

@@ -28,6 +28,7 @@ use think\helper\Str;
  * @method $this chunk(bool $value = true) 本地分片上传
  * @method $this url(string $value) 上传url
  * @method $this params(array $value) 上传参数
+ * @method $this inputShow(bool $value = true) 显示输入框
  * @package Eadmin\component\form\field
  */
 class Upload extends Field
@@ -40,7 +41,7 @@ class Upload extends Field
         $this->url('/eadmin/upload');
         $this->attr('token', Admin::token()->get());
         $uploadType = config('admin.uploadDisks');
-
+        $this->inputShow(true);
         $this->disk($uploadType);
     }
 
@@ -131,7 +132,7 @@ class Upload extends Field
     public function jsonSerialize()
     {
         if (is_null($this->attr('finder'))) {
-            $finder = Admin::dispatch('/filesystem');
+            $finder = Admin::dispatch('/filesystem?type=1');
             $uploadButton = clone $this;
             $uploadButton->finder(false)
                 ->attr('foreverShow', true)
@@ -139,7 +140,9 @@ class Upload extends Field
                     Button::create('上传')
                         ->icon('el-icon-upload')
                         ->sizeMini()
-                )->isUniqidmd5()
+                )
+                ->inputShow(false)
+                ->isUniqidmd5()
                 ->multiple();
             $uploadButton->bindValue('', 'modelValue', null);
             if($finder instanceof Component){

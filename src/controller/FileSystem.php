@@ -18,7 +18,7 @@ use think\db\Query;
 
 class FileSystem extends Controller
 {
-    public function index()
+    public function index($type=0)
     {
         $search = $this->request->get('search');
         $cate_id = $this->request->get('cate_id');
@@ -50,11 +50,19 @@ class FileSystem extends Controller
             ->attr('height', '350px')
             ->attr('display','menu')
             ->uploadFinder();
-        $sidebarGrid = SidebarGrid::create(new SystemFileCate(), null,'id','label')
+        $grid = $fileSystem;
+        if($type == 1){
+            $grid = null;
+        }
+        $sidebarGrid = SidebarGrid::create(new SystemFileCate(), $grid,'id','label')
             ->treePid()
             ->form($this->cateForm())
             ->field('cate_id')
             ->height(362);
+        if(empty($type)){
+            $sidebarGrid->sidebar()->bindAttValue('dataSource',[],true);
+            $grid->bindAttr('cate',$sidebarGrid->sidebar()->bindAttr('dataSource'));
+        }
         $sidebarGrid->sidebar()->attr('fileSystem',$fileSystem);
         $sidebarGrid->model()
             ->field('id,name as label,pid')
@@ -62,7 +70,6 @@ class FileSystem extends Controller
             ->where(function (Query $query){
                 $query->whereOr('admin_id',Admin::id())->whereOr('per_type',0);
             });
-
         return $sidebarGrid;
     }
     public function cateForm()

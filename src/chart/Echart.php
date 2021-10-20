@@ -52,6 +52,7 @@ class Echart extends Component
     protected $date_type = null;
     protected $pkField = '';
     protected $groupMode = false;
+
     /**
      * Echart constructor.
      * @param string $title 标题
@@ -87,20 +88,53 @@ class Echart extends Component
     }
 
     /**
+     * 隐藏工具栏
+     */
+    public function hideTools()
+    {
+        $this->attr('hideTools', true);
+    }
+
+    /**
+     * 设置工具栏默认筛选
+     * @param string|array $type yesterday-昨天 today-今天 week-本周 month-本月 year-今年 ['2020-02-02','2020-02-02']-范围
+     * @param string $start_date range范围 开始日期
+     * @param string $end_date range范围 开始日期
+     * $this->toolDefault(['2020-02-02','2020-02-02']) 范围
+     */
+    public function toolDefault($type)
+    {
+        if (is_array($type)) {
+            $this->attr('rangeDate', $type);
+            $this->attr('start_date',$type[0]);
+            $this->attr('end_date',$type[1]);
+            $type = 'range';
+        }
+        if (!Request::has('date_type')) {
+            $this->date_type = $type;
+        }
+        $params = $this->attr('params');
+        $this->attr('params', $params + ['date_type' => $type]);
+    }
+
+    /**
      * 头部内容
      * @param $content
      */
-    public function header($content){
-        $this->attr('header',$content);
+    public function header($content)
+    {
+        $this->attr('header', $content);
     }
 
     /**
      * 底部内容
      * @param $content
      */
-    public function footer($content){
-        $this->attr('footer',$content);
+    public function footer($content)
+    {
+        $this->attr('footer', $content);
     }
+
     /**
      * 查询过滤
      * @param mixed $callback
@@ -108,7 +142,7 @@ class Echart extends Component
     public function filter($callback)
     {
         if ($callback instanceof \Closure) {
-			$field = Str::random(15, 3);
+            $field = Str::random(15, 3);
             $this->bind($field, false);
             $this->bindAttr('modelValue', $field, true);
             $this->filter = new Filter($this->db);
@@ -124,7 +158,7 @@ class Echart extends Component
      * 设置表名数据源
      * @param mixed $table 模型或表名
      * @param string $dateField 日期字段
-	 * @param string $pkField 主键字段
+     * @param string $pkField 主键字段
      */
     public function table($table, $dateField = 'create_time', $pkField = '')
     {
@@ -170,9 +204,9 @@ class Echart extends Component
             $after = array_shift($arguments);
             if ($this->chartType == 'line' || $this->chartType == 'bar') {
                 if ($this->groupMode) {
-                    $this->lineAnalyzeGroup($name, $field, $text,$query,$after);
+                    $this->lineAnalyzeGroup($name, $field, $text, $query, $after);
                 } else {
-                    $this->lineAnalyze($name, $field, $text,$query,$after);
+                    $this->lineAnalyze($name, $field, $text, $query, $after);
                 }
             } elseif ($this->chartType == 'pie' || $this->chartType == 'funnel') {
                 $this->pieAnalyze($name, $field, $text, $query, $after);
@@ -299,7 +333,7 @@ class Echart extends Component
                         call_user_func($query, $db);
                     }
                     $value = $db->whereDay($this->dateField, $month)->$type($field);
-					if ($after instanceof \Closure) {
+                    if ($after instanceof \Closure) {
                         $value = call_user_func($after, $value);
                     }
                     $series[] = $value;
@@ -320,8 +354,8 @@ class Echart extends Component
                 }
                 break;
             case 'range':
-                $start_date = Request::get('start_date');
-                $end_date = Request::get('end_date');
+                $start_date = Request::get('start_date',$this->attr('start_date'));
+                $end_date = Request::get('end_date',$this->attr('end_date'));
                 $dates = Carbon::parse($start_date)->daysUntil($end_date)->toArray();
                 foreach ($dates as $date) {
                     $xAxis[] = $date->toDateString();
@@ -338,7 +372,7 @@ class Echart extends Component
                 break;
         }
         $total = array_sum($series);
-       // $this->chart->xAxis($xAxis)->series($name . " ($total)", $series);
+        // $this->chart->xAxis($xAxis)->series($name . " ($total)", $series);
         $this->chart->xAxis($xAxis)->series($name, $series);
     }
 
@@ -372,7 +406,7 @@ class Echart extends Component
         }
 
         if (Request::has('ajax')) {
-            return ['header'=>$this->attr('header'),'footer'=>$this->attr('footer'),'content'=>$this->chart];
+            return ['header' => $this->attr('header'), 'footer' => $this->attr('footer'), 'content' => $this->chart];
         }
 
         $this->attr('echart', $this->chart);

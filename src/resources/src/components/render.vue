@@ -1,8 +1,9 @@
 <script>
     import {defineComponent, toRaw, h,reactive, resolveComponent,isProxy,resolveDirective,withDirectives,getCurrentInstance,onBeforeUnmount} from 'vue'
     import {splitCode} from '@/utils/splitCode'
-    import {setObjectValue} from '@/utils'
+    import {setObjectValue,findArrKey} from '@/utils'
     import dayjs from 'dayjs'
+    import request from '@/utils/axios'
     export default defineComponent({
         name: "render",
         props: {
@@ -161,8 +162,29 @@
                         data.attribute.onGridRefresh = (e)=>{
                             modelValue[slotProps.grid] = true
                         }
+                    }else if(event === 'ChangeAjax'){
+                        //change改变ajax
+                        data.attribute['onChange'] = (value)=>{
+                            if(data.attribute.valueFormat){
+                              value = dateFormat(value,data.attribute.valueFormat)
+                            }
+                            if(eventBind.data.field){
+                                eventBind.data[eventBind.data.field] = value
+                            }
+                            request({
+                                url:eventBind.url,
+                                method: eventBind.method,
+                                data:eventBind.data
+                            }).then(res=>{
+                              if(slotProps && slotProps.grid){
+                                setObjectValue(modelValue,eventBind.data.eadmin_editable_bind,0)
+                                //刷新editable行数据
+                                const index = findArrKey(modelValue[slotProps.grid+'data'],res.data.eadmin_id,'eadmin_id')
+                                modelValue[slotProps.grid+'data'][index] = res.data
+                              }
+                            })
+                        }
                     }else{
-
                         data.attribute['on'+event] = (e)=>{
                             for (let field in eventBind) {
                                 if(field == 'gridRefresh'){
@@ -223,7 +245,11 @@
                     if (slotProps && slotProps.row) {
                         mapData =  slotProps.row[field] || []
                     }else{
-                       eval('mapData = modelValue.'+field + ' || []')
+                        try {
+                            eval('mapData = modelValue.'+field + ' || []')
+                        }catch (e) {
+
+                        }
                     }
                     if(!Array.isArray(mapData)){
                         mapData = []

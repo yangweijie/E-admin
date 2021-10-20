@@ -46,6 +46,7 @@ use think\Model;
  * @method $this hideDeleteButton(bool $bool = true) 隐藏删除按钮
  * @method $this hideTrashed(bool $bool = true) 隐藏回收站
  * @method $this hideTools(bool $bool = true) 隐藏工具栏
+ * @method $this autoHeight(bool $bool = true) 自适应高度
  * @method $this hideSelection(bool $bool = true) 隐藏选择框
  * @method $this hideDeleteSelection(bool $bool = true) 隐藏删除选中按钮
  * @method $this hideTrashedDelete(bool $bool = true) 隐藏回收站删除按钮
@@ -67,6 +68,7 @@ class Grid extends Component
     protected $name = 'EadminGrid';
 
     protected $column = [];
+    protected $childrenColumn = [];
 
     protected $pagination;
     //是否隐藏分页
@@ -119,6 +121,7 @@ class Grid extends Component
         $this->pagination->pageSize(20);
         //操作列
         $this->actionColumn = new Actions($this);
+
         $this->bindAttValue('modelValue', false, true);
         $this->bindAttValue('addParams',[]);
         $this->attr('eadmin_grid_param', $this->bindAttr('addParams'));
@@ -446,18 +449,37 @@ class Grid extends Component
 
     /**
      * 添加表格列
-     * @param string $field 字段
+     * @param string|\Closure $field 字段
      * @param string $label 显示的标题
      * @return Column
      */
-    public function column(string $field = '',$label = '')
+    public function column($field = '',$label = '')
     {
-        $column = new Column($field, $label, $this);
+        $childrenColumns = [];
+        if($field instanceof \Closure){
+            $prop = 'group'.md5($label.time());
+            $childrenColumns = $this->collectColumns($field);
+            $column = new Column($prop, $label, $this);
+            $column->attr('children',array_column($childrenColumns,'attribute'));
+            foreach ($childrenColumns as $childrenColumn){
+                $childrenColumn->attr('children_row',true);
+                $this->childrenColumn[] = $childrenColumn;
+            }
+        }else{
+            $column = new Column($field, $label, $this);
+            $this->drive->realiton($field);
+        }
         $this->column[] = $column;
-        $this->drive->realiton($field);
         return $column;
     }
-
+    public function collectColumns(\Closure $closure)
+    {
+        $offset = count($this->column);
+        call_user_func($closure, $this);
+        $columns = array_slice($this->column, $offset);
+        $this->column = array_slice($this->column, 0, $offset);
+        return $columns;
+    }
     /**
      * 自定义列表元素
      * @param \Closure $closure
@@ -479,6 +501,7 @@ class Grid extends Component
     {
 
         $tableData = [];
+        $columns = array_merge($this->column,$this->childrenColumn);
         //解析行数据
         foreach ($datas as $key=>$data) {
             //主键
@@ -489,7 +512,10 @@ class Grid extends Component
                     $row['eadmin_tree_id'] = $data[$this->treeId];
                     $row['eadmin_tree_parent'] = $data[$this->treeParent];
                 }
-                foreach ($this->column as $column) {
+                foreach ($columns as $column) {
+                    if($column->attr('children')){
+                        continue;
+                    }
                     $field = $column->attr('prop');
                     $row[$field] = $column->row($data);
                     if ($export) {
@@ -594,7 +620,7 @@ class Grid extends Component
             exit;
         }
     }
-    protected function parseData(){
+    public function parseData(){
         //总条数
         $this->pagination->total($this->drive->getTotal());
         //排序
@@ -614,6 +640,7 @@ class Grid extends Component
         }
         return $data;
     }
+
     public function jsonSerialize()
     {
         $this->exec();
@@ -672,13 +699,11 @@ class Grid extends Component
         }
         if (request()->has('ajax_request_data') && request()->get('eadmin_class') == $this->callClass && !$this->attr('static')) {
             $data = $this->parseData();
-            $columns = array_column($this->column, 'attribute');
             return [
                 'code' => 200,
                 'data' => $data,
                 'header'=> $this->attr('header'),
                 'tools'=> $this->attr('tools'),
-                'columns'=> $columns,
                 'total' => $this->pagination->attr('total')
             ];
         } else {

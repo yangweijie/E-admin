@@ -70,12 +70,12 @@
         </div>
       </div>
       <div class="fileButtonBox" v-if="displayType == 'file'" v-show="showUploadBtn || foreverShow" >
-        <div style="margin-right: 5px;width: 100%">
+        <div style="margin-right: 5px;width: 100%" v-if="inputShow">
             <el-input v-model="inputValue" @change="changeInput"></el-input>
         </div>
         <span @click="handelBrowse" ref="btn">
         <slot>
-          <el-progress v-show="progressShow" style="margin: 13px 0px" :text-inside="true" :stroke-width="15" :percentage="percentage" />
+
           <template v-if="drag">
              <label class="fileButton" >
               <i class="el-icon-upload" />
@@ -85,6 +85,7 @@
           <template v-else>
             <el-button icon="el-icon-upload">上传文件</el-button>
           </template>
+           <el-progress v-show="progressShow" style="margin: 13px 0px" :text-inside="true" :stroke-width="15" :percentage="percentage" />
         </slot>
       </span>
       </div>
@@ -203,6 +204,7 @@ export default defineComponent({
       default: false
     },
     foreverShow:Boolean,
+    inputShow:Boolean,
     onProgress: {
       type: Function,
       default: noop
@@ -249,31 +251,9 @@ export default defineComponent({
       inputValue:'',
     })
     const instance = getCurrentInstance()
-    watch(()=>props.modelValue,val=>{
-      if (typeof val === 'string') {
-        state.files = val.split(',')
-        state.files = state.files.filter(function(s) {
-          return s && s.trim()
-        })
-      } else if (typeof val === 'object' && val instanceof Array) {
-        state.files = val
-      }
-    })
 
-    watch(()=>state.files,val=>{
-      if (!props.multiple && val.length === 1) {
-        state.showUploadBtn = false
-      }else if(props.multiple && props.limit > 0 && val.length >= props.limit){
-        state.showUploadBtn = false
-      } else{
-        state.showUploadBtn = true
-      }
-      if(instance.parent && instance.parent.provides && instance.parent.provides.elFormItem){
-        instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val.join(',')])
-      }
-      state.inputValue = val.join(',')
-      ctx.emit('update:modelValue', state.inputValue)
-    },{deep:true})
+
+
     if (props.width != 'auto') {
       state.styleWidth = props.width + 'px'
     } else {
@@ -295,6 +275,30 @@ export default defineComponent({
     } else if (typeof props.modelValue === 'object' && props.modelValue instanceof Array) {
       state.files = props.modelValue
     }
+    watch(()=>state.files,val=>{
+      if (!props.multiple && val.length === 1) {
+        state.showUploadBtn = false
+      }else if(props.multiple && props.limit > 0 && val.length >= props.limit){
+        state.showUploadBtn = false
+      } else{
+        state.showUploadBtn = true
+      }
+      if(instance.parent && instance.parent.provides && instance.parent.provides.elFormItem){
+        instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val.join(',')])
+      }
+      state.inputValue = val.join(',')
+      ctx.emit('update:modelValue', state.inputValue)
+    },{deep:true})
+    watch(()=>props.modelValue,val=>{
+      if (typeof val === 'string') {
+        state.files = val.split(',')
+        state.files = state.files.filter(function(s) {
+          return s && s.trim()
+        })
+      } else if (typeof val === 'object' && val instanceof Array) {
+        state.files = val
+      }
+    })
     let oss = null
     if (props.upType == 'oss') {
       oss = new OSS({

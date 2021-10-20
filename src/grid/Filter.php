@@ -21,6 +21,7 @@ use Eadmin\constant\Style;
 use Eadmin\form\Form;
 use think\db\Query;
 use think\facade\Db;
+use think\facade\Request;
 use think\Model;
 use think\model\Relation;
 use think\model\relation\BelongsTo;
@@ -770,6 +771,7 @@ class Filter
     public function hideAction(bool $bool = true)
     {
         $this->hideAction = $bool;
+        $this->form->attr('hideAction',true);
     }
     public function __call($name, $arguments)
     {
@@ -786,6 +788,12 @@ class Filter
         return $this->db;
     }
 
+    /**
+     * @return Form
+     */
+    public function form(){
+        return $this->form;
+    }
     /**
      * @return Form
      */
@@ -823,6 +831,7 @@ class Filter
         } else {
             $this->form->push($actions);
         }
+
         return $this->form;
     }
 }

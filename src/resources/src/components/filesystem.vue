@@ -106,7 +106,7 @@
       </div>
     </el-card>
     <!--分页-->
-    <el-pagination style="margin-top: 10px" @size-change="handleSizeChange"
+    <el-pagination style="padding:10px;background: #ffffff" @size-change="handleSizeChange"
                    @current-change="handleCurrentChange"
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total"
@@ -119,6 +119,7 @@
 <script>
     import {computed, defineComponent, reactive, toRefs, onActivated, watch,ref} from "vue";
     import {deleteArr, fileIcon, unique,link} from '@/utils'
+    import request from '@/utils/axios'
     import {useHttp} from "@/hooks";
     import {ElMessageBox,ElLoading} from 'element-plus';
     export default defineComponent({
@@ -225,7 +226,7 @@
             loadData()
             watch(()=>state.selectCate,value=>{
                 if(value){
-                  http({
+                  request({
                     url:'filesystem/moveCate',
                     method:'post',
                     data:{
@@ -237,6 +238,7 @@
                     state.selectIds = []
                     state.selectUrls = []
                     ctx.emit('update:selection',[])
+                    loading.value = true
                   })
                 }
             })
@@ -554,7 +556,7 @@
       margin-bottom: 5px;
     }
     .menuBox .text{
-
+        margin: 0 auto;
         text-align: center;
         overflow: hidden;
         white-space:nowrap;
