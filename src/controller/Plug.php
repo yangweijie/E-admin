@@ -65,6 +65,7 @@ class Plug extends Controller
         } else {
             $datas = Admin::plug()->all($search, $cate_id, $page, $size);
         }
+
         $grid = new Grid($datas['list']);
         $grid->drive()->setTotal($datas['total']);
         $grid->title('插件管理');

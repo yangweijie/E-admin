@@ -960,6 +960,14 @@ class Form extends Component
                         }
                     }
                 }
+            }elseif ($item instanceof Row) {
+                foreach ($item->content['default'] as $col) {
+                    foreach ($col->content['default'] as $content) {
+                        if ($content instanceof FormMany) {
+                            $this->valueModel($content);
+                        }
+                    }
+                }
             } elseif ($item->attr('setpItem')) {
                 foreach ($item->content['default'] as $content) {
                     if ($content instanceof FormMany) {

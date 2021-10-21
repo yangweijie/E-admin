@@ -34,7 +34,7 @@ class CreateSystemFile extends Migrator
         $table->addColumn(Column::integer('cate_id')->setDefault(0)->setComment('分类id'));
         $table->addColumn(Column::string('url')->setDefault('')->setComment('访问url'));
         $table->addColumn(Column::string('path')->setDefault('')->setComment('路径'));
-        $table->addColumn(Column::string('file_type',20)->setComment('文件类型'));
+        $table->addColumn(Column::string('file_type',20)->setDefault('')->setComment('文件类型'));
         $table->addColumn(Column::string('ext',10)->setComment('文件后缀'));
         $table->addColumn(Column::bigInteger('file_size')->setComment('文件大小'));
         $table->addColumn(Column::integer('admin_id')->setNullable()->setComment('后台上传人员'));

@@ -229,7 +229,7 @@ class PlugService
             }
             $plug['status'] = $status ?? false;
             $plug['install_version'] = $this->getInfo($plug['composer'], 'version');
-            $plug['install'] = is_null($status) ? false : true;
+            $plug['install'] = is_numeric($status) ? true : false;
             $plug['path'] = $this->plugPathBase . '/' . $plug['composer'];
             $this->plugs[] = $plug;
             if (!is_dir($plug['path'])) {
@@ -278,7 +278,7 @@ class PlugService
             $plug['desc']=  '';
             $plug['status'] = $status ?? false;
             $plug['install_version'] = '本地插件';
-            $plug['install'] = is_null($status) ? false : true;
+            $plug['install'] = is_numeric($status) ? true : false;
             $plug['path'] = $this->plugPathBase . '/' . $name;
             $plug['composer'] = $name;
             $plug['version'] = [
@@ -307,7 +307,7 @@ class PlugService
     public function getInfo($name, $field = 'status')
     {
         try {
-            return Db::name($this->table)->where('name', $name)->cache(60)->value($field);
+            return Db::name($this->table)->where('name', $name)->cache(60)->value($field,null);
         } catch (\Exception $exception) {
             return false;
         }
