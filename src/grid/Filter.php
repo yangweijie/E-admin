@@ -420,10 +420,12 @@ class Filter
      * @param array $options 选项值
      * @param \Closure|null $closure 回调统计数量
      */
-    public function radioButton(array $options,\Closure $closure = null){
+    public function radioButton(array $options, \Closure $closure = null)
+    {
 
-        return $this->radio($options,true,$closure);
+        return $this->radio($options, true, $closure);
     }
+
     /**
      * 单选框
      * @param array $options 选项值
@@ -431,12 +433,12 @@ class Filter
      * @param \Closure|null $closure 回调统计数量
      * @return \Eadmin\component\form\field\RadioGroup
      */
-    public function radio(array $options, bool $buttonTheme = false,\Closure $closure = null)
+    public function radio(array $options, bool $buttonTheme = false, \Closure $closure = null)
     {
-        $options = [''=>'全部']+$options;
-        foreach ($options as $value=>$text){
-            if(is_callable($closure)){
-                $count = call_user_func($closure,$value);
+        $options = ['' => '全部'] + $options;
+        foreach ($options as $value => $text) {
+            if (is_callable($closure)) {
+                $count = call_user_func($closure, $value);
                 $options[$value] = $text . " ($count)";
             }
         }
@@ -486,6 +488,46 @@ class Filter
         $field = $item->attr('prop');
         $label = $item->attr('label');
         return $this->form->select($field, $label)->options($options);
+    }
+
+    /**
+     * 单选选择器
+     * @param string $field 字段
+     * @param string $label 标签
+     * @param array $options
+     * @return \Eadmin\component\form\field\Checktag
+     */
+    public function selectorOne($field, $label, $options = [])
+    {
+        $this->eq($field, $label);
+        $item = $this->form->popItem();
+        $field = $item->attr('prop');
+        $label = $item->attr('label');
+        $item =  $this->form->checkTag($field, $label)->options($options);
+        $item->getFormItem()->labelWidth('130px');
+        $this->form()->labelPosition('left');
+        return $item;
+    }
+    /**
+     * 多选选择器
+     * @param string $field 字段
+     * @param string $label 标签
+     * @param array $options
+     * @return \Eadmin\component\form\field\Checktag
+     */
+    public function selector($field, $label, $options = [])
+    {
+        $this->in($field, $label);
+        $item = $this->form->popItem();
+        $field = $item->attr('prop');
+        $label = $item->attr('label');
+        $item =  $this->form->checkTag($field, $label)
+            ->multiple()
+            ->options($options);
+        $item->getFormItem()->labelWidth('130px');
+        $this->form()->labelPosition('left');
+        return $item;
+
     }
 
     /**
@@ -720,7 +762,7 @@ class Filter
                     $sql = $this->relationModel->db()->whereRaw("{$pk}={$this->db->getTable()}.{$foreignKey}")->buildSql();
                 } else if ($relation instanceof HasOne) {
                     $sql = $this->relationModel->db()->whereRaw("{$foreignKey}={$this->db->getTable()}.{$pk}")->buildSql();
-                }else if ($relation instanceof MorphOne || $relation instanceof MorphMany) {
+                } else if ($relation instanceof MorphOne || $relation instanceof MorphMany) {
                     $reflectionClass = new \ReflectionClass($relation);
                     $propertys = ['morphKey', 'morphType', 'type'];
                     $propertyValues = [];
@@ -771,14 +813,16 @@ class Filter
     public function hideAction(bool $bool = true)
     {
         $this->hideAction = $bool;
-        $this->form->attr('hideAction',true);
+        $this->form->attr('hideAction', true);
     }
+
     public function __call($name, $arguments)
     {
         $components = $this->form->itemComponent();
         $component = end($components);
-        call_user_func_array([$component,$name],$arguments);
+        call_user_func_array([$component, $name], $arguments);
     }
+
     /**
      * 返回db对象
      * @return Db
@@ -791,9 +835,11 @@ class Filter
     /**
      * @return Form
      */
-    public function form(){
+    public function form()
+    {
         return $this->form;
     }
+
     /**
      * @return Form
      */
