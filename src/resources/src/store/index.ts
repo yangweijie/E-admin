@@ -48,6 +48,7 @@ const states = reactive({
     //表格grid激活刷新
     gridActivatedRefresh:true,
     gridFirst:true,
+    lang:{},
 });
 export const state = states
 //操作方法
@@ -216,6 +217,7 @@ const action = {
                 if (info) {
                     states.component = null
                     states.info = info
+                    states.lang = res.data.lang
                     states.info.webLogo = res.data.webLogo
                     states.info.webName = res.data.webName
                     states.info.dropdownMenu = res.data.dropdownMenu

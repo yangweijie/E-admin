@@ -1032,9 +1032,9 @@ $--breakpoints-spec: (
 // the :export directive is the magic sauce for webpack
 // https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass
 /* icon font path, required */
-$--font-path: '~element-plus/lib/theme-chalk/fonts';
-
-@import "~element-plus/packages/theme-chalk/src/index";
+//$--font-path: '~element-plus/lib/theme-chalk/fonts';
+//
+//@import "~element-plus/packages/theme-chalk/src/index";
 :export {
   theme: $--color-primary;
 }

@@ -207,6 +207,7 @@ class Admin extends Controller
         $data['webName'] = sysconf('web_name');
         $data['topMenu'] = config('admin.topMenu', true);
         $data['tagMenu'] = config('admin.tagMenu', true);
+        $data['lang'] = lang('element_plus');
         $data['dropdownMenu'] = [
             DropdownItem::create(Dialog::create('个人信息')->title('个人信息')->form($this->editInfo())->appendToBody(true)),
             DropdownItem::create(Dialog::create('修改密码')->title('修改密码')->form($this->updatePassword())->appendToBody(true)),

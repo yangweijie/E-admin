@@ -31,7 +31,7 @@
                         <img :src="state.info.avatar" class="user-avatar">
                         <span class="right-menu-item" style="line-height: 1">
                         <span style="color: #ffffff">{{ state.info.nickname }}</span>
-                        <div style="line-height: 18px"><el-badge is-dot type="success" style="top:4px;"/> <span style="color: #ffffff">{{ state.info.username }}</span></div>
+                        <div style="line-height: 18px"><el-badge type="success" is-dot  style="top:4px;"/> <span style="color: #ffffff">{{ state.info.username }}</span></div>
                         </span>
                         <i class="el-icon-caret-bottom" style="line-height: 30px"/>
                     </div>

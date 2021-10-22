@@ -25,6 +25,7 @@ use Symfony\Component\Finder\Finder;
 use think\facade\Console;
 use think\facade\Db;
 
+use think\facade\Lang;
 use think\route\Resource;
 use think\Service;
 use Eadmin\controller\Backup;
@@ -52,7 +53,29 @@ class ServiceProvider extends Service
         Admin::registerRoute();
         //权限中间件
         $this->app->middleware->route(\Eadmin\middleware\Permission::class);
-
+        //加载语言
+        $this->language();
+    }
+    protected function finderIn($path,$name = [],$type='directories'){
+        $finder= new Finder();
+        $data = [];
+        foreach ($finder->$type()->in($path)->depth(0)->name($name) as $dir) {
+            $data[]= $dir;
+        }
+        return $data;
+    }
+    //加载语言
+    protected function language(){
+        $dirs = $this->finderIn($this->app->getBasePath());
+        $dirs = $this->finderIn($dirs,['lang']);
+        $ranges = $this->finderIn($dirs);
+        foreach ($ranges as $range){
+            $name = $range->getFilename();
+            $files = $this->finderIn($range->getRealPath(),['*.php','*.json'],'files');
+            foreach ($files as $file){
+                $this->app->lang->load($file->getRealPath(),$name);
+            }
+        }
     }
     //检测静态文件版本发布
     protected function publishVersion(){
