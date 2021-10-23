@@ -59,8 +59,13 @@ class ServiceProvider extends Service
     protected function finderIn($path,$name = [],$type='directories'){
         $finder= new Finder();
         $data = [];
-        foreach ($finder->$type()->in($path)->depth(0)->name($name) as $dir) {
-            $data[]= $dir;
+        $paths = (array)$path;
+        foreach ($paths as $path){
+            if(is_dir($path)){
+                foreach ($finder->$type()->in($path)->depth(0)->name($name) as $dir) {
+                    $data[]= $dir->getRealPath();
+                }
+            }
         }
         return $data;
     }
@@ -70,10 +75,10 @@ class ServiceProvider extends Service
         $dirs = $this->finderIn($dirs,['lang']);
         $ranges = $this->finderIn($dirs);
         foreach ($ranges as $range){
-            $name = $range->getFilename();
-            $files = $this->finderIn($range->getRealPath(),['*.php','*.json'],'files');
+            $name = basename($range);
+            $files = $this->finderIn($range,['*.php','*.json'],'files');
             foreach ($files as $file){
-                $this->app->lang->load($file->getRealPath(),$name);
+                $this->app->lang->load($file,$name);
             }
         }
     }
