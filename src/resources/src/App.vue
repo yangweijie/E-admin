@@ -1,8 +1,6 @@
 <template>
-  <el-config-provider :locale="locale">
     <router-view/>
     <eadmin-error-page/>
-  </el-config-provider>
 </template>
 
 <script>
