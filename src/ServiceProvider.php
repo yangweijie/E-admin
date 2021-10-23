@@ -68,14 +68,16 @@ class ServiceProvider extends Service
     protected function language(){
         $dirs = $this->finderIn($this->app->getBasePath());
         $dirs = $this->finderIn($dirs,['lang']);
-        $ranges = $this->finderIn($dirs);
-        foreach ($ranges as $range){
-            $name = $range->getFilename();
-            $files = $this->finderIn($range->getRealPath(),['*.php','*.json'],'files');
-            foreach ($files as $file){
-                $this->app->lang->load($file->getRealPath(),$name);
-            }
-        }
+		if (!empty($dirs)) {
+			$ranges = $this->finderIn($dirs);
+			foreach ($ranges as $range){
+				$name = $range->getFilename();
+				$files = $this->finderIn($range->getRealPath(),['*.php','*.json'],'files');
+				foreach ($files as $file){
+					$this->app->lang->load($file->getRealPath(),$name);
+				}
+			}
+		}
     }
     //检测静态文件版本发布
     protected function publishVersion(){
