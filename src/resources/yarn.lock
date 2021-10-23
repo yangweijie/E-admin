@@ -957,11 +957,6 @@
   resolved "https://registry.npm.taobao.org/@ctrl/tinycolor/download/@ctrl/tinycolor-3.4.0.tgz#c3c5ae543c897caa9c2a68630bed355be5f9990f"
   integrity sha1-w8WuVDyJfKqcKmhjC+01W+X5mQ8=
 
-"@element-plus/icons@^0.0.11":
-  version "0.0.11"
-  resolved "https://registry.nlark.com/@element-plus/icons/download/@element-plus/icons-0.0.11.tgz#9b187c002774548b911850d17fa5fc2f9a515f57"
-  integrity sha1-mxh8ACd0VIuRGFDRf6X8L5pRX1c=
-
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.nlark.com/@hapi/address/download/@hapi/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"
@@ -4373,12 +4368,11 @@ electron-to-chromium@^1.3.723:
   resolved "https://registry.nlark.com/electron-to-chromium/download/electron-to-chromium-1.3.743.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2Felectron-to-chromium%2Fdownload%2Felectron-to-chromium-1.3.743.tgz#fcec24d6d647cb84fd796b42caa1b4039a180894"
   integrity sha1-/Owk1tZHy4T9eWtCyqG0A5oYCJQ=
 
-element-plus@1.0.2-beta.70:
-  version "1.0.2-beta.70"
-  resolved "https://registry.npmmirror.com/element-plus/download/element-plus-1.0.2-beta.70.tgz#13058f4e78c5e73b19a915404d71076a13a2616e"
-  integrity sha1-EwWPTnjF5zsZqRVATXEHahOiYW4=
+element-plus@1.0.2-beta.36:
+  version "1.0.2-beta.36"
+  resolved "https://registry.npmjs.org/element-plus/-/element-plus-1.0.2-beta.36.tgz#78a7e1be10b9622c4fc342fdce0801650f30bb01"
+  integrity sha512-5Qc54rH0GGtFRXpfA4ilpcOzdAw6t2m4mBXMXYjs9c5RSYP+EV+gJyfhyolXqZoOtYZ35ovBcqljlIJJD6Nz7g==
   dependencies:
-    "@element-plus/icons" "^0.0.11"
     "@popperjs/core" "^2.4.4"
     async-validator "^3.4.0"
     dayjs "1.x"

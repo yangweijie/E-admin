@@ -59,8 +59,13 @@ class ServiceProvider extends Service
     protected function finderIn($path,$name = [],$type='directories'){
         $finder= new Finder();
         $data = [];
-        foreach ($finder->$type()->in($path)->depth(0)->name($name) as $dir) {
-            $data[]= $dir;
+        $paths = (array)$path;
+        foreach ($paths as $path){
+            if(is_dir($path)){
+                foreach ($finder->$type()->in($path)->depth(0)->name($name) as $dir) {
+                    $data[]= $dir->getRealPath();
+                }
+            }
         }
         return $data;
     }
@@ -68,16 +73,14 @@ class ServiceProvider extends Service
     protected function language(){
         $dirs = $this->finderIn($this->app->getBasePath());
         $dirs = $this->finderIn($dirs,['lang']);
-		if (!empty($dirs)) {
-			$ranges = $this->finderIn($dirs);
-			foreach ($ranges as $range){
-				$name = $range->getFilename();
-				$files = $this->finderIn($range->getRealPath(),['*.php','*.json'],'files');
-				foreach ($files as $file){
-					$this->app->lang->load($file->getRealPath(),$name);
-				}
-			}
-		}
+        $ranges = $this->finderIn($dirs);
+        foreach ($ranges as $range){
+            $name = basename($range);
+            $files = $this->finderIn($range,['*.php','*.json'],'files');
+            foreach ($files as $file){
+                $this->app->lang->load($file,$name);
+            }
+        }
     }
     //检测静态文件版本发布
     protected function publishVersion(){
