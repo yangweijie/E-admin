@@ -51,5 +51,15 @@ return [
     'theme'=>[
         //主题色
         'color'=>'#409EFF'
+    ],
+    //多语言设置
+    'lang'=>[
+        //开启多语言
+        'enable'=>true,
+        //支持语言列表
+        'list'=>[
+            'zh-cn'=>'中文',
+            'en'=>'English',
+        ]
     ]
 ];

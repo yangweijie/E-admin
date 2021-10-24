@@ -16,6 +16,7 @@
     "core-js": "^3.6.5",
     "element-plus": "1.0.2-beta.36",
     "highlight.js": "^11.0.1",
+    "js-cookie": "^3.0.1",
     "node-sass": "^5.0.0",
     "sass-resources-loader": "^2.1.1",
     "style-loader": "^2.0.0",
