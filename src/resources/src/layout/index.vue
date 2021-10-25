@@ -5,14 +5,15 @@
         <div class="main-container">
             <header-top></header-top>
             <tags-view v-if="state.tagMenuMode"></tags-view>
-            <a-spin wrapperClassName="main-content" :spinning="state.mainLoading" tip="正在刷新...">
+            <a-spin wrapperClassName="main-content" :spinning="state.mainLoading">
               <div class="header-title" v-if="state.mainTitle">
                 <div>
                   <span class="title">{{state.mainTitle}}</span>
                   <span class="desc" v-if="state.mainDescription">{{state.mainDescription}}</span>
                 </div>
                 <breadcrumb class="indexBreadcrumb" style="margin-right: 5px" v-if="state.topMenuMode && state.device != 'mobile'"></breadcrumb>
-                <el-button style="margin-right: 0" v-if="!state.topMenuMode && state.device != 'mobile'" size="mini" @click="back">返回上一页</el-button>
+                <el-button style="margin-right: 0" v-if="!state.topMenuMode && state.device != 'mobile'" size="mini" @click="back">
+                  {{ trans('back') }}</el-button>
               </div>
               <el-backtop target=".main-content"></el-backtop>
               <keep-alive :include="cacheKeys">
@@ -33,6 +34,7 @@
     import breadcrumb from '@/components/breadcrumb.vue'
     import tagsView from './tagsView.vue'
     import { store,action} from '@/store'
+    import {trans} from '@/utils'
     export default defineComponent({
         name: "index",
         components: {
@@ -81,7 +83,8 @@
                 route,
                 state,
                 sidebar,
-                back
+                back,
+                trans
             }
         }
     })

@@ -33,10 +33,10 @@
                     </el-dropdown-item>
                 </div>
                 <div class="noticeClear">
-                    <span v-if="list.length == 0">暂无通知</span>
-                    <el-popconfirm v-else icon-color="red" title="清空将无法恢复，确认清空？" @confirm="noticeClear">
+                    <span v-if="list.length == 0">{{ trans('notice.empty')}}</span>
+                    <el-popconfirm v-else icon-color="red" :title="trans('notice.clearAlert')" @confirm="noticeClear">
                         <template #reference>
-                            <span>清空通知</span>
+                            <span>{{ trans('notice.clear') }}</span>
                         </template>
                     </el-popconfirm>
                 </div>
@@ -51,7 +51,7 @@
 <script>
     import {defineComponent, ref} from 'vue'
     import request from '@/utils/axios'
-    import {link} from '@/utils'
+    import {link,trans} from '@/utils'
     import { ElNotification } from 'element-plus'
     export default defineComponent({
         name: "notice",
@@ -166,6 +166,7 @@
                 }
             }
             return {
+                trans,
                 noticeCount,
                 list,
                 readNotice,

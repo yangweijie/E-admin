@@ -55,7 +55,7 @@ return [
     //多语言设置
     'lang'=>[
         //开启多语言
-        'enable'=>true,
+        'enable'=>false,
         //支持语言列表
         'list'=>[
             'zh-cn'=>'中文',

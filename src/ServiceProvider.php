@@ -21,6 +21,7 @@ use Eadmin\model\SystemFile;
 use Eadmin\service\BackupData;
 use Eadmin\service\MenuService;
 use Eadmin\service\QueueService;
+use Eadmin\support\Translator;
 use Symfony\Component\Finder\Finder;
 use think\facade\Console;
 use think\facade\Db;
@@ -59,11 +60,12 @@ class ServiceProvider extends Service
         $this->language();
     }
     protected function finderIn($path,$name = [],$type='directories'){
-        $finder= new Finder();
+       
         $data = [];
         $paths = (array)$path;
         foreach ($paths as $path){
             if(is_dir($path)){
+                $finder= new Finder();
                 foreach ($finder->$type()->in($path)->depth(0)->name($name) as $dir) {
                     $data[]= $dir->getRealPath();
                 }
@@ -73,14 +75,23 @@ class ServiceProvider extends Service
     }
     //加载语言
     protected function language(){
-        $dirs = $this->finderIn($this->app->getBasePath());
-        $dirs = $this->finderIn($dirs,['lang']);
+
+        $dirs = $this->finderIn(__DIR__,['lang']);
         $ranges = $this->finderIn($dirs);
+       
+        $dirs = $this->finderIn($this->app->getBasePath());
+       
+        $dirs = $this->finderIn($dirs,['lang']);
+      
+        $ranges = array_merge($ranges,$this->finderIn($dirs));
+
         foreach ($ranges as $range){
             $name = basename($range);
             $files = $this->finderIn($range,['*.php','*.json'],'files');
             foreach ($files as $file){
+                $filename = pathinfo($file)['filename'];
                 $this->app->lang->load($file,$name);
+                $this->app->lang->load($file,$filename.'-'.$name);
             }
         }
     }
@@ -141,6 +152,7 @@ class ServiceProvider extends Service
             'admin.menu'         => MenuService::class,
             'admin.message'      => Message::class,
             'admin.notification' => Notification::class,
+            'admin.translator' => Translator::class,
         ]);
     }
     protected function crontab(){

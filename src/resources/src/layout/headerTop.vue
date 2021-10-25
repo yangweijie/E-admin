@@ -20,10 +20,10 @@
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
-            <el-tooltip effect="dark" content="全屏" placement="bottom">
+            <el-tooltip effect="dark" :content="trans('fullScreen')" placement="bottom">
                 <screenfull id="screenfull" class="right-menu-item hover-effect" />
             </el-tooltip>
-            <el-tooltip effect="dark" content="刷新" placement="bottom">
+            <el-tooltip effect="dark" :content="trans('refresh')" placement="bottom">
                 <div class="right-menu-item hover-effect" @click="refreshs">
                     <i class="el-icon-refresh-right refresh"/>
                 </div>
@@ -49,7 +49,7 @@
                     <a-menu v-if="state.info.dropdownMenu">
                         <render v-for="item in state.info.dropdownMenu" :data="item"></render>
                         <a-menu-item divided @click.native="logout">
-                            <span style="display:block;">退出登陆</span>
+                            <span style="display:block;">{{ trans('logout') }}</span>
                         </a-menu-item>
                     </a-menu>
                 </template>
@@ -61,7 +61,7 @@
 <script>
     import variables  from '../styles/theme.scss';
     import {useRoute} from 'vue-router'
-    import {link, findParent, findTree,refresh} from '@/utils'
+    import {link, findParent, findTree,refresh,trans} from '@/utils'
     import {defineComponent, watch, inject, computed} from 'vue'
     import {store, action, state} from '@/store'
     import router from "../router";
@@ -192,6 +192,7 @@
                 location.reload()
             }
             return {
+                trans,
                 commandLang,
                 activeIndex,
                 state,

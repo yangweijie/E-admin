@@ -2,9 +2,18 @@ import {isExternal} from "./validate";
 import router from '@/router'
 
 
-import {action} from "@/store";
+import { store,action} from '@/store'
+import { t,use } from 'element-plus/lib/locale'
 // @ts-ignore
 import md5 from 'js-md5'
+import {inject} from "vue";
+
+export function trans(name){
+    const state = inject(store)
+    // @ts-ignore
+    use(state.lang.element)
+    return t(name)
+}
 export function findParent(datas: Array<any>, pid: string) {
     let list = [], find
     do {
