@@ -416,7 +416,7 @@ trait Validator
 	 */
 	public function idCardRule($text = '[字段]不是有效的身份证')
 	{
-		$this->formItem->rules(['id_card' => str_replace('[字段]', $this->formItem->attr('label'), $text)]);
+		$this->formItem->rules(['idCard' => str_replace('[字段]', $this->formItem->attr('label'), $text)]);
 		return $this;
 	}
 
