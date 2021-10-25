@@ -217,7 +217,9 @@ const action = {
                 if (info) {
                     states.component = null
                     states.info = info
-                    states.lang = res.data.lang
+                    if(res.data.lang){
+                        states.lang = res.data.lang
+                    }
                     states.info.webLogo = res.data.webLogo
                     states.info.webName = res.data.webName
                     states.info.dropdownMenu = res.data.dropdownMenu

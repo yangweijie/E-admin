@@ -10,7 +10,16 @@
         </el-menu>
         <breadcrumb v-if="!state.topMenuMode && state.device != 'mobile'" style="margin-right: 5px"></breadcrumb>
         <div class="right-menu">
-
+            <el-dropdown @command="commandLang" v-if="state.lang.enable">
+                <div class="right-menu-item hover-effect" style="color: #FFFFFF">
+                    <i class="fa fa-language" ></i>
+                </div>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item v-for="(item,key) in state.lang.list" :command="key">{{item}}</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
             <el-tooltip effect="dark" content="全屏" placement="bottom">
                 <screenfull id="screenfull" class="right-menu-item hover-effect" />
             </el-tooltip>
@@ -59,6 +68,7 @@
     import screenfull from "@/components/screenfull.vue";
     import notice from "@/layout/notice.vue";
     import breadcrumb from '@/components/breadcrumb.vue'
+    import Cookies from 'js-cookie'
     export default defineComponent({
         name: "headerTop",
         components:{
@@ -176,7 +186,13 @@
             function changeTheme(){
               action.changeTheme()
             }
+            //切换语言
+            function commandLang(cmd) {
+                Cookies.set(state.lang.cookie_var,cmd)
+                location.reload()
+            }
             return {
+                commandLang,
                 activeIndex,
                 state,
                 selectMenu,

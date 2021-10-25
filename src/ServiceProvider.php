@@ -26,6 +26,7 @@ use think\facade\Console;
 use think\facade\Db;
 
 use think\facade\Lang;
+use think\middleware\LoadLangPack;
 use think\route\Resource;
 use think\Service;
 use Eadmin\controller\Backup;
@@ -53,6 +54,7 @@ class ServiceProvider extends Service
         Admin::registerRoute();
         //权限中间件
         $this->app->middleware->route(\Eadmin\middleware\Permission::class);
+        $this->app->middleware->route(LoadLangPack::class);
         //加载语言
         $this->language();
     }
