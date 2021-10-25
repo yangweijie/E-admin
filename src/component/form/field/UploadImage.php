@@ -98,7 +98,7 @@ class UploadImage extends Upload
 
             $this->uploadThumbnail($url, $realPath, $ext, $saveDir, $upType);
             if (!$url) {
-                return json(['code' => 999, 'message' => '上传失败'], 404);
+                return json(['code' => 999, 'message' => admin_trans('admin.upload_fail')], 404);
             } else {
                 return json(['code' => 200, 'data' => $url], 200);
             }
@@ -127,7 +127,7 @@ class UploadImage extends Upload
      */
     public function helpSize($width, $height)
     {
-        $this->help("建议上传图片尺寸 $width * $height");
+        $this->help(admin_trans('admin.upload_image_size')." $width * $height");
         return $this;
     }
 

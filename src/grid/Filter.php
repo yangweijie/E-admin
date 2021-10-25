@@ -846,12 +846,12 @@ class Filter
     public function render()
     {
         $actions = Html::create([
-            Button::create('搜索')
+            Button::create(admin_trans('admin.search'))
                 ->typePrimary()
                 ->sizeSmall()
                 ->icon('el-icon-search')
                 ->event('click', [$this->form->bindAttr('submit') => true]),
-            Button::create('重置')->sizeSmall()
+            Button::create(admin_trans('admin.reset'))->sizeSmall()
                 ->event('click', [$this->form->bindAttr('reset') => true]),
         ])->whenShow(!$this->hideAction);
         if ($this->columnNum > 0) {

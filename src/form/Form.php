@@ -453,7 +453,7 @@ class Form extends Component
                 if ($i < ($count - 1) && $i > 0) {
                     $back = $i - 1;
                     $this->actions->addLeftAction(
-                        Button::create('上一步')
+                        Button::create(admin_trans('admin.pre_step'))
                             ->sizeMedium()
                             ->where($active, $i)
                             ->event('click', [$active => $back])
@@ -462,7 +462,7 @@ class Form extends Component
                 if ($count - 2 > $i) {
                     $next = $i + 1;
                     $this->actions->addLeftAction(
-                        Button::create('下一步')
+                        Button::create(admin_trans('admin.next_step'))
                             ->sizeMedium()
                             ->where($active, $i)
                             ->event('click', [$validateField => true])
@@ -726,8 +726,8 @@ class Form extends Component
                 if ($name == 'dateRange' || $name == 'datetimeRange' || $name == 'timeRange') {
                     $component = $class::create();
                     $component->rangeField($field, $arguments[1]);
-                    $component->startPlaceholder('请选择开始时间');
-                    $component->endPlaceholder('请选择结束时间');
+                    $component->startPlaceholder(admin_trans('admin.select_start_time'));
+                    $component->endPlaceholder(admin_trans('admin.select_end_time'));
                     $this->except([$component->bindAttr('timeValue')]);
                 }
                 $prop = $component->bindAttr('modelValue');
@@ -751,9 +751,9 @@ class Form extends Component
             $prop = $component->bindAttr('modelValue');
         }
         if ($component instanceof Input) {
-            $component->placeholder('请输入' . $label);
+            $component->placeholder(admin_trans('admin.please_enter') . $label);
         } elseif ($component instanceof Select || $component instanceof Cascader) {
-            $component->placeholder('请选择' . $label);
+            $component->placeholder(admin_trans('admin.please_select') . $label);
         }
         $item = $this->item($prop, $label);
         $item->attr('validateField', $field);
@@ -903,9 +903,9 @@ class Form extends Component
         }
         if ($result !== false) {
             $url = $this->redirectUrl;
-            admin_success('操作完成', '数据保存成功')->redirect($url);
+            admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.save_success'))->redirect($url);
         } else {
-            admin_error_message('数据保存失败');
+            admin_error_message(admin_trans('admin.save_fail'));
         }
     }
 

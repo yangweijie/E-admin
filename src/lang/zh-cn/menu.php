@@ -17,5 +17,16 @@ return [
             [1 => '显示'], 
             [0 => '隐藏']
         ]
+    ],
+    'titles'=>[
+        'index'=>'首页',
+        'system_manage'=>'系统管理',
+        'system_menu_manage'=>'系统菜单管理',
+        'system_config'=>'系统配置',
+        'system_param_config'=>'系统参数配置',
+        'system_user_manage'=>'系统用户管理',
+        'auth_manage'=>'权限管理',
+        'access_auth_manage'=>'访问权限管理',
+        'backup'=>'数据库备份',
     ]
 ];

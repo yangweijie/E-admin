@@ -35,13 +35,13 @@ class Auth extends Controller
     public function index(): Grid
     {
         return Grid::create(new SystemAuth(), function (Grid $grid) {
-            $grid->title('系统角色管理');
-            $grid->column('name', '角色名称');
-            $grid->column('desc', '角色描述');
-            $grid->column('status', '状态')->switch();
+            $grid->title(admin_trans('auth.title'));
+            $grid->column('name', admin_trans('auth.fields.name'));
+            $grid->column('desc', admin_trans('auth.fields.desc'));
+            $grid->column('status', admin_trans('auth.fields.status'))->switch();
             $grid->actions(function (Actions $action, $data) {
                 $action->hideDetail();
-                $button = Button::create('权限授权')
+                $button = Button::create(admin_trans('auth.auth_grant'))
                     ->type('primary')
                     ->plain()
                     ->size('small')
@@ -51,13 +51,13 @@ class Auth extends Controller
                     ->title('权限授权')
                     ->form($this->authNode($data['id']));
                 $action->prepend($button);
-                $button = Button::create('菜单授权')
+                $button = Button::create(admin_trans('auth.menu_grant'))
                     ->type('primary')
                     ->plain()
                     ->size('small')
                     ->icon('el-icon-menu')
                     ->dialog()
-                    ->title('菜单授权')
+                    ->title(admin_trans('auth.menu_grant'))
                     ->form($this->menu($data['id']));
                 $action->prepend($button);
             });
@@ -74,8 +74,8 @@ class Auth extends Controller
     public function form(): Form
     {
         return Form::create(new SystemAuth(), function (Form $form) {
-            $form->text('name', '权限名称')->required();
-            $form->textarea('desc', '权限描述')->rows(4)->required();
+            $form->text('name', admin_trans('auth.fields.name'))->required();
+            $form->textarea('desc', admin_trans('auth.fields.desc'))->rows(4)->required();
         });
     }
 
@@ -92,7 +92,7 @@ class Auth extends Controller
             $form->labelPosition('top');
             $menus = SystemAuthMenu::where('auth_id', request()->get('id'))->column('menu_id');
             $form->tree('menu_nodes')
-                ->data([['name' => '全选', 'id' => 0, 'children' => Admin::menu()->tree()]])
+                ->data([['name' => admin_trans('auth.all'), 'id' => 0, 'children' => Admin::menu()->tree()]])
                 ->showCheckbox()
                 ->value($menus)
                 ->props(['children' => 'children', 'label' => 'name'])
