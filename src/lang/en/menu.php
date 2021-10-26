@@ -20,13 +20,13 @@ return [
     ],
     'titles' => [
         'index' => 'Index',
-        'system_manage' => 'System management',
-        'system_menu_manage' => 'System menu management',
-        'system_config' => 'System configuration',
-        'system_param_config' => 'System parameter configuration',
-        'system_user_manage' => 'System user management',
-        'auth_manage' => 'Authority management',
-        'access_auth_manage' => 'Access rights management',
+        'system_manage' => 'System',
+        'system_menu_manage' => 'Menu',
+        'system_config' => 'System config',
+        'system_param_config' => 'System config',
+        'system_user_manage' => 'Users',
+        'auth_manage' => 'User',
+        'access_auth_manage' => 'Permissions',
         'backup' => 'Database backup',
     ]
 ];

@@ -60,7 +60,7 @@ class ServiceProvider extends Service
         $this->language();
     }
     protected function finderIn($path,$name = [],$type='directories'){
-       
+
         $data = [];
         $paths = (array)$path;
         foreach ($paths as $path){
@@ -78,11 +78,11 @@ class ServiceProvider extends Service
 
         $dirs = $this->finderIn(__DIR__,['lang']);
         $ranges = $this->finderIn($dirs);
-       
+
         $dirs = $this->finderIn($this->app->getBasePath());
-       
+
         $dirs = $this->finderIn($dirs,['lang']);
-      
+
         $ranges = array_merge($ranges,$this->finderIn($dirs));
 
         foreach ($ranges as $range){
@@ -100,7 +100,7 @@ class ServiceProvider extends Service
         $file = __DIR__.'/../.env';
         $systemEnv = Env::load($file);
         $envFile = app()->getRootPath().'public/eadmin/.env';
-        if(is_file($file)){
+        if(is_file($envFile)){
             $env =  Env::load($envFile);
             //版本检测
             if($systemEnv->get('VERSION') != $env->get('VERSION')){
