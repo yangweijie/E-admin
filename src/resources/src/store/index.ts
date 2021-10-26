@@ -54,7 +54,7 @@ export const state = states
 //操作方法
 const action = {
     //切换主题
-    changeTheme(){
+    changeTheme(theme){
         if(state.theme == 'light'){
             state.theme = ''
             window.document.documentElement.removeAttribute('data-theme')
@@ -219,6 +219,11 @@ const action = {
                     states.info = info
                     if(res.data.lang){
                         states.lang = res.data.lang
+                    }
+                    if(res.data.theme){
+                        states.theme = res.data.theme + '-theme'
+                    }else{
+                        states.theme = 'light-theme'
                     }
                     states.info.webLogo = res.data.webLogo
                     states.info.webName = res.data.webName

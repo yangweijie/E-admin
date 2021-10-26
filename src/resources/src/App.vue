@@ -1,6 +1,6 @@
 <template>
-    <router-view/>
-    <eadmin-error-page/>
+  <router-view/>
+  <eadmin-error-page/>
 </template>
 
 <script>
@@ -22,6 +22,9 @@
                 }
             })
             resize()
+            return {
+              state
+            }
         }
     })
 </script>

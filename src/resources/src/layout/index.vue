@@ -1,5 +1,5 @@
 <template>
-    <div :class="['app-wrapper',state.device === 'mobile' ? 'mobile':'']">
+    <div :class="['app-wrapper',state.theme,state.device === 'mobile' ? 'mobile':'']">
         <div class="headerBg" :style="{background:state.theme == 'light'?'background: #2c2c42':'#409eff'}"></div>
         <sidebar v-if="sidebar.visible"></sidebar>
         <div class="main-container">

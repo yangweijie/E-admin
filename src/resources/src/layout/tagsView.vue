@@ -134,8 +134,8 @@
         align-items: center;
         height: 40px;
         background: #FFFFFF;
-        border-top: 1px solid #f6f6f6;
-        box-shadow: rgba(0, 21, 41, 0.08) 0px 1px 4px;
+        border-top: 1px solid #F0F0F0;
+        box-shadow: rgba(0, 21, 41, 0.08) 0px 2px 4px;
     }
     .tagsView .tabs{
         display: flex;

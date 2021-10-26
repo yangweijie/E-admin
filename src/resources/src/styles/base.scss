@@ -126,7 +126,6 @@ $themes: (
   @include background_color(black);
 }
 .sidebar-container{
-  box-shadow: none !important;
   @include font_color(font);
   @include background_color(black);
 }

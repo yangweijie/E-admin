@@ -206,6 +206,7 @@ class Admin extends Controller
         $data['webName'] = sysconf('web_name');
         $data['topMenu'] = config('admin.topMenu', true);
         $data['tagMenu'] = config('admin.tagMenu', true);
+        $data['theme'] = config('admin.theme.skin');
         $data['lang'] = config('admin.lang');
         $data['lang']['cookie_var'] = config('lang.cookie_var');
         $data['lang']['element'] = admin_trans('element-plus.element');

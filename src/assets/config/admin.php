@@ -52,6 +52,13 @@ return [
         //主题色
         'color'=>'#409EFF'
     ],
+    'theme'=>[
+        //主题皮肤
+        //light primary
+        'skin'=>'light',
+        //主题色
+        'color'=>'#409EFF',
+    ],
     //多语言设置
     'lang'=>[
         //开启多语言

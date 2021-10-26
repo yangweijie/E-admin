@@ -98,7 +98,19 @@
                 </el-row>
             </div>
             <!--表格-->
-            <a-table v-else :row-selection="rowSelection" @expand="expandChange" @change="tableChange" :columns="tableColumns" :data-source="tableData"  :expanded-row-keys="expandedRowKeys" :pagination="false" :loading="loading" v-bind="$attrs" row-key="eadmin_id" ref="dragTable" class="eadmin_table">
+            <a-table v-else
+                     :row-selection="rowSelection"
+                     @expand="expandChange"
+                     @change="tableChange"
+                     :columns="tableColumns"
+                     :data-source="tableData"
+                     :expanded-row-keys="expandedRowKeys"
+                     :pagination="false" :loading="loading"
+                     :rowClassName="(record, index) => (index % 2 === 1 && stripe ? 'table-striped' : null)"
+                     v-bind="$attrs"
+                     row-key="eadmin_id"
+                     ref="dragTable"
+                     class="eadmin_table">
                 <template #title v-if="header">
                     <div class="header"><render v-for="item in header" :data="item" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params"  :slot-props="grid"></render></div>
                 </template>
@@ -190,6 +202,7 @@
             sortInput: Boolean,
             tools:[Object,Array],
             hideSelection: Boolean,
+            stripe: Boolean,
             selectionType:{
                 type:String,
                 default:'checkbox'
@@ -848,6 +861,7 @@
     .customEadminAction .el-radio{
         margin-right: 0;
     }
-
-
+    /deep/.table-striped td {
+      background-color: #fafafa;
+    }
 </style>

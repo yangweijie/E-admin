@@ -2,7 +2,12 @@
     <div class="header-container">
         <i v-if="sidebar.visible || state.device === 'mobile'" :class="sidebar.opend?'el-icon-s-unfold hamburger':'el-icon-s-fold hamburger'"
            style="font-size: 18px" @click="collapse"/>
-        <el-menu :default-active="activeIndex" text-color="hsla(0,0%,100%,.7)" active-text-color="#ffffff" :background-color="variables.theme" @select="selectMenu" class="menu" mode="horizontal" v-show="state.topMenuMode && state.device === 'desktop'">
+        <el-menu :default-active="activeIndex"
+                 :text-color="state.theme == 'light-theme'?'hsla(0,0%,100%,.7)':undefined"
+                 :active-text-color="state.theme == 'light-theme'?'#FFFFFF':undefined"
+                 :background-color="state.theme == 'light-theme'?variables.theme:undefined"
+                 @select="selectMenu" class="menu" mode="horizontal"
+                 v-show="state.topMenuMode && state.device === 'desktop'">
             <el-menu-item v-for="item in menus" :index="item.id+''">
                 <i :class="item.icon" v-if="item.icon"></i>
                 <span>{{item.name}}</span>
@@ -39,8 +44,8 @@
                     <div class="avatar-wrapper">
                         <img :src="state.info.avatar" class="user-avatar">
                         <span class="right-menu-item" style="line-height: 1">
-                        <span style="color: #ffffff">{{ state.info.nickname }}</span>
-                        <div style="line-height: 18px"><el-badge type="success" is-dot  style="top:4px;"/> <span style="color: #ffffff">{{ state.info.username }}</span></div>
+                        <span>{{ state.info.nickname }}</span>
+                        <div style="line-height: 18px"><el-badge type="success" is-dot  style="top:4px;"/> <span>{{ state.info.username }}</span></div>
                         </span>
                         <i class="el-icon-caret-bottom" style="line-height: 30px"/>
                     </div>
@@ -216,12 +221,6 @@
         scrollbar-width:none;
         display: flex;
     }
-    .menu .el-menu-item i{
-       color: hsla(0,0%,100%,.7)!important;
-    }
-    .menu .el-menu-item:hover{
-        background-color: hsla(0,0%,100%,.1)!important;
-    }
     .header-container {
         display: flex;
         align-items: center;
@@ -234,7 +233,7 @@
     .hamburger {
         padding: 0 10px;
         cursor: pointer;
-        color: #ffffff;
+
     }
 
     .right-menu {
@@ -244,7 +243,7 @@
         display: -webkit-flex;
         align-items: center;
         justify-content: center;
-        color: #ffffff;
+
 
         &:focus {
             outline: none;
@@ -279,7 +278,7 @@
                 display: -webkit-flex;
                 align-items: center;
                 justify-content: center;
-                color: #ffffff;
+
                 position: relative;
                 padding: 0 8px;
 
