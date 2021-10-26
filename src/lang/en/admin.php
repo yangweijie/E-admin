@@ -38,6 +38,7 @@ return [
     'phone_exist' => 'Phone number already exists',
     'please_enter' => 'Please enter',
     'please_select' => 'Please select',
+    'required' => 'is required',
     'tip' => 'Tips',
     'cancel' => 'Cancel',
     'save' => 'Save',
@@ -58,8 +59,8 @@ return [
         [0 => 'close']
     ],
     'fields' => [
-        'username' => 'user name',
-        'nickname' => 'user nickname',
+        'username' => 'username',
+        'nickname' => 'nickname',
         'avatar' => 'avatar',
         'password' => 'password',
         'phone' => 'phone',

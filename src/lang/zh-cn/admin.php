@@ -38,6 +38,7 @@ return [
     'phone_exist' => '手机号已存在',
     'please_enter' => '请输入',
     'please_select' => '请选择',
+    'required' => '不能为空',
     'tip' => '提示',
     'cancel' => '取消',
     'save' => '保存',
