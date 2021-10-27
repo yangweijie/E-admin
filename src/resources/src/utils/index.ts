@@ -7,7 +7,14 @@ import { t,use } from 'element-plus/lib/locale'
 // @ts-ignore
 import md5 from 'js-md5'
 import {inject} from "vue";
-
+export function treeData(source, id, parentId, children){
+    let cloneData = JSON.parse(JSON.stringify(source))
+    return cloneData.filter(father=>{
+        let branchArr = cloneData.filter(child => father[id] == child[parentId]);
+        branchArr.length>0 ? father[children] = branchArr : ''
+        return father[parentId] == 0    // 如果第一层不是parentId=0，请自行修改
+    })
+}
 export function trans(name){
     const state = inject(store)
     // @ts-ignore

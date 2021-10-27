@@ -16,8 +16,10 @@ use Eadmin\controller\FileSystem;
 use Eadmin\controller\ResourceController;
 use Eadmin\controller\Queue;
 use Eadmin\facade\Schedule;
+use Eadmin\middleware\DataAuth;
 use Eadmin\middleware\Response;
 use Eadmin\model\SystemFile;
+use Eadmin\service\AuthService;
 use Eadmin\service\BackupData;
 use Eadmin\service\MenuService;
 use Eadmin\service\QueueService;
@@ -53,6 +55,7 @@ class ServiceProvider extends Service
         Admin::plug()->register();
         //视图路由
         Admin::registerRoute();
+
         //权限中间件
         $this->app->middleware->route(\Eadmin\middleware\Permission::class);
         $this->app->middleware->route(LoadLangPack::class);
@@ -153,6 +156,7 @@ class ServiceProvider extends Service
             'admin.message'      => Message::class,
             'admin.notification' => Notification::class,
             'admin.translator' => Translator::class,
+            'admin.auth' => AuthService::class,
         ]);
     }
     protected function crontab(){
@@ -193,6 +197,7 @@ class ServiceProvider extends Service
             'Eadmin\command\Queue',
             'Eadmin\command\Crontab',
         ]);
+       
         //定时任务
         $this->crontab();
         //检测静态文件版本发布

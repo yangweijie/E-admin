@@ -34,7 +34,7 @@ use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
  */
 class Admin extends Controller
 {
-    
+
     /**
      * 系统用户列表
      * @auth true
@@ -61,23 +61,22 @@ class Admin extends Controller
             $grid->column('mail',  admin_trans('admin.fields.mail'));
             $grid->column('status', admin_trans('admin.fields.status'))->switch();
             $grid->column('create_time', admin_trans('admin.create_time'));
-
             $grid->actions(function (Actions $action, $data) {
+                $dropdown = $action->dropdown();
                 if ($data['id'] == config('admin.admin_auth_id') || $data['id'] == \Eadmin\Admin::id()) {
                     $action->hideDel();
+                }else{
+                    $dropdown
+                        ->prepend(admin_trans('auth.data_grant'),'fa fa-database')
+                        ->dialog()
+                        ->width('50%')
+                        ->title(admin_trans('auth.data_grant'))
+                        ->form(url('auth/dataAuth',['id'=>$data['id'],'type'=>2]));
                 }
-
-                $action->hideDetail();
-                $button = Button::create(admin_trans('admin.reset_password'))
-                    ->type('primary')
-                    ->size('small')
-                    ->icon('el-icon-key')
-                    ->plain()
+                $dropdown->prepend(admin_trans('admin.reset_password'),'el-icon-key')
                     ->dialog()
                     ->title(admin_trans('admin.reset_password'))
                     ->form($this->resetPassword($data['id']));
-                $action->prepend($button);
-
             });
             //删掉前回调
             $grid->deling(function ($ids) {

@@ -18,6 +18,7 @@ use Eadmin\controller\Notice;
 use Eadmin\controller\Plug;
 use Eadmin\controller\Queue;
 use Eadmin\controller\ResourceController;
+use Eadmin\service\AuthService;
 use Eadmin\service\MenuService;
 use Eadmin\service\NodeService;
 use Eadmin\service\PlugService;
@@ -203,6 +204,14 @@ class Admin
     public static function plug()
     {
         return app('admin.plug');
+    }
+
+    /**
+     * 权限
+     * @return AuthService
+     */
+    public static function auth(){
+        return app('admin.auth');
     }
     /**
      * 菜单服务

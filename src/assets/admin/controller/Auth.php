@@ -14,7 +14,9 @@ use Eadmin\Controller;
 use Eadmin\form\Form;
 use Eadmin\grid\Actions;
 use Eadmin\grid\Grid;
+use Eadmin\model\AdminModel;
 use Eadmin\model\SystemAuth;
+use Eadmin\model\SystemAuthData;
 use Eadmin\model\SystemAuthMenu;
 use Eadmin\model\SystemAuthNode;
 use Eadmin\Admin;
@@ -36,30 +38,25 @@ class Auth extends Controller
     {
         return Grid::create(new SystemAuth(), function (Grid $grid) {
             $grid->title(admin_trans('auth.title'));
+            $grid->treeTable();
             $grid->column('name', admin_trans('auth.fields.name'));
             $grid->column('desc', admin_trans('auth.fields.desc'));
             $grid->column('status', admin_trans('auth.fields.status'))->switch();
             $grid->actions(function (Actions $action, $data) {
-                $action->hideDetail();
-                $button = Button::create(admin_trans('auth.auth_grant'))
-                    ->type('primary')
-                    ->plain()
-                    ->size('small')
-                    ->icon('el-icon-s-check')
+                $dropdown = $action->dropdown();
+                $dropdown->prepend(admin_trans('auth.auth_grant'),'el-icon-s-check')
                     ->dialog()
                     ->width('70%')
-                    ->title('权限授权')
+                    ->title(admin_trans('auth.auth_grant'))
                     ->form($this->authNode($data['id']));
-                $action->prepend($button);
-                $button = Button::create(admin_trans('auth.menu_grant'))
-                    ->type('primary')
-                    ->plain()
-                    ->size('small')
-                    ->icon('el-icon-menu')
+                $dropdown->prepend(admin_trans('auth.data_grant'),'fa fa-database')
                     ->dialog()
+                    ->width('50%')
+                    ->title(admin_trans('auth.data_grant'))
+                    ->form($this->dataAuth($data['id'],1));
+                $dropdown->prepend(admin_trans('auth.menu_grant'),'el-icon-menu')->dialog()
                     ->title(admin_trans('auth.menu_grant'))
                     ->form($this->menu($data['id']));
-                $action->prepend($button);
             });
             $grid->setForm($this->form())->dialog();
         });
@@ -74,13 +71,69 @@ class Auth extends Controller
     public function form(): Form
     {
         return Form::create(new SystemAuth(), function (Form $form) {
+            $options = SystemAuth::field('id,name,pid')->select()->toArray();
+            $form->select('pid',admin_trans('auth.parent'))
+                ->treeOptions($options);
             $form->text('name', admin_trans('auth.fields.name'))->required();
             $form->textarea('desc', admin_trans('auth.fields.desc'))->rows(4)->required();
         });
     }
-
     /**
-     * 菜单授权
+     * 数据权限
+     * @auth true
+     * @login true
+     * @return Form
+     */
+    public function dataAuth($id,$type){
+        return Form::create([], function (Form $form) use ($id,$type) {
+            $data = SystemAuthData::where('auth_type',$type)
+                ->where('auth_id',$id)
+                ->where('data_type',1)
+                ->column('data_id');
+            $form->selectTable('group_data',admin_trans('auth.select_group'))
+                ->from($this->index())
+                ->tip(admin_trans('auth.select_group_tip'))
+                ->multiple()
+                ->value($data)
+                ->options(function ($ids){
+                    return SystemAuth::whereIn('id',$ids)->column('name','id');
+                });
+            $data = SystemAuthData::where('auth_type',$type)
+                ->where('auth_id',$id)
+                ->where('data_type',2)
+                ->column('data_id');
+            $form->selectTable('user_data',admin_trans('auth.select_user'))
+                ->from(url('admin/index'))
+                ->value($data)
+                ->multiple()
+                ->options(function ($ids){
+                    return AdminModel::whereIn('id',$ids)->column('nickname','id');
+                })->tip(admin_trans('auth.select_user_tip'));
+            $form->saving(function ($data) use($type) {
+                SystemAuthData::where('auth_type',$type)->where('auth_id', $data['id'])->delete();
+                $insertData = [];
+                foreach ($data['group_data'] as $data_id) {
+                    $insertData[] = [
+                        'auth_type'=>$type,
+                        'auth_id' => $data['id'],
+                        'data_type' => 1,
+                        'data_id' => $data_id,
+                    ];
+                }
+                foreach ($data['user_data'] as $data_id) {
+                    $insertData[] = [
+                        'auth_type'=>$type,
+                        'auth_id' => $data['id'],
+                        'data_type' => 2,
+                        'data_id' => $data_id,
+                    ];
+                }
+                (new SystemAuthData())->saveAll($insertData);
+            });
+        });
+    }
+    /**
+     * 菜单权限
      * @auth true
      * @login true
      * @return Form
@@ -114,10 +167,9 @@ class Auth extends Controller
     }
 
     /**
-     * 权限授权
+     * 功能权限
      * @auth true
      * @login true
-     * @return string
      */
     public function authNode($id)
     {
