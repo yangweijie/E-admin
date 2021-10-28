@@ -48,9 +48,9 @@ class AuthService
             $userAuthIds = array_unique($userAuthIds);
             $query->where(function (Query  $query) use($fields,$userAuthIds){
                 foreach ($fields as $field){
-                    $query->whereOr($field,Admin::id());
+                    $query->whereOr($query->getTable().'.'.$field,Admin::id());
                     if(count($userAuthIds) > 0){
-                        $query->whereIn($field,$userAuthIds,'OR');
+                        $query->whereIn($query->getTable().'.'.$field,$userAuthIds,'OR');
                     }
                 }
             });

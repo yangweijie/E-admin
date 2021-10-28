@@ -41,7 +41,10 @@
             modelValue:[Object,Array,String,Number],
             loadOptionField:[Object,Array,String,Number],
             loadField:[Object,Array,String,Number],
-            options:[Object,Array,String,Number],
+            options:{
+              type:[Object,Array,String,Number],
+              default:[],
+            },
         },
         emits:['update:modelValue','update:loadField','update:loadOptionField'],
         setup(props,ctx){
@@ -61,7 +64,9 @@
               if(find){
                 state.treeLabel = find[props.treeProps.label]
               }
-              state.treeData = treeData(props.options,props.treeProps.value,props.treeProps.pid,props.treeProps.children)
+              if(props.options){
+                state.treeData = treeData(props.options,props.treeProps.value,props.treeProps.pid,props.treeProps.children)
+              }
             }
             watch(()=>props.modelValue,val=>{
                 value.value = val
