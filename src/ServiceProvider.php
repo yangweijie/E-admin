@@ -28,6 +28,7 @@ use Symfony\Component\Finder\Finder;
 use think\facade\Console;
 use think\facade\Db;
 
+use think\facade\Event;
 use think\facade\Lang;
 use think\middleware\LoadLangPack;
 use think\route\Resource;
@@ -197,7 +198,7 @@ class ServiceProvider extends Service
             'Eadmin\command\Queue',
             'Eadmin\command\Crontab',
         ]);
-       
+
         //定时任务
         $this->crontab();
         //检测静态文件版本发布

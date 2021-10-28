@@ -186,8 +186,13 @@ class Admin extends Controller
                 'email' => admin_trans('admin.please_email'),
             ]);
             if ($form->getData('id') != config('admin.admin_auth_id')) {
-                $auths = SystemAuth::where('status', 1)->column('name', 'id');
-                $form->checkbox('roles', '访问权限')->options($auths, true);
+                $auths = SystemAuth::where('status', 1)->select()->toArray();
+                $auths = \Eadmin\Admin::tree($auths);
+                $form->tree('roles','访问权限')
+                    ->data($auths)
+                    ->showCheckbox()
+                    ->defaultExpandAll()
+                    ->props(['children' => 'children', 'label' => 'name']);
             }
         });
     }

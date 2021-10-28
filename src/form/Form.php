@@ -151,7 +151,7 @@ class Form extends Component
         $this->labelWidth('100px');
         $this->parseCallMethod();
         $this->setAction('/eadmin.rest');
-        $this->event('gridRefresh', []);
+        $this->saveCloseDialog();
         $this->validator = new ValidatorForm();
         $this->validatorBind();
         $this->description(Request::param('eadmin_description'));
@@ -166,7 +166,18 @@ class Form extends Component
         return $self;
     }
 
-
+    /**
+     * 保存成功关闭弹窗
+     * @param bool $value false不关闭
+     */
+    public function saveCloseDialog(bool $value = true){
+        $this->attr('saveCloseDialog',$value);
+        if($value){
+            $this->event('gridRefresh');
+        }else{
+            $this->removeEvent('gridRefresh');
+        }
+    }
     /**
      * 居中对齐
      * @param int $width 宽度

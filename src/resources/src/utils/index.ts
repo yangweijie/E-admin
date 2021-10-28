@@ -15,10 +15,13 @@ export function treeData(source, id, parentId, children){
         return father[parentId] == 0    // 如果第一层不是parentId=0，请自行修改
     })
 }
+var lang = {}
+export function setLang(data){
+    lang = data
+}
 export function trans(name){
-    const state = inject(store)
     // @ts-ignore
-    use(state.lang.element)
+    use(lang.element)
     return t(name)
 }
 export function findParent(datas: Array<any>, pid: string) {

@@ -13,7 +13,7 @@ use Eadmin\model\AdminModel;
 use Eadmin\model\SystemFile;
 use Eadmin\model\SystemFileCate;
 use Eadmin\service\FileService;
-use Eadmin\service\FileSystemService;
+
 use think\db\Query;
 
 class FileSystem extends Controller
@@ -46,7 +46,7 @@ class FileSystem extends Controller
                 return $item;
             })->toArray();
         $fileSystem = new \Eadmin\component\basic\FileSystem($data);
-        $fileSystem->initPath(FileSystemService::instance()->getPath())
+        $fileSystem->initPath(\think\facade\Filesystem::disk('local')->path('/'))
             ->attr('height', '350px')
             ->attr('display','menu')
             ->uploadFinder();
@@ -74,7 +74,7 @@ class FileSystem extends Controller
     }
     public function cateForm()
     {
-      
+
         $form = new Form(new SystemFileCate);
         $options = Admin::menu()->listOptions(SystemFileCate::where('admin_id',Admin::id())->select()->toArray());
         $form->select('pid', admin_trans('filesystem.labels.cate'))

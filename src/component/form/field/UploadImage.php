@@ -82,20 +82,20 @@ class UploadImage extends Upload
             $ext = $file->extension();
 
             if (count($this->interventionCalls) > 0) {
-                $image = Image::make($realPath);
-                $savePath = $file->getPath() . DIRECTORY_SEPARATOR . $filename;
-                foreach ($this->interventionCalls as $call) {
-                    try {
+                try {
+                    $image = Image::make($realPath);
+                    $savePath = $file->getPath() . DIRECTORY_SEPARATOR . $filename;
+                    foreach ($this->interventionCalls as $call) {
+
                         call_user_func_array([$image, $call['method']], $call['arguments']);
-                    } catch (\Exception $exception) {
 
                     }
+                    $file = $image->encode(null, null)->getEncoded();
+                } catch (\Exception $exception) {
+
                 }
-                $file = $image->encode(null, null)->getEncoded();
             }
-
             $url = FileService::instance()->upload($file, $filename, $saveDir, $upType, $isUniqidmd5);
-
             $this->uploadThumbnail($url, $realPath, $ext, $saveDir, $upType);
             if (!$url) {
                 return json(['code' => 999, 'message' => admin_trans('admin.upload_fail')], 404);
@@ -127,7 +127,7 @@ class UploadImage extends Upload
      */
     public function helpSize($width, $height)
     {
-        $this->help(admin_trans('admin.upload_image_size')." $width * $height");
+        $this->help(admin_trans('admin.upload_image_size') . " $width * $height");
         return $this;
     }
 

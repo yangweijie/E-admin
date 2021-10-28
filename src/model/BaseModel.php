@@ -36,9 +36,7 @@ class BaseModel extends Model
             $query->order("{$id} desc");
         }
         Admin::auth()->checkDataAuth($this->dataAuth,$query);
-       
     }
-
     //分页条件
     public function scopePages($query, $page = 1, $size = 10)
     {

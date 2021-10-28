@@ -1,6 +1,6 @@
 <template>
     <div :class="['app-wrapper',state.theme,state.device === 'mobile' ? 'mobile':'']">
-        <div class="headerBg" :style="{background:state.theme == 'primary-theme'?'#000000':'#409eff'}"></div>
+        <div class="headerBg" :style="{background:state.theme == 'primary-theme'?'#000000':variables.theme}"></div>
         <sidebar v-if="sidebar.visible"></sidebar>
         <div class="main-container">
             <header-top></header-top>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+    import variables  from '../styles/theme.scss';
     import {useRoute, useRouter} from 'vue-router'
     import {defineComponent, inject,computed,h,getCurrentInstance,defineAsyncComponent,resolveComponent,nextTick,watch} from 'vue'
     import headerTop from './headerTop.vue'
@@ -78,6 +79,7 @@
                 router.back()
             }
             return {
+                variables,
                 cacheKeys,
                 mainComponent,
                 route,

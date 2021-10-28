@@ -1,7 +1,8 @@
 // @ts-ignore
 import {reactive} from "vue";
 import request from '@/utils/axios'
-import {findTree, appendCss} from '@/utils'
+// @ts-ignore
+import {findTree, appendCss,setLang} from '@/utils'
 export const store = Symbol()
 // 使用 reactive 函数完成响应式转换
 const states = reactive({
@@ -219,6 +220,8 @@ const action = {
                     states.info = info
                     if(res.data.lang){
                         states.lang = res.data.lang
+                        // @ts-ignore
+                        setLang(states.lang)
                     }
                     if(res.data.theme){
                         states.theme = res.data.theme + '-theme'

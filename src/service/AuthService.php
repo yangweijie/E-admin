@@ -43,14 +43,14 @@ class AuthService
             $userIds = Db::name('SystemAuthData')->where('auth_type',2)
                 ->where('auth_id',Admin::id())
                 ->where('data_type',2)->column('data_id');
-            $userAuthIds = array_merge($groupUserIds,$userIds);
+            $userAuthIds = array_merge($userAuthIds,$groupUserIds,$userIds);
 
             $userAuthIds = array_unique($userAuthIds);
-            $query->where(function (Query  $query) use($fields,$userIds){
+            $query->where(function (Query  $query) use($fields,$userAuthIds){
                 foreach ($fields as $field){
                     $query->whereOr($field,Admin::id());
-                    if(count($userIds) > 0){
-                        $query->whereIn($field,$userIds,'OR');
+                    if(count($userAuthIds) > 0){
+                        $query->whereIn($field,$userAuthIds,'OR');
                     }
                 }
             });

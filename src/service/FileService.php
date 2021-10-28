@@ -24,11 +24,12 @@ class FileService extends Service
 
     protected $totalSizeCacheKey;
     public $upType = 'local';
-
+    protected $disableExt = [];
     public function __construct(App $app)
     {
         parent::__construct($app);
         $this->upType = config('admin.uploadDisks', 'local');
+        $this->disableExt = config('admin.upload.extension.disable',['php']);
     }
 
     /**
@@ -151,7 +152,9 @@ class FileService extends Service
         }
 
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-
+        if(in_array($ext,$this->disableExt)){
+            return false;
+        }
         if ($isUniqidmd5) {
             $fileName = md5((string)microtime(true)) . '.' . $ext;;
         } elseif (empty($fileName)) {

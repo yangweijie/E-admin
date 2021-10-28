@@ -251,9 +251,6 @@ export default defineComponent({
       inputValue:'',
     })
     const instance = getCurrentInstance()
-
-
-
     if (props.width != 'auto') {
       state.styleWidth = props.width + 'px'
     } else {
@@ -275,14 +272,9 @@ export default defineComponent({
     } else if (typeof props.modelValue === 'object' && props.modelValue instanceof Array) {
       state.files = props.modelValue
     }
+    watchUploadBtn()
     watch(()=>state.files,val=>{
-      if (!props.multiple && val.length === 1) {
-        state.showUploadBtn = false
-      }else if(props.multiple && props.limit > 0 && val.length >= props.limit){
-        state.showUploadBtn = false
-      } else{
-        state.showUploadBtn = true
-      }
+      watchUploadBtn()
       if(instance.parent && instance.parent.provides && instance.parent.provides.elFormItem){
         instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val.join(',')])
       }
@@ -494,6 +486,15 @@ export default defineComponent({
         })
       }
     })
+    function watchUploadBtn(){
+      if (!props.multiple && state.files.length === 1) {
+        state.showUploadBtn = false
+      }else if(props.multiple && props.limit > 0 && state.files.length >= props.limit){
+        state.showUploadBtn = false
+      } else{
+        state.showUploadBtn = true
+      }
+    }
     function changeInput(val){
       state.files = val.split(',')
       state.files = state.files.filter(function(s) {

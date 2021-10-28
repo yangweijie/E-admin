@@ -49,10 +49,6 @@ return [
     'tagMenu'=> true,
     //主题
     'theme'=>[
-        //主题色
-        'color'=>'#409EFF'
-    ],
-    'theme'=>[
         //主题皮肤
         //light primary
         'skin'=>'light',

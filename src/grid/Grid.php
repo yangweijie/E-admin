@@ -671,16 +671,16 @@ class Grid extends Component
         if (!$this->hideAddButton && !is_null($this->formAction)) {
             $form = $this->formAction->form();
             $callMethod = $form->getCallMethod();
-            $form->eventSuccess([$this->bindAttr('modelValue') => true, $form->bindAttr('model') => $callMethod]);
-            $button = Button::create(admin_trans('admin.add'))
+            $form->eventSuccess([$form->bindAttr('model') => $callMethod]);
+            $button = Button::create($this->formAction->addText())
                 ->type('primary')
                 ->size('small')
                 ->icon('el-icon-plus');
             $action = clone $this->formAction->component();
             if ($action instanceof Html) {
-                $button = $action->content($button)->redirect("eadmin/create.rest", ['eadmin_description' => admin_trans('admin.add')] + $callMethod);
+                $button = $action->content($button)->redirect("eadmin/create.rest", ['eadmin_description' => $this->formAction->addText()] + $callMethod);
             } else {
-                $button = $action->bindValue(false)->reference($button)->title('添加')->form($form)->url('/eadmin/create.rest');
+                $button = $action->bindValue(false)->reference($button)->title($this->formAction->addText())->form($form)->url('/eadmin/create.rest');
             }
             //添加权限
             $action->auth($callMethod['eadmin_class'], $callMethod['eadmin_function'], 'post');
