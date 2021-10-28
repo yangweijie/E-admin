@@ -6,7 +6,7 @@ import './styles/index.scss'
 import app from  './app'
 import './component'
 import './directive'
-
+import zhLocale from 'element-plus/lib/locale/lang/zh-cn'
 import request from '@/utils/axios'
 import { Switch ,Table ,Dropdown,Menu,Steps,Result,List,Popover,Spin} from "ant-design-vue";
 import VueMarkdownEditor from '@kangc/v-md-editor';
@@ -27,7 +27,7 @@ app.use(Dropdown)
 app.use(Menu)
 app.use(Table)
 app.use(Switch)
-app.use(ElementPlus,{size: 'medium'})
+app.use(ElementPlus,{size: 'medium',locale :zhLocale})
 app.use(router)
 app.provide(store, state)
 app.config.globalProperties.$request = request
