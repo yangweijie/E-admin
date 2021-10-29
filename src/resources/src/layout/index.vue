@@ -1,6 +1,5 @@
 <template>
     <div :class="['app-wrapper',state.theme,state.device === 'mobile' ? 'mobile':'']">
-        <div class="headerBg" :style="{background:state.theme == 'primary-theme'?'#000000':variables.theme}"></div>
         <sidebar v-if="sidebar.visible"></sidebar>
         <div class="main-container">
             <header-top></header-top>
@@ -93,9 +92,7 @@
 </script>
 
 <style scoped>
-    .headerBg{
-      height: 60px;;width: 100%;position: fixed
-    }
+
     .header-title .title{
         font-weight: 500;
         font-size: 20px;
