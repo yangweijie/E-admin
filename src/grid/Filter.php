@@ -22,6 +22,7 @@ use Eadmin\form\Form;
 use think\db\Query;
 use think\facade\Db;
 use think\facade\Request;
+use think\helper\Str;
 use think\Model;
 use think\model\Relation;
 use think\model\relation\BelongsTo;
@@ -739,6 +740,10 @@ class Filter
      */
     protected function relationWhere($relation_method, $callback)
     {
+        $relationCamel = Str::camel($relation_method);
+        if (method_exists($this->model, $relationCamel)) {
+            $relation_method = $relationCamel;
+        }
         if (method_exists($this->model, $relation_method)) {
             $relation = $this->model->$relation_method();
             if ($relation instanceof Relation && !($relation instanceof MorphTo)) {

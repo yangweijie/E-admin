@@ -17,9 +17,9 @@
         setup() {
             const state = inject(store)
             watch(()=>state.lang,value=>{
-                if(value.enable){
-                    locale(value.element)
-                }
+              if(value.element){
+                locale(value.element)
+              }
             })
             resize()
             return {
