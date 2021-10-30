@@ -13,7 +13,7 @@
     box-shadow: 0px 8px 14.72px 1.28px rgba(229, 228, 230, 0.5);
     border-right: 1px solid #e3e3e3;
     height: 100%;
-    //transition: width .28s ease-in-out;
+    transition: width .28s ease-in-out;
     .horizontal-collapse-transition {
       transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
     }

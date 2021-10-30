@@ -101,7 +101,7 @@
 <style scoped>
 
     .collapse {
-        display: none !important;
+        width: 64px !important;
     }
     .mobile .collapse {
         width: 0 !important;;

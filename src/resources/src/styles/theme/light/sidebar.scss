@@ -22,7 +22,7 @@
     box-shadow: 7px 0 14px rgba(0, 0, 0, 0.03);
     background: #ffffff;
     height: 100%;
-    //transition: width .28s ease-in-out;
+    transition: width .28s ease-in-out;
     .horizontal-collapse-transition {
       transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
     }
