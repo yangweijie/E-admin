@@ -113,11 +113,11 @@ PHP;
             //注册路由
             $this->registerRoute();
             $form = $this->setting();
-            if($form instanceof Form){
-                $form->saved(function () use($form){
+            if ($form instanceof Form) {
+                $form->saved(function () use ($form) {
                     $callMehod = $form->getCallMethod();
                     $param = $this->app->request->param();
-                    if($callMehod['eadmin_class'] == $param['eadmin_class'] && $callMehod['eadmin_function'] == $param['eadmin_function']){
+                    if ($callMehod['eadmin_class'] == $param['eadmin_class'] && $callMehod['eadmin_function'] == $param['eadmin_function']) {
                         //刷新菜单状态
                         $this->refreshMenu();
                     }
@@ -129,41 +129,41 @@ PHP;
     /**
      * 刷新菜单状态
      */
-    protected function refreshMenu(){
+    protected function refreshMenu()
+    {
         $menus = $this->menus();
-        if(!empty($menus)){
-            foreach ($menus as $menu){
-                SystemMenu::where('mark',$this->getName())
-                    ->where('name',$menu['name'])
-                    ->update(['status'=>$menu['status']]);
+        if (!empty($menus)) {
+            foreach ($menus as $menu) {
+                SystemMenu::where('mark', $this->getName())
+                    ->where('name', $menu['name'])
+                    ->update(['status' => $menu['status']]);
             }
         }
     }
+
     /**
      * 注册路由
      */
     final function registerRoute()
     {
         $dir = basename($this->getPath());
-        $this->app->route->group($dir, function () {
-            $namespace = $this->getNamespace();
-            $pathinfo = strpos(Request::server('REQUEST_URI'), '?') ? strstr(Request::server('REQUEST_URI'), '?', true) : Request::server('REQUEST_URI');
-            $pathinfo = ltrim($pathinfo, '/');
-            $pathArr = explode('/', $pathinfo);
-            if ($pathArr[0] == 'api') {
-                $namespace .= 'controller\\api\\';
+        $this->app->route->group('plugin/' . $dir, function () {
+            $pathArr = explode('/', Request::pathinfo());
+            if($pathArr[0] == 'api'){
+                $namespace = $this->getNamespace().'controller\\api\\';
                 $method = Request::method();
                 //兼容快捷路由和按请求方式访问
                 $function = '';
                 $rule = '';
-                if (count($pathArr) > 3) {
+                if (count($pathArr) > 4) {
                     $function = '<function>';
                     $rule = '/';
                 }
                 $route = '<controller>/' . $method . $function;
                 $rule = '<controller>' . $rule . $function;
                 $this->app->route->any($rule, $namespace . $route);
-            } else {
+            }else{
+                $namespace = $this->getNamespace();
                 $namespace .= 'controller\\';
                 $this->app->route->any('<controller>/<function>', $namespace . '<controller>@<function>');
                 $this->app->route->any('<controller>', $namespace . '<controller>@index');

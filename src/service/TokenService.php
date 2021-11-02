@@ -33,14 +33,22 @@ class TokenService
     protected $unique = false;
     protected $authFields = [];
 
-    public function __construct()
+    public function __construct($config = [])
     {
-        $key = config('admin.token.key', 'QoYEClMJsgOSWUBkSCq26yWkApqSuH3');
-        $this->model = config('admin.token.model');
-        $this->unique = config('admin.token.unique', false);
+        if(empty($config)){
+            $config = config('token');
+        }
+        $key = $config['key'] ?? 'QoYEClMJsgOSWUBkSCq26yWkApqSuH3';
         $this->key = substr(md5($key), 8, 16);
-        $this->expire = config('admin.token.expire', 7200);
-        $this->authFields = config('admin.token.auth_field', []);
+        $this->model = $config['model'];
+        $this->unique = $config['model'] ?? false;
+        $this->expire = $config['expire'] ?? 7200;
+        $this->authFields = $config['auth_field'] ?? [];
+        if(isset($config['debug']) && $config['debug']){
+            $user = $this->model::find($config['uid']);
+            $tokens = $this->encode($user);
+            $this->set($tokens['token']);
+        }
     }
 
     /**

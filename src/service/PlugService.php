@@ -11,6 +11,7 @@ namespace Eadmin\service;
 use Composer\Autoload\ClassLoader;
 use Eadmin\component\basic\Button;
 use Eadmin\PlugServiceProvider;
+use Eadmin\support\Composer;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -35,14 +36,13 @@ class PlugService
      */
     protected $plugPaths = [];
     protected $plugs = [];
-    protected static $loader;
+
     /**
      * 插件服务集合
      * @var array
      */
     protected $serviceProvider = [];
     protected $client;
-    protected $loginKey = '';
     protected $table = 'system_plugs';
     public function __construct()
     {
@@ -55,49 +55,15 @@ class PlugService
             'base_uri' => 'https://eadmin.togy.com.cn/api/',
             'verify' => false,
         ]);
-        $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'eadmin-plugs');
-
+        $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'plugin');
         foreach (glob($this->plugPathBase . '/*') as $file) {
-
-            if (is_dir($file)) {
-                foreach (glob($file . '/*') as $file) {
-                    $this->plugPaths[] = $file;
-                }
+            if (is_dir($file) && $this->checkFiles($file)) {
+                $this->plugPaths[] = $file;
             }
         }
-
-        $this->loginKey = md5(Request::header('Authorization').'plug');
     }
 
-    /**
-     * 是否登录
-     * @return bool
-     */
-    public function isLogin(){
-        return Cache::has($this->loginKey);
-    }
-    /**
-     * 登录
-     * @param string $username 账号
-     * @param string $password 密码
-     * @return mixed
-     */
-    public function login($username,$password){
-        $response = $this->client->post('plugs/login',[
-            'form_params'=>[
-                'username'=>$username,
-                'password'=>$password,
-            ]
-        ]);
-        $content = $response->getBody()->getContents();
-        $res = json_decode($content, true);
-        if($res['code'] == 200){
-            Cache::set($this->loginKey,$res['data'],60*60*24);
-            return true;
-        }else{
-            return false;
-        }
-    }
+
     /**
      * 获取插件目录
      * @return string
@@ -107,51 +73,42 @@ class PlugService
         return $this->plugPathBase;
     }
 
-    /**
-     * 获取 composer 类加载器.
-     *
-     * @return ClassLoader
-     */
-    public function loader()
-    {
-        if (!static::$loader) {
-            static::$loader = include $this->app->getRootPath() . '/vendor/autoload.php';
-        }
-        return static::$loader;
-    }
+
 
     /**
      * 注册扩展
      */
     public function register()
     {
-        $loader = $this->loader();
+        $loader = Composer::loader();
         $plugs = [];
         foreach ($this->plugPaths as $plugPaths) {
             $file = $plugPaths . DIRECTORY_SEPARATOR . 'composer.json';
             if (is_file($file)) {
-                $arr = $this->parseComposer($file);
+                $arr = Composer::parse($file);
                 $plugs[] = $arr;
             }
         }
         $names = array_column($plugs, 'name');
-
         try {
             $plugNames = Db::name($this->table)->whereIn('name', $names)->where('status', 1)->column('name');
         } catch (\Exception $exception) {
             $plugNames = [];
         }
+
         foreach ($this->plugPaths as $plugPaths) {
             $file = $plugPaths . DIRECTORY_SEPARATOR . 'composer.json';
             if (is_file($file)) {
-                $arr = $this->parseComposer($file);
+
+                $arr = Composer::parse($file);
                 $arr['plug_path'] = $plugPaths;
                 $psr4 = Arr::get($arr, 'autoload.psr-4');
                 $name = Arr::get($arr, 'name');
                 if (in_array($name, $plugNames)) {
+
                     if ($psr4) {
                         foreach ($psr4 as $namespace => $path) {
-                            $path = $plugPaths . '/' . trim($path, '/') . '/';
+                            $path = $plugPaths . '/' ;
                             $loader->addPsr4($namespace, $path);
                         }
                     }
@@ -170,14 +127,7 @@ class PlugService
                 }
             }
         }
-    }
-
-    /**
-     * @param $file
-     * @return mixed
-     */
-    protected function parseComposer($file){
-        return json_decode(file_get_contents($file), true);
+       
     }
 
     /**
@@ -336,7 +286,7 @@ class PlugService
     protected function checkFiles($directory)
     {
         if (
-            !is_dir($directory . '/src')
+            !is_file($directory . '/config.php')
             || !is_file($directory . '/composer.json')
         ) {
             return false;
@@ -352,21 +302,14 @@ class PlugService
      */
     protected function dataMigrate($cmd, $path)
     {
-        $migrations = $path . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations';
+        $migrations = $path . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations';
         if (is_dir($migrations)) {
             Console::call('migrate:eadmin', ['cmd' => $cmd, 'path' => $migrations]);
         }
 
         return true;
     }
-    protected function loginSession(){
-        $cookies = Cache::get($this->loginKey);
-        $cookieJar = new CookieJar();
-        foreach ($cookies as $cookie){
-            $cookieJar->setCookie(new SetCookie($cookie));
-        }
-        return $cookieJar;
-    }
+
     /**
      * 安装
      * @param string $name 插件名称
@@ -442,7 +385,8 @@ class PlugService
     public function uninstall($name, $path)
     {
         $this->dataMigrate('rollback', $path);
-        FileSystemService::instance()->delFiels($path);
+        $filesystem = new \Symfony\Component\Filesystem\Filesystem;
+        $filesystem->remove($path);
         Db::name($this->table)->where('name', $name)->delete();
         Db::name('system_menu')->where('mark', $name)->delete();
         Db::name('system_config')->where('mark', $name)->delete();

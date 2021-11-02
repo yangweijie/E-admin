@@ -2,9 +2,7 @@
     "name": "{package}",
     "description": "{description}",
     "type": "library",
-    "keywords": ["e-admin", "extension"],
-    "homepage": "https://github.com/{package}",
-    "license": "MIT",
+    "keywords": ["ex-admin", "extension"],
     "authors": [
         {
             "name": "your name",
@@ -16,14 +14,14 @@
     },
     "autoload": {
         "psr-4": {
-            "{namespace}": "src/"
+            "{namespace}": "/"
         }
     },
     "extra": {
-        "e-admin": "{namespace}{className}ServiceProvider",
+        "e-admin": "{namespace}{className}Service",
         "think": {
             "services": [
-                "{namespace}{className}ServiceProvider"
+                "{namespace}{className}Service"
             ]
         }
     }

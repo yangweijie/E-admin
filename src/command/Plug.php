@@ -26,37 +26,46 @@ class Plug extends Command
     protected function execute(Input $input,Output $output)
     {
         $this->package = $input->getArgument('name');
-        $this->namespace = $input->getOption('namespace');
+        $plugName = $this->package;
+        $this->namespace = 'plugin\\'.$input->getOption('namespace');
         $this->description = $input->getOption('description');
-        $plugDir = $this->app->getRootPath().config('admin.extension.dir','eadmin-plugs');
+        $plugDir = $this->app->getRootPath().config('admin.extension.dir','plugin');
         if(!is_dir($plugDir)) mkdir($plugDir);
-        list($vendor,$plugName) = explode('/',$this->package);
+
         $this->className = ucfirst($plugName);
         if(is_null($this->namespace)){
            $this->namespace = $plugName;
         }
-        //插件分组目录
-        $plugDir = $plugDir.DIRECTORY_SEPARATOR.$vendor.DIRECTORY_SEPARATOR;
-        if(!is_dir($plugDir)) mkdir($plugDir);
         //插件名目录
-        $plugNameDir = $plugDir.$plugName.DIRECTORY_SEPARATOR;
+        $plugNameDir = $plugDir.DIRECTORY_SEPARATOR.$plugName.DIRECTORY_SEPARATOR;
         if(!is_dir($plugNameDir)) mkdir($plugNameDir);
-        //src目录
-        $plugSrc = $plugNameDir.'src'.DIRECTORY_SEPARATOR;
-        if(!is_dir($plugSrc)) mkdir($plugSrc);
+        //控制器目录
+        mkdir($plugNameDir.'controller');
+        //控制器api目录
+        mkdir($plugNameDir.'controller'.DIRECTORY_SEPARATOR.'api');
+        //模型目录
+        mkdir($plugNameDir.'model');
+        //语言包目录
+        mkdir($plugNameDir.'lang');
+        //数据库
+        $database = $plugNameDir.'database';
+        mkdir($plugNameDir.'database');
+        //数据库迁移
+        mkdir($database.DIRECTORY_SEPARATOR.'migrations');
+        //数据库填充
+        mkdir($database.DIRECTORY_SEPARATOR.'seeds');
         //config文件
-        file_put_contents($plugSrc.'config.php','<?php');
+        file_put_contents($plugNameDir.'config.php','<?php');
         $res =  $this->composerFile($plugNameDir);
         if($res){
-            $this->serviceFile($plugSrc);
-           
-            file_put_contents($plugSrc.'README.md','# E-admin Extension');
+            $this->serviceFile($plugNameDir);
+            file_put_contents($plugNameDir.'README.md','# Ex-admin Extension');
             $output->writeln('<info>created successfully.</info>');
         }else{
             $output->error('创建失败 (Creation failed)');
         }
     }
-    
+
     protected function composerFile($dir){
         $stub =$this->getStubs('composer.json');
         $composerContent = str_replace([
@@ -84,9 +93,9 @@ class Plug extends Command
             '{%className%}',
         ],[
             $this->namespace,
-            $this->className.'ServiceProvider',
+            $this->className.'Service',
         ],$stub);
-        file_put_contents($dir.$this->className.'ServiceProvider.php',$serviceContent);
+        file_put_contents($dir.$this->className.'Service.php',$serviceContent);
     }
     protected function getStubs($name)
     {

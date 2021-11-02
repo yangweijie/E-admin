@@ -100,12 +100,6 @@ class Plug extends Controller
                 $html->content($space);
                 $timeLine->item($html)->timestamp($version['version']);
             }
-            if (!empty($rows['git_remote'])) {
-                $actions->append(
-                    Button::create('更新到git')
-                        ->save(['path' => $rows['path'], 'git_remote' => $rows['git_remote']], 'plug/uploadGit', 'git commit')->input()
-                );
-            }
             $actions->append(
                 Button::create('历史版本')
                     ->dialog()
@@ -161,7 +155,6 @@ class Plug extends Controller
                 ->form($this->add()),
             Button::create('登录')
                 ->typeDanger()
-                ->whenShow(!Admin::plug()->isLogin())
                 ->sizeSmall()
                 ->dialog()
                 ->form($this->login()),
@@ -235,9 +228,7 @@ class Plug extends Controller
             $formAction->hideResetButton();
         });
         $form->saving(function ($post) use ($data, $composer) {
-            if (!Admin::plug()->isLogin()) {
-                admin_error_message('请先登录插件');
-            }
+
 
             $this->requireInstall($data, $post['id']);
             $urls = array_column($data, 'url', 'id');
@@ -305,28 +296,20 @@ class Plug extends Controller
     public function add()
     {
         $form = new Form(new Config());
-        $form->text('name', '名称')->placeholder('请输入扩展名称，例如：eadmin/plug')->required();
+        $form->text('name', '名称')->placeholder('请输入扩展名称，例如：wechat')->required();
         $form->text('description', '描述');
-        $form->text('namespace', '命名空间');
         $form->saving(function ($post) {
             $name = $post['name'];
-            if (!strpos($name, '/')) {
-                admin_warn_message('扩展名称格式错误，例如：eadmin/plug');
-            }
             $cmd['name'] = $name;
             $description = $post['description'];
-            $namespace = $post['namespace'];
             if (!empty($description)) {
                 array_push($cmd, "--description={$description}");
             }
-            if (!empty($namespace)) {
-                array_push($cmd, "--namespace={$namespace}");
-            }
+            array_push($cmd, "--namespace={$name}");
             Console::call('eadmin:plug', $cmd);
             admin_success_message('添加成功');
         });
         return $form;
-
     }
 
     /**
