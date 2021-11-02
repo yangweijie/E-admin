@@ -1,0 +1,14 @@
+{
+  "name": "{name}",
+  "title": "{title}",
+  "description": "{description}",
+  "status": true,
+  "version": "1.0.0",
+  "author": "",
+  "namespace": "{namespace}",
+  "services": "{namespace}\\{className}Service",
+  "require": {
+    "php": ">=7.1.0"
+  }
+}
+

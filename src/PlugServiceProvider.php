@@ -27,7 +27,7 @@ abstract class PlugServiceProvider extends Service
      */
     final public function enabled()
     {
-        return Admin::plug()->getInfo($this->getName(), 'status') ? true : false;
+        return $this->composerProperty['status'];
     }
 
     /**
@@ -70,9 +70,7 @@ abstract class PlugServiceProvider extends Service
      */
     final public function getNamespace()
     {
-        $psr = $this->composerProperty['autoload']['psr-4'];
-        $psr = array_flip($psr);
-        return end($psr);
+        return $this->composerProperty['namespace'].'\\';
     }
 
     /**

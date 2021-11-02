@@ -393,6 +393,7 @@ class Admin
         //插件
         app()->route->get('plug/add', Plug::class . '@add');
         app()->route->get('plug/grid', Plug::class . '@grid');
+        app()->route->post('plug/zipInstall', Plug::class . '@zipInstall');
         app()->route->post('plug/enable', Plug::class . '@enable');
         app()->route->post('plug/install', Plug::class . '@install');
         app()->route->post('plug/uninstall', Plug::class . '@uninstall');

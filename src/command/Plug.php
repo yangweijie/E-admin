@@ -12,6 +12,7 @@ use think\console\Output;
 class Plug extends Command
 {
     protected $package;
+    protected $title;
     protected $namespace;
     protected $description;
     protected $className;
@@ -20,12 +21,14 @@ class Plug extends Command
         // 指令配置
         $this->setName('eadmin:plug')->setDescription('生成插件');
         $this->addArgument('name', 1, "插件包名");
+        $this->addArgument('title', 1, "插件标题");
         $this->addOption('description', 1, Option::VALUE_REQUIRED,"插件描述");
         $this->addOption('namespace', 2, Option::VALUE_REQUIRED,"命名空间");
     }
     protected function execute(Input $input,Output $output)
     {
         $this->package = $input->getArgument('name');
+        $this->title = $input->getArgument('title');
         $plugName = $this->package;
         $this->namespace = 'plugin\\'.$input->getOption('namespace');
         $this->description = $input->getOption('description');
@@ -67,19 +70,21 @@ class Plug extends Command
     }
 
     protected function composerFile($dir){
-        $stub =$this->getStubs('composer.json');
+        $stub =$this->getStubs('info');
         $composerContent = str_replace([
-            '{package}',
+            '{name}',
+            '{title}',
             '{description}',
             '{namespace}',
             '{className}',
         ],[
             $this->package,
+            $this->title,
             $this->description,
-            str_replace('\\', '\\\\', $this->namespace.'\\'),
+            str_replace('\\', '\\\\', $this->namespace),
             $this->className
         ],$stub);
-        $composerFile = $dir.DIRECTORY_SEPARATOR.'composer.json';
+        $composerFile = $dir.DIRECTORY_SEPARATOR.'info.json';
         if(is_file($composerFile)){
             $this->output->error('插件命名冲突');
         }else{

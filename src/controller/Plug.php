@@ -60,46 +60,45 @@ class Plug extends Controller
         $page = $this->request->get('page', 1);
         $size = $this->request->get('size', 20);
         if ($type == 1) {
-            $datas = Admin::plug()->installed($search, $page, $size);
+            $datas = Admin::plug()->installed($search);
 
         } else {
             $datas = Admin::plug()->all($search, $cate_id, $page, $size);
         }
-
-        $grid = new Grid($datas['list']);
-        $grid->drive()->setTotal($datas['total']);
+        $grid = new Grid($datas);
+        $grid->drive()->setTotal(count($datas));
         $grid->title('插件管理');
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');
-        $grid->column('composer', '名称')->display(function ($val, $data) {
+        $grid->column('title', '名称')->display(function ($val, $data) {
             return Html::div()->content([
-                Html::div()->content(Tag::create($data['name'])->size('mini')->effect('dark')),
-                Html::div()->content($data['composer']),
-                Html::div()->content($data['desc']),
+                Html::div()->content(Tag::create($data['title'])->size('mini')->effect('dark')),
+                Html::div()->content($data['name']),
+                Html::div()->content($data['description']),
             ]);
         });
 
-        $grid->column('install_version', '版本');
+        $grid->column('version', '版本');
         $grid->actions(function (Actions $actions, $rows) {
             $actions->hideDel();
 
             $timeLine = TimeLine::create();
-            foreach ($rows['version'] as $version) {
-                $descs = explode("\n", $version['desc']);
-                $html = Html::div();
-                foreach ($descs as $desc) {
-                    $html->content(Html::div()->content($desc));
-                }
-                if (count($version['require']) > 0) {
-                    $html->content(Html::div()->content('依赖插件：')->style(['marginTop' => '5px']));
-                }
-                $space = Space::create();
-                foreach ($version['require'] as $require) {
-                    $space->content(Tag::create($require['title'])->size('mini'));
-                }
-                $html->content($space);
-                $timeLine->item($html)->timestamp($version['version']);
-            }
+//            foreach ($rows['version'] as $version) {
+//                $descs = explode("\n", $version['desc']);
+//                $html = Html::div();
+//                foreach ($descs as $desc) {
+//                    $html->content(Html::div()->content($desc));
+//                }
+//                if (count($version['require']) > 0) {
+//                    $html->content(Html::div()->content('依赖插件：')->style(['marginTop' => '5px']));
+//                }
+//                $space = Space::create();
+//                foreach ($version['require'] as $require) {
+//                    $space->content(Tag::create($require['title'])->size('mini'));
+//                }
+//                $html->content($space);
+//                $timeLine->item($html)->timestamp($version['version']);
+//            }
             $actions->append(
                 Button::create('历史版本')
                     ->dialog()
@@ -116,26 +115,26 @@ class Plug extends Controller
             if ($rows['install']) {
                 if ($rows['status']) {
                     $actions->append(
-                        Button::create('禁用')->sizeSmall()->typeInfo()->save(['id' => $rows['composer'], 'status' => 0], 'plug/enable', '确认禁用？')
+                        Button::create('禁用')->sizeSmall()->typeInfo()->save(['id' => $rows['name'], 'status' => 0], 'plug/enable', '确认禁用？')
                     );
                 } else {
                     $actions->append(
-                        Button::create('启用')->sizeSmall()->typeSuccess()->save(['id' => $rows['composer'], 'status' => 1], 'plug/enable', '确认启用？')
+                        Button::create('启用')->sizeSmall()->typeSuccess()->save(['id' => $rows['name'], 'status' => 1], 'plug/enable', '确认启用？')
                     );
                 }
-                $plug = array_column($rows['version'], 'require', 'version');
-
-                $require = $plug[$rows['install_version']];
-                $actions->append(
-                    Button::create('卸载')
-                        ->sizeSmall()
-                        ->typeDanger()
-                        ->when(count($require) > 0, function (Button $button) use ($rows, $require) {
-                            return $button->dialog()->content($this->uninstallAll($rows['composer'], $rows['path'], $require));
-                        }, function (Button $button) use ($rows) {
-                            return $button->save(['id' => $rows['composer'], 'path' => $rows['path']], 'plug/uninstall', '确认卸载？');
-                        })
-                );
+//                $plug = array_column($rows['version'], 'require', 'version');
+//
+//                $require = $plug[$rows['install_version']];
+//                $actions->append(
+//                    Button::create('卸载')
+//                        ->sizeSmall()
+//                        ->typeDanger()
+//                        ->when(count($require) > 0, function (Button $button) use ($rows, $require) {
+//                            return $button->dialog()->content($this->uninstallAll($rows['name'], $rows['path'], $require));
+//                        }, function (Button $button) use ($rows) {
+//                            return $button->save(['id' => $rows['name'], 'path' => $rows['path']], 'plug/uninstall', '确认卸载？');
+//                        })
+//                );
             } else {
                 $actions->append(
                     Button::create('安装')
@@ -153,11 +152,12 @@ class Plug extends Controller
                 ->sizeSmall()
                 ->dialog()
                 ->form($this->add()),
-            Button::create('登录')
-                ->typeDanger()
-                ->sizeSmall()
-                ->dialog()
-                ->form($this->login()),
+            Button::create('本地安装')->upload('plug/zipInstall')->ext('zip'),
+//            Button::create('登录')
+//                ->typeDanger()
+//                ->sizeSmall()
+//                ->dialog()
+//                ->form($this->login()),
         ]);
         $grid->quickSearch();
         return $grid;
@@ -180,36 +180,15 @@ class Plug extends Controller
         });
     }
 
-    public function uploadGit($path, $git_remote, $inputValue)
-    {
-        if (empty($inputValue)) {
-            admin_error_message('commit 不能为空');
-        }
-        $girDir = $path . DIRECTORY_SEPARATOR . '.git';
-        if (!is_dir($girDir)) {
-            $cmd = "cd $path && git init && git remote rm origin";
-            exec($cmd, $out, $result);
-            $cmd = "cd $path && git init && git checkout -b eadmin";
-            exec($cmd, $out, $result);
-            $cmd = "cd $path && git remote add origin $git_remote";
-            exec($cmd, $out, $result);
-        }
-
-        $cmd = "git config user.name 'eadmin' && git config user.email 'eadmin@eadmin.com' && git add . && git commit -m $inputValue";
-        $process = new Process($cmd, $path);
-        $process->run();
-        if (!$process->isSuccessful()) {
-            admin_error($process->getOutput(), $process->getErrorOutput());
-        }
-        $process = new Process('git push origin eadmin', $path);
-        $process->run();
-        if ($process->isSuccessful()) {
-            admin_success_message('git上传成功');
-        } else {
-            admin_error($process->getOutput(), $process->getErrorOutput());
+    public function zipInstall(){
+        $file = $this->request->file('file');
+        $res = Admin::plug()->install($file->getRealPath());
+        if($res){
+            admin_success_message('安装完成');
+        }else{
+            admin_error_message('安装失败');
         }
     }
-
     /**
      * 安装
      * @param $composer
@@ -228,8 +207,6 @@ class Plug extends Controller
             $formAction->hideResetButton();
         });
         $form->saving(function ($post) use ($data, $composer) {
-
-
             $this->requireInstall($data, $post['id']);
             $urls = array_column($data, 'url', 'id');
             $versions = array_column($data, 'version', 'id');
@@ -296,11 +273,13 @@ class Plug extends Controller
     public function add()
     {
         $form = new Form(new Config());
-        $form->text('name', '名称')->placeholder('请输入扩展名称，例如：wechat')->required();
+        $form->text('name', '扩展标识')->alphaDashRule()->required();
+        $form->text('title', '名称')->required();
         $form->text('description', '描述');
         $form->saving(function ($post) {
             $name = $post['name'];
             $cmd['name'] = $name;
+            $cmd['title'] = $post['title'];
             $description = $post['description'];
             if (!empty($description)) {
                 array_push($cmd, "--description={$description}");
@@ -319,7 +298,7 @@ class Plug extends Controller
      */
     public function enable($id, $status)
     {
-        Admin::plug()->enable($id, $status);
+        Admin::plug()->setStatus($id, (bool)$status);
         admin_success_message('操作完成');
     }
 

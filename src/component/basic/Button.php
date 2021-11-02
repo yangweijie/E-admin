@@ -131,6 +131,7 @@ class Button extends Component
             ->attr('foreverShow',true)
             ->url((string)$url)
             ->chunk(false)
+            ->inputShow(false)
             ->disk('local')
             ->content($this);
     }
