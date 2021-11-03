@@ -53,6 +53,9 @@ class Actions extends Html
         $this->grid = $grid;
         $this->attr('class', 'EadminAction');
         $this->column = new Column('EadminAction', '', $grid);
+        $this->editText = admin_trans('admin.edit');
+        $this->delText = admin_trans('admin.delete');
+        $this->detailText =  admin_trans('admin.detail');
     }
 
     public function row($data)
