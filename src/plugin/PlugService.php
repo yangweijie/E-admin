@@ -6,11 +6,11 @@
  * Time: 16:49
  */
 
-namespace Eadmin\service;
+namespace Eadmin\plugin;
 
 use Composer\Autoload\ClassLoader;
 use Eadmin\component\basic\Button;
-use Eadmin\PlugServiceProvider;
+use Eadmin\plugin\PlugServiceProvider;
 use Eadmin\support\Composer;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -43,14 +43,15 @@ class PlugService
      */
     protected $serviceProvider = [];
     protected $client;
-    protected $table = 'system_plugs';
+
     public function __construct()
     {
         $this->initialize();;
     }
+
     protected function initialize()
     {
-        $this->app  = app();
+        $this->app = app();
         $this->client = new Client([
             'base_uri' => 'https://eadmin.togy.com.cn/api/',
             'verify' => false,
@@ -74,7 +75,6 @@ class PlugService
     }
 
 
-
     /**
      * 注册扩展
      */
@@ -88,20 +88,25 @@ class PlugService
                 $arr['plug_path'] = $plugPaths;
                 $psr4 = Arr::get($arr, 'namespace');
                 $name = Arr::get($arr, 'name');
-                $loader->addPsr4(Arr::get($arr, 'namespace').'\\', $plugPaths);
+                $loader->addPsr4(Arr::get($arr, 'namespace') . '\\', $plugPaths);
                 $serviceProvider = Arr::get($arr, 'services');
-                if ($serviceProvider) {
-                    $configPath = $plugPaths . DIRECTORY_SEPARATOR . 'src'.DIRECTORY_SEPARATOR . 'config.php';
+                if ($serviceProvider && $arr['status']) {
+                    $configPath = $plugPaths . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'config.php';
                     $this->app->register($serviceProvider);
                     $service = $this->app->getService($serviceProvider);
                     $this->serviceProvider[$name] = $service;
-                    $this->app->bind($serviceProvider,$service);
-                    if(method_exists($service,'withComposerProperty')){
-                        $service->withComposerProperty($arr);
+                    $this->app->bind($serviceProvider, $service);
+                    if (method_exists($service, 'withinfo')) {
+                        $service->withinfo($arr);
                     }
                 }
             }
         }
+    }
+
+    public function provider()
+    {
+
     }
 
     /**
@@ -109,12 +114,14 @@ class PlugService
      * @param null $name 插件名称
      * @return PlugServiceProvider
      */
-    public function getServiceProviders($name = null){
-        if(empty($name)){
+    public function getServiceProviders($name = null)
+    {
+        if (empty($name)) {
             return $this->serviceProvider;
         }
         return $this->serviceProvider[$name];
     }
+
     public function getCate()
     {
         $response = $this->client->get("Plugs/cate");
@@ -129,7 +136,7 @@ class PlugService
      */
     public function all($search = '', $cate_id = 0, $page = 1, $size = 20, $names = null)
     {
-       return $this->installed();
+        return $this->installed();
     }
 
     /**
@@ -139,12 +146,24 @@ class PlugService
      */
     public function installed($search = '')
     {
-        foreach ($this->plugPaths as $plug){
+        $plugs = [];
+        foreach ($this->plugPaths as $plug) {
             $info = $this->info(basename($plug));
             $info['install'] = true;
             $plugs[] = $info;
         }
         return $plugs;
+    }
+
+    /**
+     * 是否安装插件
+     * @param $name 插件名称
+     * @return bool
+     */
+    public function isInstall($name)
+    {
+        $path = $this->plugPathBase . DIRECTORY_SEPARATOR . $name;
+        return $this->checkFiles($path);
     }
 
     /**
@@ -156,21 +175,26 @@ class PlugService
     {
         return Composer::parse($this->infoJson($name));
     }
-    protected function infoJson($name){
-        return $this->plugPathBase.DIRECTORY_SEPARATOR.$name.DIRECTORY_SEPARATOR.'info.json';
+
+    protected function infoJson($name)
+    {
+        return $this->plugPathBase . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . 'info.json';
     }
+
     /**
-     * 设置插件状态
+     * 设置插件信息
      * @param $name
      * @param $bool
      * @return false|string
      */
-    public function setStatus($name,$status){
+    public function setInfo($name, array $data)
+    {
 
         $content = $this->info($name);
-        $content['status'] = $status;
-        return file_put_contents($this->infoJson($name),json_encode($content,JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT));
+        $content = array_merge($content, $data);
+        return file_put_contents($this->infoJson($name), json_encode($content, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
     }
+
     /**
      * 启用
      * @param string $name 插件名称
@@ -178,7 +202,7 @@ class PlugService
      */
     public function enable($name)
     {
-       return $this->setStatus($name,true);
+        return $this->setInfo($name, ['status' => true]);
     }
 
     /**
@@ -186,9 +210,11 @@ class PlugService
      * @param $name 插件名称
      * @return false|string
      */
-    public function disable($name){
-        return $this->setStatus($name,false);
+    public function disable($name)
+    {
+        return $this->setInfo($name, ['status' => false]);
     }
+
     /**
      * 校验扩展包内容是否正确.
      *
@@ -234,7 +260,7 @@ class PlugService
             $zip = new \ZipArchive();
             if ($zip->open($fileZip) === true) {
                 $info = $zip->getFromName('info.json');
-                $info = json_decode($info,true);
+                $info = json_decode($info, true);
                 $path = $this->plugPathBase . '/' . $info['name'];
                 if (!is_dir($path)) {
                     mkdir($path, 0755, true);
@@ -250,9 +276,11 @@ class PlugService
                 $this->initialize();
                 $this->register();
                 //添加菜单
-                $file = $path. DIRECTORY_SEPARATOR . 'composer.json';
+                $file = $path . DIRECTORY_SEPARATOR . 'composer.json';
                 $serviceProvider = $this->getServiceProviders($info['name']);
                 $serviceProvider->addMenus();
+                //生成ide提示
+                $this->buildIde();
                 return true;
             } else {
                 return false;
@@ -260,6 +288,32 @@ class PlugService
         } catch (\Exception $exception) {
             return false;
         }
+    }
+
+    public function buildIde()
+    {
+        $this->initialize();
+        $doc = '';
+        $count = count($this->plugPaths);
+        foreach ($this->plugPaths as $index => $plug) {
+            $name = basename($plug);
+            $info = $this->info($name);
+            $name = $info['name'];
+            $title = $info['title'];
+            $doc .= " * @property $name\\" . ucfirst($name) . "Service \$$name $title";
+            if (($index + 1) != $count) {
+                $doc .= PHP_EOL;
+            }
+        }
+        $content = <<<PHP
+<?php
+namespace plugin;
+/**
+$doc
+ */
+class IDE{}
+PHP;
+        return file_put_contents($this->plugPathBase . DIRECTORY_SEPARATOR . 'IDE.php', $content);
     }
 
     /**

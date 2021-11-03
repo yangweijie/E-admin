@@ -1,6 +1,6 @@
 <?php
 
-namespace Eadmin;
+namespace Eadmin\plugin;
 
 use Closure;
 use Eadmin\form\drive\File;
@@ -14,7 +14,7 @@ use \think\Service;
 
 abstract class PlugServiceProvider extends Service
 {
-    protected $composerProperty;
+    protected $info;
 
     abstract public function menus();
 
@@ -27,7 +27,7 @@ abstract class PlugServiceProvider extends Service
      */
     final public function enabled()
     {
-        return $this->composerProperty['status'];
+        return $this->info['status'];
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class PlugServiceProvider extends Service
     final public function getPath()
     {
 
-        return $this->composerProperty['plug_path'];
+        return $this->info['plug_path'];
     }
 
     /**
@@ -56,12 +56,22 @@ abstract class PlugServiceProvider extends Service
      */
     final public function getName()
     {
-        return $this->composerProperty['name'];
+        return $this->info['name'];
     }
-
-    final public function withComposerProperty($composerProperty)
+    /**
+     * 获取扩展标题
+     * @return mixed
+     */
+    final public function getTitle()
     {
-        $this->composerProperty = $composerProperty;
+        return $this->info['title'];
+    }
+    final public function getInfo(){
+        return $this->info;
+    }
+    final public function withinfo($info)
+    {
+        $this->info = $info;
     }
 
     /**
@@ -70,7 +80,7 @@ abstract class PlugServiceProvider extends Service
      */
     final public function getNamespace()
     {
-        return $this->composerProperty['namespace'].'\\';
+        return $this->info['namespace'].'\\';
     }
 
     /**
@@ -79,7 +89,7 @@ abstract class PlugServiceProvider extends Service
      * @param string $value
      * @return array|\ArrayAccess|false|int|mixed
      */
-    final public static function config($key, $value = null)
+    final public function config($key, $value = null)
     {
         $file = static::instance()->getPath() . '/src/config.php';
         $data = include $file;

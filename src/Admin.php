@@ -21,7 +21,7 @@ use Eadmin\controller\ResourceController;
 use Eadmin\service\AuthService;
 use Eadmin\service\MenuService;
 use Eadmin\service\NodeService;
-use Eadmin\service\PlugService;
+use Eadmin\plugin\PlugService;
 use Eadmin\service\QueueService;
 use Eadmin\service\TokenService;
 use think\app\Url;
@@ -230,7 +230,7 @@ class Admin
     {
         return new NodeService();
     }
-    
+
     /**
      * 树形
      * @param array $data 数据

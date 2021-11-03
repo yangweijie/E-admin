@@ -40,7 +40,7 @@ use Eadmin\controller\Notice;
 use Eadmin\controller\Plug;
 use Eadmin\middleware\Permission;
 use Eadmin\service\FileService;
-use Eadmin\service\PlugService;
+use Eadmin\plugin\PlugService;
 use Eadmin\service\TableViewService;
 
 class ServiceProvider extends Service

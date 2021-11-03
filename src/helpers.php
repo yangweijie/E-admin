@@ -223,5 +223,15 @@ if (!function_exists('color_mix')) {
         return rgbToHex("rgb($r,$g,$b)");
     }
 }
+if (!function_exists('plug')) {
+    /**
+     * 插件管理
+     * @return \Eadmin\plugin\Manage
+     */
+    function plug()
+    {
+        return new \Eadmin\plugin\Manage();
+    }
+}
 
 

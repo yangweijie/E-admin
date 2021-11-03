@@ -48,6 +48,9 @@ class Plug extends Command
         mkdir($plugNameDir.'controller'.DIRECTORY_SEPARATOR.'api');
         //模型目录
         mkdir($plugNameDir.'model');
+        //服务目录
+        mkdir($plugNameDir.'service');
+        $this->serviceFile($plugNameDir);
         //语言包目录
         mkdir($plugNameDir.'lang');
         //数据库
@@ -61,7 +64,7 @@ class Plug extends Command
         file_put_contents($plugNameDir.'config.php','<?php');
         $res =  $this->composerFile($plugNameDir);
         if($res){
-            $this->serviceFile($plugNameDir);
+            $this->serviceProviderFile($plugNameDir);
             file_put_contents($plugNameDir.'README.md','# Ex-admin Extension');
             $output->writeln('<info>created successfully.</info>');
         }else{
@@ -93,6 +96,16 @@ class Plug extends Command
     }
     protected function serviceFile($dir){
         $stub = $this->getStubs('service');
+        $serviceContent = str_replace([
+            '{%name%}',
+
+        ],[
+            $this->package,
+        ],$stub);
+        file_put_contents($dir.'service'.DIRECTORY_SEPARATOR.'Service.php',$serviceContent);
+    }
+    protected function serviceProviderFile($dir){
+        $stub = $this->getStubs('ServiceProvider');
         $serviceContent = str_replace([
             '{%namespace%}',
             '{%className%}',

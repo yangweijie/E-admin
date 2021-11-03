@@ -286,6 +286,7 @@ class Plug extends Controller
             }
             array_push($cmd, "--namespace={$name}");
             Console::call('eadmin:plug', $cmd);
+            Admin::plug()->buildIde();
             admin_success_message('添加成功');
         });
         return $form;
@@ -298,7 +299,7 @@ class Plug extends Controller
      */
     public function enable($id, $status)
     {
-        Admin::plug()->setStatus($id, (bool)$status);
+        Admin::plug()->setInfo($id,['status'=>(bool)$status]);
         admin_success_message('操作完成');
     }
 
@@ -316,7 +317,7 @@ class Plug extends Controller
         $requires = array_column($data, 'require', 'id');
         $requires = $requires[$version];
         foreach ($requires as $require) {
-            if (!Db::name('system_plugs')->where('name', $require['composer'])->find()) {
+            if (Admin::plug()->isInstall($require['composer'])) {
                 Admin::plug()->install($require['composer'], $require['url'], $require['version_number']);
                 $this->requireInstall($require['version'], $require['id']);
             }

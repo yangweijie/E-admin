@@ -9,7 +9,7 @@
 namespace Eadmin\service;
 
 use Eadmin\Admin;
-use Eadmin\PlugServiceProvider;
+use Eadmin\plugin\PlugServiceProvider;
 use Symfony\Component\Finder\Finder;
 use think\route\Resource;
 use Eadmin\Service;
