@@ -60,13 +60,12 @@ class Plug extends Controller
         $page = $this->request->get('page', 1);
         $size = $this->request->get('size', 20);
         if ($type == 1) {
-            $datas = Admin::plug()->installed($search);
-
+            $data = Admin::plug()->installed($search);
         } else {
-            $datas = Admin::plug()->all($search, $cate_id, $page, $size);
+            $data = Admin::plug()->all($search, $cate_id, $page, $size);
         }
-        $grid = new Grid($datas);
-        $grid->drive()->setTotal(count($datas));
+        $grid = new Grid($data);
+        $grid->drive()->setTotal(Admin::plug()->total());
         $grid->title('插件管理');
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');
@@ -83,22 +82,22 @@ class Plug extends Controller
             $actions->hideDel();
 
             $timeLine = TimeLine::create();
-//            foreach ($rows['version'] as $version) {
-//                $descs = explode("\n", $version['desc']);
-//                $html = Html::div();
-//                foreach ($descs as $desc) {
-//                    $html->content(Html::div()->content($desc));
-//                }
-//                if (count($version['require']) > 0) {
-//                    $html->content(Html::div()->content('依赖插件：')->style(['marginTop' => '5px']));
-//                }
-//                $space = Space::create();
-//                foreach ($version['require'] as $require) {
-//                    $space->content(Tag::create($require['title'])->size('mini'));
-//                }
-//                $html->content($space);
-//                $timeLine->item($html)->timestamp($version['version']);
-//            }
+            foreach ($rows['versions'] as $version) {
+                $descs = explode("\n", $version['desc']);
+                $html = Html::div();
+                foreach ($descs as $desc) {
+                    $html->content(Html::div()->content($desc));
+                }
+                if (count($version['require']) > 0) {
+                    $html->content(Html::div()->content('依赖插件：')->style(['marginTop' => '5px']));
+                }
+                $space = Space::create();
+                foreach ($version['require'] as $require) {
+                    $space->content(Tag::create($require['title'])->size('mini'));
+                }
+                $html->content($space);
+                $timeLine->item($html)->timestamp($version['version']);
+            }
             $actions->append(
                 Button::create('历史版本')
                     ->dialog()
@@ -136,13 +135,13 @@ class Plug extends Controller
 //                        })
 //                );
             } else {
-                $actions->append(
-                    Button::create('安装')
-                        ->sizeSmall()
-                        ->typePrimary()
-                        ->dialog()
-                        ->content($this->install($rows['composer'], $rows['version']))
-                );
+//                $actions->append(
+//                    Button::create('安装')
+//                        ->sizeSmall()
+//                        ->typePrimary()
+//                        ->dialog()
+//                        ->content($this->install($rows['composer'], $rows['version']))
+//                );
             }
         });
         $grid->hideDeleteButton();
@@ -153,11 +152,12 @@ class Plug extends Controller
                 ->dialog()
                 ->form($this->add()),
             Button::create('本地安装')->upload('plug/zipInstall')->ext('zip'),
-//            Button::create('登录')
-//                ->typeDanger()
-//                ->sizeSmall()
-//                ->dialog()
-//                ->form($this->login()),
+            Button::create('登录')
+                ->typeDanger()
+                ->whenShow(!Admin::plug()->isLogin())
+                ->sizeSmall()
+                ->dialog()
+                ->form($this->login()),
         ]);
         $grid->quickSearch();
         return $grid;

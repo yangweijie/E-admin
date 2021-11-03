@@ -43,7 +43,8 @@ class PlugService
      */
     protected $serviceProvider = [];
     protected $client;
-
+    protected $total = 0;
+    protected $loginToken = '';
     public function __construct()
     {
         $this->initialize();;
@@ -53,7 +54,7 @@ class PlugService
     {
         $this->app = app();
         $this->client = new Client([
-            'base_uri' => 'https://eadmin.togy.com.cn/api/',
+            'base_uri' => 'http://1.117.208.85:1000/api/Plugin/',
             'verify' => false,
         ]);
         $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'plugin');
@@ -62,6 +63,14 @@ class PlugService
                 $this->plugPaths[] = $file;
             }
         }
+        $this->loginToken = md5(Request::header('Authorization').'plug');
+    }
+    /**
+     * 是否登录
+     * @return bool
+     */
+    public function isLogin(){
+        return Cache::has($this->loginToken);
     }
 
     /**
@@ -110,11 +119,6 @@ class PlugService
         }
     }
 
-    public function provider()
-    {
-
-    }
-
     /**
      * 获取注册插件服务
      * @param null $name 插件名称
@@ -130,7 +134,7 @@ class PlugService
 
     public function getCate()
     {
-        $response = $this->client->get("Plugs/cate");
+        $response = $this->client->get("cate");
         $content = $response->getBody()->getContents();
         $content = json_decode($content, true);
         return $content['data'];
@@ -140,11 +144,36 @@ class PlugService
      * 获取所有插件
      * @param string $search 搜索的关键词
      */
-    public function all($search = '', $cate_id = 0, $page = 1, $size = 20, $names = null)
+    public function all($search = '', $cate_id = 0, $page = 1, $size = 20)
     {
-        return $this->installed();
+        if(count($this->plugs) == 0){
+            $response = $this->client->get("list", [
+                'query' => [
+                    'cate_id' => $cate_id,
+                    'page' => $page,
+                    'size' => $size,
+                    'search' => $search,
+                ]
+            ]);
+            $content = $response->getBody()->getContents();
+            $content = json_decode($content, true);
+            $this->plugs = $content['data']['data'];
+            $this->total = $content['data']['total'];
+            $names = array_column($this->installed(),'name');
+            foreach ($this->plugs as &$plug) {
+                $plug['install'] = false;
+                if(in_array($plug['name'],$names)){
+                    $info = $this->info($plug['name']);
+                    $plug['version'] = $info['version'];
+                    $plug['install'] = true;
+                }
+            }
+        }
+        return $this->plugs;
     }
-
+    public function total(){
+        return $this->total;
+    }
     /**
      * 已安装插件
      * @param string $search 搜索的关键词
@@ -156,9 +185,32 @@ class PlugService
         foreach ($this->plugPaths as $plug) {
             $info = $this->info(basename($plug));
             $info['install'] = true;
+            $info['versions'] = [];
             $plugs[] = $info;
         }
         return $plugs;
+    }
+    /**
+     * 登录
+     * @param string $username 账号
+     * @param string $password 密码
+     * @return mixed
+     */
+    public function login($username,$password){
+        $response = $this->client->post('login',[
+            'form_params'=>[
+                'username'=>$username,
+                'password'=>$password,
+            ]
+        ]);
+        $content = $response->getBody()->getContents();
+        $res = json_decode($content, true);
+        if($res['code'] == 200){
+            Cache::set($this->loginToken,$res['data']['token'],60*60*24);
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**
@@ -282,7 +334,6 @@ class PlugService
                 $this->initialize();
                 $this->register();
                 //添加菜单
-                $file = $path . DIRECTORY_SEPARATOR . 'composer.json';
                 $serviceProvider = $this->getServiceProviders($info['name']);
                 $serviceProvider->addMenus();
                 //生成ide提示

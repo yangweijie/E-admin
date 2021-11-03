@@ -7,6 +7,9 @@
   "author": "",
   "namespace": "{namespace}",
   "services": "{namespace}\\{className}Service",
+  "plugin": {
+
+  },
   "require": {
     "php": ">=7.1.0"
   }
