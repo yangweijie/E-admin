@@ -82,13 +82,11 @@ class ServiceProvider extends Service
 
         $dirs = $this->finderIn(__DIR__,['lang']);
         $ranges = $this->finderIn($dirs);
-
         $dirs = $this->finderIn($this->app->getBasePath());
-
         $dirs = $this->finderIn($dirs,['lang']);
-
         $ranges = array_merge($ranges,$this->finderIn($dirs));
-
+        $dirs = $this->finderIn(Admin::plug()->getPlugPath(),['lang']);
+        $ranges = array_merge($ranges,$this->finderIn($dirs));
         foreach ($ranges as $range){
             $name = basename($range);
             $files = $this->finderIn($range,['*.php','*.json'],'files');

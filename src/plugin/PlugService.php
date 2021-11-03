@@ -64,16 +64,22 @@ class PlugService
         }
     }
 
-
     /**
-     * 获取插件目录
+     * 获取插件目录集合
+     * @return array
+     */
+    public function getPlugPath(){
+        return $this->plugPaths;
+    }
+    /**
+     * 获取插件基本目录
      * @return string
      */
-    public function getPath()
+    public function getBasePath()
     {
         return $this->plugPathBase;
     }
-
+    
 
     /**
      * 注册扩展

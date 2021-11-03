@@ -257,7 +257,7 @@ class Plug extends Controller
         });
         $form->saving(function ($post) use ($composer, $path) {
             foreach ($post['requires'] as $require) {
-                Admin::plug()->uninstall($require, Admin::plug()->getPath() . '/' . $require);
+                Admin::plug()->uninstall($require, Admin::plug()->getBasePath() . '/' . $require);
             }
             Admin::plug()->uninstall($composer, $path);
             admin_success_message('卸载完成');

@@ -20,6 +20,14 @@ abstract class PlugServiceProvider extends Service
 
     abstract public function setting();
 
+    public function __get($name)
+    {
+        if($name == 'service'){
+            $class = $this->getNamespace().'service\\Service';
+            return new $class;
+        }
+    }
+
     /**
      * 判断扩展是否启用.
      *
