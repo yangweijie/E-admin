@@ -46,19 +46,19 @@ class Admin
      */
     public static function sysconf($name, $value = null)
     {
-        if (is_null($value)) {
-            $value = Db::name('SystemConfig')->where('name', $name)->value('value');
-            if (is_null($value)) {
-                return '';
-            } else {
-                $json = json_decode($value,true);
-                if (is_null($json)) {
-                    return $value;
-                }else{
-                    return $json;
-                }
-            }
-        } else {
+		if (is_null($value)) {
+			$value = Db::name('SystemConfig')->where('name', $name)->value('value');
+			if (is_null($value)) {
+				return '';
+			} else {
+				$json = json_decode($value,true);
+				if (is_array($json)) {
+					return $json;
+				}else{
+					return $value;
+				}
+			}
+		} else {
             if(is_array($value)){
                 $value = json_encode($value,JSON_UNESCAPED_UNICODE);
             }
