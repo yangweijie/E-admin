@@ -667,6 +667,7 @@ class Grid extends Component
     public function jsonSerialize()
     {
         $this->exec();
+
         //添加按钮
         if (!$this->hideAddButton && !is_null($this->formAction)) {
             $form = $this->formAction->form();
@@ -720,8 +721,11 @@ class Grid extends Component
             $data = $this->parseData();
             $this->attr('data', $data);
         }
+
         if (request()->has('ajax_request_data') && request()->get('eadmin_class') == $this->callClass && !$this->attr('static')) {
+
             $data = $this->parseData();
+
             return [
                 'code' => 200,
                 'data' => $data,

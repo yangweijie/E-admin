@@ -88,7 +88,7 @@ class PlugService
     {
         return $this->plugPathBase;
     }
-    
+
 
     /**
      * 注册扩展
@@ -343,6 +343,8 @@ class PlugService
                 return false;
             }
         } catch (\Exception $exception) {
+            dump($exception->getMessage());
+            halt($exception->getTraceAsString());
             return false;
         }
     }

@@ -3,6 +3,7 @@
 namespace Eadmin\plugin;
 
 use Closure;
+use Eadmin\Admin;
 use Eadmin\form\drive\File;
 use Eadmin\form\Form;
 use Eadmin\model\SystemMenu;

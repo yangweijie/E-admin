@@ -36,6 +36,8 @@ use think\route\dispatch\Controller;
 
 class Admin
 {
+    protected static $permissions = [];
+
     /**
      * 配置系统参数
      * @param string $name 参数名称
@@ -51,16 +53,16 @@ class Admin
             if (is_null($value)) {
                 return '';
             } else {
-                $json = json_decode($value,true);
+                $json = json_decode($value, true);
                 if (is_null($json)) {
                     return $value;
-                }else{
+                } else {
                     return $json;
                 }
             }
         } else {
-            if(is_array($value)){
-                $value = json_encode($value,JSON_UNESCAPED_UNICODE);
+            if (is_array($value)) {
+                $value = json_encode($value, JSON_UNESCAPED_UNICODE);
             }
             $sysconfig = Db::name('SystemConfig')->where('name', $name)->find();
             if ($sysconfig) {
@@ -88,7 +90,7 @@ class Admin
         } else {
             $content = View::fetch($template, $vars);
         }
-        return Html::create($content)->tag('component')->attr('key',Str::random(30, 3));
+        return Html::create($content)->tag('component')->attr('key', Str::random(30, 3));
     }
 
     public static function notification()
@@ -139,7 +141,6 @@ class Admin
     {
         $nodeId = md5($class . $function . strtolower($method));
         $permissions = self::permissions();
-
         foreach ($permissions as $permission) {
             if ($permission['id'] == $nodeId) {
 
@@ -160,10 +161,13 @@ class Admin
      */
     public static function permissions()
     {
-
+        if (!empty(self::$permissions)) {
+            return self::$permissions;
+        }
         $permissionsKey = 'eadmin_permissions' . self::id();
         $nodes = Cache::get($permissionsKey);
         if ($nodes) {
+            self::$permissions = $nodes;
             return $nodes;
         }
         $nodes = self::node()->all();
@@ -197,6 +201,7 @@ class Admin
     {
         return new TokenService(config('admin.token'));
     }
+
     /**
      * 插件
      * @return PlugService
@@ -210,9 +215,11 @@ class Admin
      * 权限
      * @return AuthService
      */
-    public static function auth(){
+    public static function auth()
+    {
         return app('admin.auth');
     }
+
     /**
      * 菜单服务
      * @return MenuService
@@ -263,18 +270,20 @@ class Admin
      */
     public static function getDispatch($url)
     {
-
         $dispatch = null;
         try {
+            if (Str::endsWith($url, '.rest')) {
+                return null;
+            }
             if (strpos($url, '/') !== false) {
-                if($url instanceof Url){
+                if ($url instanceof Url) {
                     $url->suffix(false);
                 }
                 $parse = parse_url($url);
                 $path = $parse['path'] ?? '';
                 $pathinfo = array_filter(explode('/', $path));
                 $name = current($pathinfo);
-                if(empty(app('http')->getName())){
+                if (empty(app('http')->getName())) {
                     app('http')->name('admin');
                     app()->setNamespace("app\\admin");
                 }
@@ -335,7 +344,8 @@ class Admin
      * @param $url
      * @return array
      */
-    public static function parseUrlQuery($url){
+    public static function parseUrlQuery($url)
+    {
         $vars = [];
         if (is_string($url) || $url instanceof Url) {
             $parse = parse_url($url);
@@ -345,6 +355,7 @@ class Admin
         }
         return $vars;
     }
+
     /**
      * 解析url并执行返回
      * @param mixed $url
@@ -374,9 +385,9 @@ class Admin
             }
             $request->withGet($get);
         }
-        if($data instanceof Component){
+        if ($data instanceof Component) {
             return $data;
-        }else{
+        } else {
             return $url;
         }
     }
@@ -416,9 +427,9 @@ class Admin
         app()->route->delete('filesystem/del', FileSystem::class . '@del');
         app()->route->post('filesystem/moveCate', FileSystem::class . '@moveCate');
         //系统队列
-        app()->route->get('queue/progress',function (){
+        app()->route->get('queue/progress', function () {
             $queue = new QueueService(app()->request->get('id'));
-            return json(['code'=>200,'data'=>$queue->progress()]);
+            return json(['code' => 200, 'data' => $queue->progress()]);
         });
         app()->route->get('queue', Queue::class . '@index');
         app()->route->post('queue/retry', Queue::class . '@retry');

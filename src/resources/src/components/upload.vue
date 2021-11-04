@@ -69,7 +69,7 @@
           <i class="el-icon-close" @click="fileDelete(index)" /><i class="el-icon-close-tip" />
         </div>
       </div>
-      <div class="fileButtonBox" v-if="displayType == 'file'" v-show="showUploadBtn || foreverShow" >
+      <span :class="inputShow?'fileButtonBox':''" v-if="displayType == 'file'" v-show="showUploadBtn || foreverShow" >
         <div style="margin-right: 5px;width: 100%" v-if="inputShow">
             <el-input v-model="inputValue" @change="changeInput"></el-input>
         </div>
@@ -88,7 +88,7 @@
            <el-progress v-show="progressShow" style="margin: 13px 0px" :text-inside="true" :stroke-width="15" :percentage="percentage" />
         </slot>
       </span>
-      </div>
+      </span>
     </span>
     <el-dialog :title="trans('el.upload.resource')" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
       <el-row :gutter="10">

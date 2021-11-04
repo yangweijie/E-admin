@@ -63,7 +63,7 @@ class Actions extends Html
         $this->space = Space::create()->wrap()->size(10);
         $this->row = $data;
         //如果有id设置id标示
-        $pk = $this->grid->drive()->getPk();
+       $pk = $this->grid->drive()->getPk();
         if (isset($data[$pk])) {
             $this->id = $data[$pk];
         }
@@ -238,7 +238,6 @@ class Actions extends Html
                     ->method('DELETE');
                 $this->space->content($button);
             }
-
         }
     }
 

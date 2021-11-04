@@ -53,7 +53,7 @@ class ServiceProvider extends Service
         //注册上传路由
         FileService::instance()->registerRoute();
         //注册插件
-        //Admin::plug()->register();
+        Admin::plug()->register();
         //视图路由
         Admin::registerRoute();
 
