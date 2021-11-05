@@ -217,7 +217,7 @@ export default defineComponent({
         var suffix = filename.substring(index + 1, filename.length)
         filename = uniqidMd5() + '.' + suffix
         if (props.upType == 'oss') {
-          props.oss = new OSS({
+          state.oss = new OSS({
             accessKeyId: props.accessKey,
             accessKeySecret: props.secretKey,
             bucket: props.bucket,
