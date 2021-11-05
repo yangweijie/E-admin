@@ -61,7 +61,7 @@ class Plug extends Command
         //数据库填充
         mkdir($database.DIRECTORY_SEPARATOR.'seeds');
         //config文件
-        file_put_contents($plugNameDir.'config.php','<?php');
+        file_put_contents($plugNameDir.'config.php','<?php return [];');
         $res =  $this->composerFile($plugNameDir);
         if($res){
             $this->serviceProviderFile($plugNameDir);
