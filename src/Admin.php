@@ -54,10 +54,10 @@ class Admin
                 return '';
             } else {
                 $json = json_decode($value, true);
-                if (is_null($json)) {
-                    return $value;
-                } else {
+                if (is_array($json)) {
                     return $json;
+                } else {
+                    return $value;
                 }
             }
         } else {
