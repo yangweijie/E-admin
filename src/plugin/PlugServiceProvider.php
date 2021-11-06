@@ -166,6 +166,7 @@ PHP;
         $dir = basename($this->getPath());
         $this->app->route->group('plugin/' . $dir, function () {
             $pathinfo = strpos(Request::server('REQUEST_URI'), '?') ? strstr(Request::server('REQUEST_URI'), '?', true) : Request::server('REQUEST_URI');
+            $pathinfo = ltrim($pathinfo,'/');
             $pathArr = explode('/', $pathinfo);
             if($pathArr[0] == 'api'){
                 $namespace = $this->getNamespace().'controller\\api\\';
