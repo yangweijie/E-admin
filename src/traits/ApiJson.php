@@ -11,11 +11,15 @@ namespace Eadmin\traits;
 
 
 use app\common\service\ApiCode;
+use think\Collection;
 use think\exception\HttpResponseException;
+use think\facade\Db;
+use think\Model;
 
 
 trait  ApiJson
 {
+    protected $example = [];
     /**
      * 返回成功json
      * @Author: rocky
@@ -46,7 +50,30 @@ trait  ApiJson
         $response = $this->responseJsonData($data, $code, $msg, $http_code);
         throw new HttpResponseException($response);
     }
+    public function getExample(){
+        return $this->example;
+    }
+    protected function createExample($data){
+        if($data instanceof Collection){
+            $data = $data->shift();
+        }
 
+        if($data instanceof Model){
+            $fields = $data->getFields();
+            foreach ($fields as $field=>$row){
+
+                if($row['primary'] && empty($row['comment'])){
+                    $table = $data->getTable();
+                    $arr = Db::query("show table status like '$table'");
+                    $info  = current($arr);
+                    $this->example[$field] = $info['Comment'].$field;
+                }
+                if(!empty($row['comment'])){
+                    $this->example[$field] = $row['comment'];
+                }
+            }
+        }
+    }
 	/**
 	 * 输出自定义json
 	 * @Author: rocky
@@ -58,6 +85,7 @@ trait  ApiJson
 	 */
 	protected function responseJsonData($data = [], $code = 200, $errMsg = '', $http_code = 200)
 	{
+	    $this->createExample($data);
 		$return['code'] = (int)$code;
 		if (!empty($errMsg)) {
 			$return['message'] = $errMsg;

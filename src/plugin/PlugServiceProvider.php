@@ -171,6 +171,7 @@ PHP;
             if($pathArr[0] == 'api'){
                 $namespace = $this->getNamespace().'controller\\api\\';
                 $method = Request::method();
+                $method = strtolower($method);
                 //兼容快捷路由和按请求方式访问
                 $function = '';
                 $rule = '';

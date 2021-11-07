@@ -39,8 +39,14 @@ class Annotation
                     $param['type'] = trim($arr[0]);
                 }
                 $param['var'] = trim(substr($arr[$varIndex],1));
+                $data['params'][] = $param;
+            }elseif (preg_match('/^@response/i', $comment)){
+                $arr = explode(' ',$comment);
+                array_shift($arr);
+                $param['resource'] = array_shift($arr);
+                $param['desc'] = trim(implode('',$arr));
+                $data['response'][] = $param;
             }
-            $data['params'][] = $param;
         }
         return $data;
     }
