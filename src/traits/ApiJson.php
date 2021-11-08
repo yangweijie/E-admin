@@ -19,6 +19,7 @@ use think\Model;
 
 trait  ApiJson
 {
+    protected $data = []; 
     protected $example = [];
     /**
      * 返回成功json
@@ -54,10 +55,9 @@ trait  ApiJson
         return $this->example;
     }
     protected function createExample($data){
-        if($data instanceof Collection){
-            $data = $data->shift();
+        if($data instanceof Collection && $data->count() > 0){
+            $data = $data[0];
         }
-
         if($data instanceof Model){
             $fields = $data->getFields();
             foreach ($fields as $field=>$row){
@@ -85,6 +85,7 @@ trait  ApiJson
 	 */
 	protected function responseJsonData($data = [], $code = 200, $errMsg = '', $http_code = 200)
 	{
+        $this->data = $data;
 	    $this->createExample($data);
 		$return['code'] = (int)$code;
 		if (!empty($errMsg)) {
@@ -96,7 +97,9 @@ trait  ApiJson
 		$return['data'] = $data;
 		return json($return, $http_code);
 	}
-
+    public function getData(){
+        return $this->data;
+    }
 	/**
 	 * 判断是否是空数组/集合
 	 * @param mixed $data 数据

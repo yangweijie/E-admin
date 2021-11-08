@@ -9,7 +9,7 @@
 namespace Eadmin\model;
 
 
-use app\model\User;
+
 use Eadmin\Admin;
 use think\db\Query;
 use think\facade\Request;
@@ -45,8 +45,4 @@ class BaseModel extends Model
         $query->page($page, $size);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'uid');
-    }
 }

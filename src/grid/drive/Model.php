@@ -59,9 +59,9 @@ class Model implements GridInterface
             $this->isSotfDelete = true;
             if (request()->has('eadmin_deleted')) {
                 $this->db->removeWhereField($this->softDeleteField);
-                $this->db->whereNotNull($this->softDeleteField);
+                $this->db->where($this->softDeleteField,'<>',0);
             } else {
-                $this->db->whereNull($this->softDeleteField);
+                $this->db->where($this->softDeleteField,0);
             }
         }
     }

@@ -184,6 +184,12 @@ class PlugService
         $plugs = [];
         foreach ($this->plugPaths as $plug) {
             $info = $this->info(basename($plug));
+            if(isset($this->serviceProvider[$info['name']])){
+                $service = $this->serviceProvider[$info['name']];
+                if(method_exists($service,'setting')){
+                    $info['setting'] = app()->invoke([$service,'setting']);
+                }
+            }
             $info['install'] = true;
             $info['versions'] = [];
             $plugs[] = $info;

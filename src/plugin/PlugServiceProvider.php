@@ -100,7 +100,7 @@ abstract class PlugServiceProvider extends Service
      */
     final public function config($key, $value = null)
     {
-        $file = static::instance()->getPath() . '/src/config.php';
+        $file = static::instance()->getPath() . '/config.php';
         $data = include $file;
         if (is_null($value)) {
             return Arr::get($data, $key);

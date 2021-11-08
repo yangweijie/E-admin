@@ -50,6 +50,9 @@ class Plug extends Command
         mkdir($plugNameDir.'model');
         //服务目录
         mkdir($plugNameDir.'service');
+        //资源目录
+        mkdir($plugNameDir.'resource');
+        
         $this->serviceFile($plugNameDir);
         //语言包目录
         mkdir($plugNameDir.'lang');
