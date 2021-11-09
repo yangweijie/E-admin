@@ -7,10 +7,18 @@ use plugin\IDE;
 /**
  * @mixin  IDE
  */
-class Manage 
+class Manage
 {
     public function __get($name)
     {
-        return Admin::plug()->getServiceProviders($name);
+        $plug = Admin::plug()->getServiceProviders($name);
+        if(is_null($plug)){
+            return $this;
+        }
+        return $plug;
+    }
+    public function __call($name, $arguments)
+    {
+       return null;
     }
 }

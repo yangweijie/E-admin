@@ -240,7 +240,7 @@ class TokenService
      */
     public function id()
     {
-        return $this->getVar('id');
+        return $this->getVar('id') ?? 0;
     }
 
     /**

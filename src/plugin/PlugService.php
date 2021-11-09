@@ -129,7 +129,10 @@ class PlugService
         if (empty($name)) {
             return $this->serviceProvider;
         }
-        return $this->serviceProvider[$name];
+        if(isset($this->serviceProvider[$name])){
+            return $this->serviceProvider[$name];
+        }
+       return null;
     }
 
     public function getCate()
