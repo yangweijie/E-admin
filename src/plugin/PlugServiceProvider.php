@@ -98,10 +98,13 @@ abstract class PlugServiceProvider extends Service
      * @param string $value
      * @return array|\ArrayAccess|false|int|mixed
      */
-    final public function config($key, $value = null)
+    final public function config($key = null, $value = null)
     {
         $file = static::instance()->getPath() . '/config.php';
         $data = include $file;
+        if(is_null($key)){
+            return $data;
+        }
         if (is_null($value)) {
             return Arr::get($data, $key);
         }

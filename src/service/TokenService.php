@@ -32,20 +32,21 @@ class TokenService
     protected static $userModel = null;
     protected $unique = false;
     protected $authFields = [];
+    protected $config = [];
 
-    public function __construct($config = [])
+    public function __construct($type = null)
     {
-        if(empty($config)){
-            $config = config('token');
+        if (empty($type)) {
+            $type = config('admin.token.default');
         }
-        $key = $config['key'] ?? 'QoYEClMJsgOSWUBkSCq26yWkApqSuH3';
-        $this->key = substr(md5($key), 8, 16);
-        $this->model = $config['model'];
-        $this->unique = $config['model'] ?? false;
-        $this->expire = $config['expire'] ?? 7200;
-        $this->authFields = $config['auth_field'] ?? [];
-        if(isset($config['debug']) && $config['debug']){
-            $user = $this->model::find($config['uid']);
+        $this->config = config('admin.token.' . $type);
+        $this->key = substr(md5($this->config['key']), 8, 16);
+        $this->model = $this->config['model'];
+        $this->unique = $this->config['model'];
+        $this->expire = $this->config['expire'] ?? 7200;
+        $this->authFields = $this->config['auth_field'] ?? [];
+        if (isset($this->config['debug']) && $this->config['debug']) {
+            $user = $this->model::find($this->config['uid']);
             $tokens = $this->encode($user);
             $this->set($tokens['token']);
         }
@@ -244,7 +245,7 @@ class TokenService
 
     /**
      * 返回用户模型
-	 * @param bool $lock 是否锁表
+     * @param bool $lock 是否锁表
      * @return mixed
      */
     public function user($lock = false)
@@ -257,7 +258,7 @@ class TokenService
             $tableFields = $user->getTableFields();
             self::$userModel = $user->lock($lock)
                 ->when(in_array('delete_time', $tableFields), function (Query $query) {
-                    $query->whereNull('delete_time');
+                    $query->where('delete_time',0);
                 })->find($this->id());
         }
         return self::$userModel;

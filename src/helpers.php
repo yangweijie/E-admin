@@ -3,6 +3,7 @@
 use rockySysLog\model\SystemLog;
 use admin\service\TokenService;
 use Eadmin\Admin;
+
 if (!function_exists('redis')) {
     /**
      * @return \Redis
@@ -20,9 +21,9 @@ if (!function_exists('sysqueue')) {
      * @param int $delay 延迟时间
      * @return mixed
      */
-    function sysqueue($title,$job, array $data,$delay = 0)
+    function sysqueue($title, $job, array $data, $delay = 0)
     {
-        return Admin::queue($title,$job,$data,$delay);
+        return Admin::queue($title, $job, $data, $delay);
     }
 }
 if (!function_exists('sysconf')) {
@@ -36,10 +37,10 @@ if (!function_exists('admin_log')) {
     {
         SystemLog::create([
             'username' => TokenService::instance()->user()->nickname ?? 'cli',
-            'geoip'    => request()->ip(),
-            'action'   => $action,
-            'node'     => request()->url(),
-            'content'  => $content,
+            'geoip' => request()->ip(),
+            'action' => $action,
+            'node' => request()->url(),
+            'content' => $content,
         ]);
     }
 }
@@ -165,12 +166,13 @@ if (!function_exists('admin_trans')) {
     /**
      * 获取语言变量值
      * @param string $name 语言变量名
-     * @param array  $vars 动态变量值
+     * @param array $vars 动态变量值
      * @param string $lang 语言
      * @return mixed
      */
-    function admin_trans(string $name, array $vars = [], string $lang = ''){
-        return app('admin.translator')->trans($name,$vars,$lang);
+    function admin_trans(string $name, array $vars = [], string $lang = '')
+    {
+        return app('admin.translator')->trans($name, $vars, $lang);
     }
 }
 if (!function_exists('rgbToHex')) {
@@ -212,14 +214,14 @@ if (!function_exists('color_mix')) {
      * @param int $rate 百分比
      * @return array
      */
-    function color_mix($color1,$color2,$rate=50)
+    function color_mix($color1, $color2, $rate = 50)
     {
         $rgb1 = hex2rgba($color1);
         $rgb2 = hex2rgba($color2);
         //颜色A-(颜色A-颜色B)*(1-颜色A的百分比)
-        $r = round($rgb1['r']-($rgb1['r']-$rgb2['r']) * (1-$rate*0.01));
-        $g = round($rgb1['g']-($rgb1['g']-$rgb2['g']) * (1-$rate*0.01));
-        $b = round($rgb1['b']-($rgb1['b']-$rgb2['b']) * (1-$rate*0.01));
+        $r = round($rgb1['r'] - ($rgb1['r'] - $rgb2['r']) * (1 - $rate * 0.01));
+        $g = round($rgb1['g'] - ($rgb1['g'] - $rgb2['g']) * (1 - $rate * 0.01));
+        $b = round($rgb1['b'] - ($rgb1['b'] - $rgb2['b']) * (1 - $rate * 0.01));
         return rgbToHex("rgb($r,$g,$b)");
     }
 }
@@ -231,6 +233,16 @@ if (!function_exists('plug')) {
     function plug()
     {
         return new \Eadmin\plugin\Manage();
+    }
+}
+if (!function_exists('auth')) {
+    /**
+     * token
+     * @return \Eadmin\service\TokenService
+     */
+    function auth($type = 'api')
+    {
+        return new \Eadmin\service\TokenService($type);
     }
 }
 

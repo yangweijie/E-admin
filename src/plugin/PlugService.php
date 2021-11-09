@@ -360,6 +360,7 @@ class PlugService
         $this->initialize();
         $doc = '';
         $count = count($this->plugPaths);
+        $this->plugPaths = array_unique($this->plugPaths);
         foreach ($this->plugPaths as $index => $plug) {
             $name = basename($plug);
             $info = $this->info($name);
