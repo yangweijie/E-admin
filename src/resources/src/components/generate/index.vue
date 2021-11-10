@@ -1,39 +1,12 @@
 <template>
     <el-container style="background: #FFFFFF">
         <el-container>
-            <el-header class="header">
-                <div>
-                    一键CURD
-                </div>
-                <div>
-                    <el-dialog
-                            title="数据库"
-                            v-model="dialogVisible"
-                            width="70%"
-                            custom-class="dialogTableClass"
-                    >
-                        <fieldForm></fieldForm>
-                    </el-dialog>
-                    <el-button @click="dialogVisible = true">数据库</el-button>
-                    <el-button @click="dialogEnumVisible = true">枚举字典</el-button>
-                    <el-dialog
-                            title="枚举字典"
-                            @open="openEnum"
-                            v-model="dialogEnumVisible"
-                            width="80%"
-                            custom-class="dialogTableClass"
-                    >
-                        <render :data="dialogEnum"></render>
-                    </el-dialog>
-                    <el-button @click="codeVisible = true">预览代码</el-button>
-                    <el-button @click="isSave = true" type="primary">保存</el-button>
-                </div>
-            </el-header>
+
              <el-container>
                  <el-aside width="300px">
                      <contoller v-model:field="initField" v-model:method-type="methodType" v-model:method-config="generateData" v-model:codeVisible="codeVisible" v-model:save="isSave"></contoller>
                  </el-aside>
-                 <el-aside width="300px" v-if="methodType == 2">
+                 <el-aside width="300px" v-if="methodType == 2" style="border-left: 1px solid #cccccc;">
                      <div v-for="group in componentList">
                          <div style="display: flex;align-items: center;margin: 5px">
                              <i class="el-icon-printer"></i><div style="margin-left: 5px">{{group.label}}</div>
@@ -57,8 +30,37 @@
                      </div>
                  </el-aside>
                  <el-main class="mainDiv">
-                     <EadminGrid v-if="methodType == 1" v-bind="generateData.grid"></EadminGrid>
-                     <el-form class="drawing" v-else-if="methodType == 2" v-bind="generateData.form">
+                     <el-header  class="header">
+                     <div>
+
+                     </div>
+                     <div>
+                       <el-dialog
+                           title="数据库"
+                           v-model="dialogVisible"
+                           width="70%"
+                           custom-class="dialogTableClass"
+                       >
+                         <fieldForm></fieldForm>
+                       </el-dialog>
+                       <el-button @click="dialogVisible = true">数据库</el-button>
+                       <el-button @click="dialogEnumVisible = true">枚举字典</el-button>
+                       <el-dialog
+                           title="枚举字典"
+                           @open="openEnum"
+                           v-model="dialogEnumVisible"
+                           width="80%"
+                           custom-class="dialogTableClass"
+                       >
+                         <render :data="dialogEnum"></render>
+                       </el-dialog>
+                       <el-button @click="codeVisible = true">预览代码</el-button>
+                       <el-button @click="isSave = true" type="primary">保存</el-button>
+                     </div>
+                   </el-header>
+                     <div class="content">
+                       <EadminGrid v-if="methodType == 1" v-bind="generateData.grid"></EadminGrid>
+                       <el-form class="drawing-form" v-else-if="methodType == 2" v-bind="generateData.form">
                          <draggable :list="generateComponentList"
                                     group="componentsGroup"
                                     item-key="id"
@@ -67,19 +69,20 @@
                                     @add="add"
                                     @choose="choose"
                          >
-                             <template #item="{element,index}">
-                                 <div :class="['drawing-item',chooseIndex==index?'active':'']" @mouseover="itemHover = index" @mouseout="itemHover = -1">
-                                     <render :data="element.formItem" :proxy-data="proxyData"></render>
-                                     <span title="复制" class="drawing-item-copy" v-show="itemHover==index" @click="copy(element)"><i class="el-icon-copy-document"></i></span>
-                                     <span title="删除" class="drawing-item-delete" v-show="itemHover==index" @click="del(index)"><i class="el-icon-delete"></i></span>
-                                 </div>
-                             </template>
+                           <template #item="{element,index}">
+                             <div :class="['drawing-item',chooseIndex==index?'active':'']" @mouseover="itemHover = index" @mouseout="itemHover = -1">
+                               <render :data="element.formItem" :proxy-data="proxyData"></render>
+                               <span title="复制" class="drawing-item-copy" v-show="itemHover==index" @click="copy(element)"><i class="el-icon-copy-document"></i></span>
+                               <span title="删除" class="drawing-item-delete" v-show="itemHover==index" @click="del(index)"><i class="el-icon-delete"></i></span>
+                             </div>
+                           </template>
                          </draggable>
                          <el-form-item v-if="!generateData.form.hideAction">
-                             <el-button type="primary">保存</el-button>
-                             <el-button>重置</el-button>
+                           <el-button type="primary">保存</el-button>
+                           <el-button>重置</el-button>
                          </el-form-item>
-                     </el-form>
+                       </el-form>
+                     </div>
                  </el-main>
              </el-container>
         </el-container>
@@ -465,9 +468,10 @@
                 isSave:false,
                 generateData:{
                     grid:{
-                        filterField:'filterField',
+                        //filterField:'filterField',
                         setPageLimit:20,
                         columns:[],
+                        columnsGenerate:true,
                         static:true,
                         proxyData:proxyData,
                     },
@@ -690,18 +694,28 @@
 <style lang="scss" scoped>
     .header{
         border-bottom: 1px solid #cccccc;
-        border-right: 1px solid #cccccc;
         display: flex;
         justify-content: space-between;
-        height: 40px !important;
         align-items: center;
+        background: #FFFFFF;
     }
     .mainDiv{
         border-left: 1px solid #cccccc;
         border-right: 1px solid #cccccc;
+        padding: 0;
+        background: #fafafa;
+    }
+    .mainDiv .content{
+      padding:20px;
+    }
+    .drawing-form{
+
+      background: #fff;
+      border: 1px dashed #999;
     }
     .drawing{
-        position: relative;
+      position: relative;
+
     }
     .components-draggable .components-item {
         display: inline-block;
@@ -768,6 +782,7 @@
     }
     .drawing-item:hover{
         cursor: move;
+        border: 1px dashed #409eff;
         background: #f6f7ff;
     }
     .select-item {

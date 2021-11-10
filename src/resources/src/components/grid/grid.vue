@@ -192,6 +192,7 @@
         props: {
             data: Array,
             columns: Array,
+            columnsGenerate: Boolean,
             pagination: [Object, Boolean],
             modelValue: Boolean,
             loadDataUrl: String,
@@ -361,8 +362,14 @@
               return data
             }
             function computedColumn() {
+
                 return columns.value.filter(item=>{
+                  if(props.columnsGenerate) {
+                    return true
+                  }else{
                     return checkboxColumn.value.indexOf(item.prop) >= 0 && !item.hide
+                  }
+
                 })
             }
             const tableColumns = computed(computedColumn)

@@ -32,7 +32,7 @@
             <a-dropdown :trigger="['contextmenu']">
                 <div style="height: 100%">
                     <div style="text-align: center;height: 20px">控制器</div>
-                    <a-list bordered :data-source="controllers" style="height: calc(100vh - 20px)"
+                    <a-list bordered :data-source="controllers" style="height: calc(100vh - 20px);border-right: none"
                             :locale="{emptyText:'右键添加控制器'}">
                         <template #renderItem="{ item ,index}">
                             <div :class="['listItem',selectIndex==index?'active':'']">
@@ -104,7 +104,7 @@
             <a-dropdown :trigger="['contextmenu']">
                 <div style="height: 100%">
                     <div style="text-align: center;height: 20px">方法</div>
-                    <a-list bordered :data-source="methods" style="height: calc(100vh - 20px)"
+                    <a-list bordered :data-source="methods" style="height: calc(100vh - 20px);border-right: none"
                             :locale="{emptyText:'右键添加方法'}">
                         <template #renderItem="{ item ,index}">
                             <div :class="['listItem',selectMethodIndex==index?'active':'']">
@@ -233,10 +233,10 @@
             watch(()=>state.tableField,value=>{
                 ctx.emit('update:field',value)
             })
-            http('rockysView/table').then(res=>{
+            http('api/plugin/curd/table').then(res=>{
                 state.tables = res.data
             })
-            http('rockysView/controller').then(res=>{
+            http('api/plugin/curd/controller').then(res=>{
                 state.controllers = res.data
             })
             function selectController(index) {
@@ -244,7 +244,7 @@
                 state.selectMethodIndex = -1
               //  ctx.emit('update:methodConfig',[])
                 http({
-                    url:'rockysView/method',
+                    url:'api/plugin/curd/method',
                     params:{
                         controller_id :state.controllers[state.selectIndex].id
                     }
@@ -273,7 +273,7 @@
                     ctx.emit('update:methodConfig',config)
                 }else{
                     http({
-                        url:'rockysView/field',
+                        url:'api/plugin/curd/field',
                         params:{
                             table_id :state.controllers[state.selectIndex].table_id
                         }
@@ -320,7 +320,7 @@
             function saveMethod() {
                 state.formMethod.controller_id = state.controllers[state.selectIndex].id
                 http({
-                    url:'rockysView/method',
+                    url:'api/plugin/curd/method',
                     method:'post',
                     data:state.formMethod
                 }).then(res=>{
@@ -342,7 +342,7 @@
             }
             function saveController() {
                 http({
-                    url:'rockysView/controller',
+                    url:'api/plugin/curd/controller',
                     method:'post',
                     data:state.form
                 }).then(res=>{
@@ -363,7 +363,7 @@
             }
             function delController() {
                 http({
-                    url:'rockysView/controller',
+                    url:'api/plugin/curd/controller',
                     method:'delete',
                     data:{
                         id:state.controllers[state.selectIndex].id
@@ -379,7 +379,7 @@
             }
             function delMethod() {
                 http({
-                    url:'rockysView/method',
+                    url:'api/plugin/curd/method',
                     method:'delete',
                     data:{
                         id:state.methods[state.selectMethodIndex].id
@@ -396,10 +396,10 @@
             //预览代码
             function previewCode(){
                 http({
-                    url:'rockysView/code',
+                    url:'api/plugin/curd/method/code',
                     method:'post',
                     data:{
-                        controller:state.controllers[state.selectIndex].name,
+                        controller_name:state.controllers[state.selectIndex].name,
                         name:state.methods[state.selectMethodIndex].name,
                         desc:state.methods[state.selectMethodIndex].desc,
                         is_login:state.methods[state.selectMethodIndex].is_login,
