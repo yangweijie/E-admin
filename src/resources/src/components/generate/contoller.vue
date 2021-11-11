@@ -29,7 +29,7 @@
                     <span> </span>
                 </template>
             </el-popover>
-            <a-dropdown :trigger="['contextmenu']">
+            <a-dropdown :trigger="['contextmenu']" @visibleChange="visibleController">
                 <div style="height: 100%">
                     <div style="text-align: center;height: 20px">控制器</div>
                     <a-list bordered :data-source="controllers" style="height: calc(100vh - 20px);border-right: none"
@@ -101,7 +101,7 @@
                     <span> </span>
                 </template>
             </el-popover>
-            <a-dropdown :trigger="['contextmenu']">
+            <a-dropdown :trigger="['contextmenu']" >
                 <div style="height: 100%">
                     <div style="text-align: center;height: 20px">方法</div>
                     <a-list bordered :data-source="methods" style="height: calc(100vh - 20px);border-right: none"
@@ -233,12 +233,20 @@
             watch(()=>state.tableField,value=>{
                 ctx.emit('update:field',value)
             })
-            http('api/plugin/curd/table').then(res=>{
-                state.tables = res.data
-            })
+
             http('api/plugin/curd/controller').then(res=>{
                 state.controllers = res.data
             })
+            function loadTable(){
+              http('api/plugin/curd/table').then(res=>{
+                state.tables = res.data
+              })
+            }
+            function visibleController(bool){
+              if(bool){
+                loadTable()
+              }
+            }
             function selectController(index) {
                 state.selectIndex = index
                 state.selectMethodIndex = -1
@@ -414,6 +422,7 @@
                 })
             }
             return {
+                visibleController,
                 previewCode,
                 loading,
                 editMethod,

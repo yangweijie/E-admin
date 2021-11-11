@@ -30,9 +30,8 @@
                 value.value = val
             })
             watch(value, value => {
-
                 ctx.emit('update:modelValue', value)
-            })
+            },{deep:true})
             //标签是否选择
             function isSelect(selectValue){
                 if(props.multiple){
@@ -57,12 +56,14 @@
                     return
                 }
                 if(props.multiple){
+
                     if(checked){
                         value.value.push(val)
                     }else{
                         const index =  value.value.indexOf(val)
                         value.value.splice(index, 1)
                     }
+
                 }else{
                     if(checked){
                         value.value = val

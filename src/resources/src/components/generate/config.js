@@ -145,7 +145,7 @@ export const components = [
             {
                 value:20,
                 label: "时间范围",
-                component:generateComponent('ElTimePicker',{component:'timeRange',clearable:true,isRange:true,valueFormat:'YHH:mm:ss'})
+                component:generateComponent('ElTimePicker',{component:'timeRange',clearable:true,isRange:true,valueFormat:'HH:mm:ss'})
             },
             {
                 value:21,

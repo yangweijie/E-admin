@@ -37,8 +37,9 @@
                      <div>
                        <el-dialog
                            title="数据库"
+                           :close-on-click-modal="false"
                            v-model="dialogVisible"
-                           width="70%"
+                           width="80%"
                            custom-class="dialogTableClass"
                        >
                          <fieldForm></fieldForm>
@@ -484,9 +485,9 @@
                     },
                 },
             })
-            http('PlugDictionary/data').then(res=>{
-                state.enumOptions = res.data
-            })
+            // http('PlugDictionary/data').then(res=>{
+            //     state.enumOptions = res.data
+            // })
             watch(()=>state.initField,value=>{
                 if(state.methodType == 1){
                     state.generateData.grid.columns.splice(0,state.generateData.grid.columns.length)
@@ -576,6 +577,7 @@
             function componentGenerate(component,form_type,value='',formItemAttr={label:'标题'}) {
                 const cloneJson = JSON.parse(JSON.stringify(component))
                 const modelValue = randomCoding(20)
+
                 if(cloneJson.attribute.component == 'checkbox'){
                     proxyData[modelValue] = []
                 }else{
@@ -707,6 +709,8 @@
     }
     .mainDiv .content{
       padding:20px;
+      height: calc(100vh - 60px);
+      overflow-y: auto;
     }
     .drawing-form{
 
