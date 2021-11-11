@@ -19,7 +19,7 @@
 
 <script>
     import {useRoute} from 'vue-router'
-    import {link, findTree} from '@/utils'
+    import {link, findTree,treeMapFilter} from '@/utils'
     import Logo from '../logo.vue'
     import menuItem from './menuItem.vue'
     import {defineComponent, inject, computed,watchEffect,ref} from 'vue'
@@ -36,18 +36,11 @@
             const state = inject(store)
             const sidebar = state.sidebar
             const defaultOpeneds = ref([])
-            //默认展开子菜单
-            state.menus.forEach(res => {
-              if(state.topMenuMode){
-                if(res.children){
-                  res.children.forEach(item=>{
-                    defaultOpeneds.value.push(item.id+'')
-                  })
-                }
-              }else{
-                defaultOpeneds.value.push(res.id+'')
-              }
+            //默认展开菜单
+            defaultOpeneds.value = treeMapFilter(state.menus,'id','open').map(item=>{
+               return item+''
             })
+
             //侧边栏菜单渲染
             const menus = computed(() => {
                 let menu = null

@@ -63,6 +63,30 @@ export function treeMap(datas: Array<any>,  field: string) {
     // @ts-ignore
     return keys = keys.concat(mapKey)
 }
+export function treeMapFilter(datas: Array<any>,  field: string,conditionField) {
+    let data = [];
+    let keys = [];
+    const mapData = datas.filter(item => {
+        if (item.children) {
+            // @ts-ignore
+            data = data.concat(treeMapFilter(item.children, field,conditionField))
+
+        }
+        if(item[conditionField]){
+          return true
+        }
+        return false
+    });
+    // @ts-ignore
+    data = data.concat(mapData)
+    keys = data.map(item=>{
+        if(item[field]){
+            return item[field]
+        }
+        return item
+    })
+    return keys
+}
 export function findTree(datas: Array<any>, id: any, field: string) {
     for (let key in datas) {
         if (datas[key][field] == id) {
