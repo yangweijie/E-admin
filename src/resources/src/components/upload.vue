@@ -29,11 +29,12 @@
         </span>
       </div>
     </span>
+
     <span v-if="displayType=='image'" v-show="showUploadBtn || foreverShow" ref="btn"  @click="handelBrowse">
       <slot>
-        <label class="uploader-btn" :style="{height: styleHeight,width:styleWidth}">
-          <el-progress v-show="progressShow" class="progess" type="circle" :width="height" :percentage="percentage" />
-          <i v-show="!progressShow" class="el-icon-plus progess" />
+       <label class="uploader-btn" :style="{height: styleHeight,width:styleWidth}">
+            <el-progress v-show="progressShow" class="progess" type="circle" :width="height" :percentage="percentage" />
+            <i v-show="!progressShow" class="el-icon-plus progess" />
         </label>
       </slot>
     </span>
@@ -88,6 +89,7 @@
            <el-progress v-show="progressShow" style="margin: 13px 0px" :text-inside="true" :stroke-width="15" :percentage="percentage" />
         </slot>
       </span>
+        <el-button icon="el-icon-menu" v-if="finder" @click="dialogVisible = true"></el-button>
       </span>
     </span>
     <el-dialog :title="trans('el.upload.resource')" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
@@ -328,7 +330,7 @@ export default defineComponent({
       }else{
         uploader.assignDrop(btn.value)
       }
-      if(!props.finder){
+      if(!props.finder || props.displayType === 'file'){
         uploader.assignBrowse(btn.value, false, !props.multiple, {
           accept: props.accept
         })
@@ -662,7 +664,7 @@ export default defineComponent({
 
     }
     function handelBrowse() {
-      if(props.finder){
+      if(props.finder && props.displayType === 'image'){
         state.dialogVisible = true
       }
       state.percentage = 0
@@ -830,4 +832,5 @@ export default defineComponent({
     display: flex;
     width: 100%;
   }
+
 </style>
