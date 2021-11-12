@@ -48,6 +48,7 @@ x: number | true, y: number
  * @method $this hideDeleteButton(bool $bool = true) 隐藏删除按钮
  * @method $this hideTrashed(bool $bool = true) 隐藏回收站
  * @method $this hideTools(bool $bool = true) 隐藏工具栏
+ * @method $this autoLayout(bool $bool = true) 布局自适
  * @method $this autoHeight(bool $bool = true) 自适应高度
  * @method $this hideSelection(bool $bool = true) 隐藏选择框
  * @method $this hideDeleteSelection(bool $bool = true) 隐藏删除选中按钮

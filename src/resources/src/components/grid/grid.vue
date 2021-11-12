@@ -212,7 +212,11 @@
                 type:Array,
                 default:[]
             },
-            autoHeight: Boolean,
+            autoHeight:Boolean,
+            autoLayout: {
+              type:Boolean,
+              default:true
+            },
             hideDeleteButton: Boolean,
             hideTrashed: Boolean,
             hideTrashedDelete: Boolean,
@@ -378,61 +382,68 @@
                     filterInitData = JSON.parse(JSON.stringify(proxyData[props.filterField]))
                 }
                 if(props.autoHeight){
-                  //自适应最大高度
-                  if(!ctx.attrs.scroll.y){
-                    ctx.attrs.scroll.y = window.innerHeight - offsetTop(tableBox.value) - 65
-                  }
+                  autoHeight()
                 }
                 dragSort()
             })
+            function autoHeight(){
+              //自适应最大高度
+              if(!ctx.attrs.scroll.y){
+                ctx.attrs.scroll.y = window.innerHeight - offsetTop(tableBox.value) - 65
+              }
+            }
             function tableAutoWidth(){
-                try {
-                    if(ctx.attrs.scroll.y){
-                        columns.value.forEach(column=>{
-                            let width = 0
-                            if(!column.width){
-                                document.getElementsByClassName('eadmin_table_th_'+column.prop).forEach(item=>{
-                                    let offsetWidth = item.parentNode.parentNode.parentNode.parentNode.offsetWidth
-                                    if(width < offsetWidth){
-                                        width = offsetWidth
-                                    }
-                                })
-                                document.getElementsByClassName('eadmin_table_td_'+column.prop).forEach(item=>{
-                                    if(width < item.parentNode.offsetWidth){
-                                        width = item.parentNode.offsetWidth
-                                    }
-                                })
-                                column.width = width
-                            }
-                        })
-                    }
-                }catch (e) {
-
-                }
+                // try {
+                //     if(ctx.attrs.scroll.y && !props.autoHeight){
+                //         columns.value.forEach(column=>{
+                //             let width = 0
+                //             if(!column.width){
+                //                 document.getElementsByClassName('eadmin_table_th_'+column.prop).forEach(item=>{
+                //                     let offsetWidth = item.parentNode.parentNode.parentNode.parentNode.offsetWidth
+                //                     if(width < offsetWidth){
+                //                         width = offsetWidth
+                //                     }
+                //                 })
+                //                 document.getElementsByClassName('eadmin_table_td_'+column.prop).forEach(item=>{
+                //                     if(width < item.parentNode.offsetWidth){
+                //                         width = item.parentNode.offsetWidth
+                //                     }
+                //                 })
+                //                 column.width = width
+                //             }
+                //         })
+                //     }
+                // }catch (e) {
+                //
+                // }
                 nextTick(()=>{
                     //操作列自适应
+                  if(props.autoLayout){
                     columns.value.forEach(item=> {
-                        if(item.prop === 'EadminAction'){
-                            if(!item.width){
-                                let width = 0
-                                document.getElementsByClassName('EadminAction').forEach(item => {
-                                  let offsetWidth = item.offsetWidth
-                                  if (width < offsetWidth) {
-                                    width = offsetWidth
-                                  }
-                                })
-                                item.width = width+20
+                      if(item.prop === 'EadminAction'){
+                        if(!item.width){
+                          let width = 0
+                          document.getElementsByClassName('EadminAction').forEach(item => {
+                            let offsetWidth = item.offsetWidth
+                            if (width < offsetWidth) {
+                              width = offsetWidth
                             }
-                            //有滚动条操作列fixed
-                            if(dragTable.value && !item.fixed){
-                                const el = dragTable.value.$el.querySelectorAll('.ant-table-body')[0]
-                                const table = dragTable.value.$el.querySelectorAll('.ant-table-body > table')[0]
-                                if(table.clientWidth > el.clientWidth){
-                                    item.fixed = 'right'
-                                }
-                            }
+                          })
+                          item.width = width+20
                         }
+                        //有滚动条操作列fixed
+                        if(dragTable.value && !item.fixed){
+                          const el = dragTable.value.$el.querySelectorAll('.ant-table-body')[0]
+                          const table = dragTable.value.$el.querySelectorAll('.ant-table-body > table')[0]
+                          if(table.clientWidth > el.clientWidth){
+                            item.fixed = 'right'
+                            //高度自适应
+                            autoHeight()
+                          }
+                        }
+                      }
                     })
+                  }
                 })
             }
             //拖拽排序
