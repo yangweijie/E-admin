@@ -55,7 +55,7 @@
             <span> </span>
           </template>
         </el-popover>
-        <a-table size="small" :loading="loading" ref="dragTable" :dataSource="dataSource" :scroll="{y:460}" :pagination="false" :custom-row="customRow" row-key="row_key" :locale="{emptyText:'暂无字段'}" style="flex: 1">
+        <a-table size="small" :loading="loading" ref="dragTable" :dataSource="dataSource" :scroll="{y:520}" :pagination="false" :custom-row="customRow" row-key="row_key" :locale="{emptyText:'暂无字段'}" style="flex: 1">
 
           <a-table-column title="字段标题" data-index="desc" :width="150">
             <template #default="{ record }">
