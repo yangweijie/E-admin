@@ -62,6 +62,11 @@ class Annotation
                 }
                 $param['desc'] = $desc;
                 $data['header'][] = $param;
+            }elseif (preg_match('/^@group/i', $comment)){
+                $arr = explode(' ',$comment);
+                if(isset($arr[1])){
+                    $data['group'] = $arr[1];
+                }
             }
         }
         return $data;
