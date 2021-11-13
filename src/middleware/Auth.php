@@ -2,8 +2,8 @@
 
 namespace Eadmin\middleware;
 
-use app\common\facade\Token;
 use app\model\User;
+use Eadmin\support\Token;
 
 
 class Auth

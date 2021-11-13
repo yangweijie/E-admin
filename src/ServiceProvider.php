@@ -23,6 +23,7 @@ use Eadmin\service\AuthService;
 use Eadmin\service\BackupData;
 use Eadmin\service\MenuService;
 use Eadmin\service\QueueService;
+use Eadmin\service\TokenService;
 use Eadmin\support\Translator;
 use Symfony\Component\Finder\Finder;
 use think\facade\Console;

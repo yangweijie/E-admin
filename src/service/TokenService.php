@@ -36,6 +36,14 @@ class TokenService
 
     public function __construct($type = null)
     {
+        $this->init($type);
+    }
+
+    /**
+     * 初始化
+     * @param string $type 配置类型
+     */
+    public function init($type){
         if (empty($type)) {
             $type = config('admin.token.default');
         }
@@ -50,8 +58,8 @@ class TokenService
             $tokens = $this->encode($user);
             $this->set($tokens['token']);
         }
+        return $this;
     }
-
     /**
      * 退出token
      * @Author: rocky

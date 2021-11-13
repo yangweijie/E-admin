@@ -235,15 +235,5 @@ if (!function_exists('plug')) {
         return new \Eadmin\plugin\Manage();
     }
 }
-if (!function_exists('auth')) {
-    /**
-     * token
-     * @return \Eadmin\service\TokenService
-     */
-    function auth($type = 'api')
-    {
-        return new \Eadmin\service\TokenService($type);
-    }
-}
 
 
