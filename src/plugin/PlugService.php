@@ -23,6 +23,9 @@ use think\facade\Db;
 use think\facade\Request;
 use think\helper\Arr;
 
+/**
+ * @property Client $client
+ */
 class PlugService
 {
     /**
@@ -42,9 +45,11 @@ class PlugService
      * @var array
      */
     protected $serviceProvider = [];
+
     protected $client;
     protected $total = 0;
     protected $loginToken = '';
+
     public function __construct()
     {
         $this->initialize();;
@@ -54,7 +59,7 @@ class PlugService
     {
         $this->app = app();
         $this->client = new Client([
-            'base_uri' => 'http://1.117.208.85:1000/api/Plugin/',
+            'base_uri' => 'https://www.ex-admin.com/api/Plugin/',
             'verify' => false,
         ]);
         $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'plugin');
@@ -63,13 +68,15 @@ class PlugService
                 $this->plugPaths[] = $file;
             }
         }
-        $this->loginToken = md5(Request::header('Authorization').'plug');
+        $this->loginToken = md5(Request::header('Authorization') . 'plug');
     }
+
     /**
      * 是否登录
      * @return bool
      */
-    public function isLogin(){
+    public function isLogin()
+    {
         return Cache::has($this->loginToken);
     }
 
@@ -77,9 +84,11 @@ class PlugService
      * 获取插件目录集合
      * @return array
      */
-    public function getPlugPath(){
+    public function getPlugPath()
+    {
         return $this->plugPaths;
     }
+
     /**
      * 获取插件基本目录
      * @return string
@@ -117,6 +126,33 @@ class PlugService
                 }
             }
         }
+        if (!Cache::has('plugverify' . date('Y-m-d'))) {
+           // $this->verify();
+        }
+    }
+
+    private function verify()
+    {
+        $data = [];
+        foreach ($this->serviceProvider as $serviceProvider) {
+            $data[] = [
+                'name' => $serviceProvider->getName(),
+                'info' => $serviceProvider->getInfo(),
+            ];
+        }
+        try {
+            $response = $this->client->post('verify', [
+                'form_params' => [
+                    'domain' => request()->host(),
+                    'plugs' => $data,
+                ]
+            ]);
+            if ($response->getStatusCode() == 200) {
+                Cache::set('plugverify' . date('Y-m-d'), 1, 60 * 60 * 24);
+            }
+        }catch (\Exception $exception){
+
+        }
     }
 
     /**
@@ -129,10 +165,10 @@ class PlugService
         if (empty($name)) {
             return $this->serviceProvider;
         }
-        if(isset($this->serviceProvider[$name])){
+        if (isset($this->serviceProvider[$name])) {
             return $this->serviceProvider[$name];
         }
-       return null;
+        return null;
     }
 
     public function getCate()
@@ -149,7 +185,7 @@ class PlugService
      */
     public function all($search = '', $cate_id = 0, $page = 1, $size = 20)
     {
-        if(count($this->plugs) == 0){
+        if (count($this->plugs) == 0) {
             $response = $this->client->get("list", [
                 'query' => [
                     'cate_id' => $cate_id,
@@ -162,10 +198,10 @@ class PlugService
             $content = json_decode($content, true);
             $this->plugs = $content['data']['data'];
             $this->total = $content['data']['total'];
-            $names = array_column($this->installed(),'name');
+            $names = array_column($this->installed(), 'name');
             foreach ($this->plugs as &$plug) {
                 $plug['install'] = false;
-                if(in_array($plug['name'],$names)){
+                if (in_array($plug['name'], $names)) {
                     $info = $this->info($plug['name']);
                     $plug['version'] = $info['version'];
                     $plug['install'] = true;
@@ -174,9 +210,12 @@ class PlugService
         }
         return $this->plugs;
     }
-    public function total(){
+
+    public function total()
+    {
         return $this->total;
     }
+
     /**
      * 已安装插件
      * @param string $search 搜索的关键词
@@ -187,10 +226,10 @@ class PlugService
         $plugs = [];
         foreach ($this->plugPaths as $plug) {
             $info = $this->info(basename($plug));
-            if(isset($this->serviceProvider[$info['name']])){
+            if (isset($this->serviceProvider[$info['name']])) {
                 $service = $this->serviceProvider[$info['name']];
-                if(method_exists($service,'setting')){
-                    $info['setting'] = app()->invoke([$service,'setting']);
+                if (method_exists($service, 'setting')) {
+                    $info['setting'] = app()->invoke([$service, 'setting']);
                 }
             }
             $info['install'] = true;
@@ -199,25 +238,27 @@ class PlugService
         }
         return $plugs;
     }
+
     /**
      * 登录
      * @param string $username 账号
      * @param string $password 密码
      * @return mixed
      */
-    public function login($username,$password){
-        $response = $this->client->post('login',[
-            'form_params'=>[
-                'username'=>$username,
-                'password'=>$password,
+    public function login($username, $password)
+    {
+        $response = $this->client->post('login', [
+            'form_params' => [
+                'username' => $username,
+                'password' => $password,
             ]
         ]);
         $content = $response->getBody()->getContents();
         $res = json_decode($content, true);
-        if($res['code'] == 200){
-            Cache::set($this->loginToken,$res['data']['token'],60*60*24);
+        if ($res['code'] == 200) {
+            Cache::set($this->loginToken, $res['data']['token'], 60 * 60 * 24);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -352,8 +393,6 @@ class PlugService
                 return false;
             }
         } catch (\Exception $exception) {
-            dump($exception->getMessage());
-            halt($exception->getTraceAsString());
             return false;
         }
     }
