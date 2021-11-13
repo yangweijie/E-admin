@@ -11,6 +11,7 @@ namespace Eadmin\traits;
 
 
 use app\common\service\ApiCode;
+use plugin\apidoc\resource\Resource;
 use think\Collection;
 use think\exception\HttpResponseException;
 use think\facade\Db;
@@ -57,7 +58,15 @@ trait  ApiJson
     {
         $this->data[$key] = $data;
         $this->example[$key] = $desc;
-        $this->createExample($data,$key);
+        if($data instanceof Resource){
+            $example = $data->getExample();
+            $data->clearExample();
+            foreach ($example as $field=>$desc){
+                $this->example[$key.'.'.$field] = $desc;
+            }
+        }else{
+            $this->createExample($data,$key);
+        }
         return $this;
     }
 
