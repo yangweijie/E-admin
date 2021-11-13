@@ -34,7 +34,12 @@ class Annotation
                     }
                 }
                 $descArr = array_slice($arr,$varIndex+1);
-                $param['desc'] = trim(implode('',$descArr));
+                $desc = trim(implode('',$descArr));
+                if(preg_match("/\{(.*)\}/U",$desc,$match)){
+                    $desc = str_replace($match[0],'',$desc);
+                    $param['value'] = $match[1];
+                }
+                $param['desc'] = $desc;
                 if($varIndex == 1){
                     $param['type'] = trim($arr[0]);
                 }
@@ -46,6 +51,17 @@ class Annotation
                 $param['resource'] = array_shift($arr);
                 $param['desc'] = trim(implode('',$arr));
                 $data['response'][] = $param;
+            }elseif (preg_match('/^@header/i', $comment)){
+                $arr = explode(' ',$comment);
+                array_shift($arr);
+                $param['key'] = array_shift($arr);
+                $desc = trim(implode('',$arr));
+                if(preg_match("/\{(.*)\}/U",$desc,$match)){
+                    $desc = str_replace($match[0],'',$desc);
+                    $param['value'] = $match[1];
+                }
+                $param['desc'] = $desc;
+                $data['header'][] = $param;
             }
         }
         return $data;
