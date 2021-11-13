@@ -19,8 +19,9 @@ use think\Model;
 
 trait  ApiJson
 {
-    protected $data = []; 
+    protected $data = [];
     protected $example = [];
+
     /**
      * 返回成功json
      * @Author: rocky
@@ -51,67 +52,92 @@ trait  ApiJson
         $response = $this->responseJsonData($data, $code, $msg, $http_code);
         throw new HttpResponseException($response);
     }
-    public function getExample(){
+
+    public function addData($key, $data, $desc)
+    {
+        $this->data[$key] = $data;
+        $this->example[$key] = $desc;
+        $this->createExample($data,$key);
+        return $this;
+    }
+
+    public function getExample()
+    {
         return $this->example;
     }
-    protected function createExample($data){
-        if($data instanceof Collection && $data->count() > 0){
-            $data = $data[0];
-        }
-        if($data instanceof Model){
-            $fields = $data->getFields();
-            foreach ($fields as $field=>$row){
 
-                if($row['primary'] && empty($row['comment'])){
+    protected function createExample($data, $parentKey = null)
+    {
+        if ($data instanceof Collection && $data->count() > 0) {
+            $data = $data[0];
+        } elseif (is_array($data)) {
+
+        }
+        if ($data instanceof Model) {
+            $fields = $data->getFields();
+            foreach ($fields as $field => $row) {
+                $key = $field;
+                if(!empty($parentKey)){
+                    $key = $parentKey.'.'.$field;
+                }
+                if ($row['primary'] && empty($row['comment'])) {
                     $table = $data->getTable();
                     $arr = Db::query("show table status like '$table'");
-                    $info  = current($arr);
-                    $this->example[$field] = $info['Comment'].$field;
+                    $info = current($arr);
+                    $this->example[$key] = $info['Comment'] . $field;
                 }
-                if(!empty($row['comment'])){
-                    $this->example[$field] = $row['comment'];
+                if (!empty($row['comment'])) {
+                    $this->example[$key] = $row['comment'];
                 }
             }
         }
     }
-	/**
-	 * 输出自定义json
-	 * @Author: rocky
-	 * 2019/7/12 17:08
-	 * @param array $data 数据
-	 * @param int $code 错误码
-	 * @param string $errMsg 错误信息
-	 * @param int $http_code 状态码
-	 */
-	protected function responseJsonData($data = [], $code = 200, $errMsg = '', $http_code = 200)
-	{
-        $this->data = $data;
-	    $this->createExample($data);
-		$return['code'] = (int)$code;
-		if (!empty($errMsg)) {
-			$return['message'] = $errMsg;
-		} else {
-			$message           = isset(config('apiCode')[$code]) ? config('apiCode')[$code] : '';
-			$return['message'] = $message;
-		}
-		$return['data'] = $data;
-		return json($return, $http_code);
-	}
-    public function getData(){
+
+    /**
+     * 输出自定义json
+     * @Author: rocky
+     * 2019/7/12 17:08
+     * @param array $data 数据
+     * @param int $code 错误码
+     * @param string $errMsg 错误信息
+     * @param int $http_code 状态码
+     */
+    protected function responseJsonData($data = [], $code = 200, $errMsg = '', $http_code = 200)
+    {
+        if (empty($data)) {
+            $data = $this->data;
+        } else {
+            $this->data = $data;
+        }
+        $this->createExample($data);
+        $return['code'] = (int)$code;
+        if (!empty($errMsg)) {
+            $return['message'] = $errMsg;
+        } else {
+            $message = isset(config('apiCode')[$code]) ? config('apiCode')[$code] : '';
+            $return['message'] = $message;
+        }
+        $return['data'] = $data;
+        return json($return, $http_code);
+    }
+
+    public function getData()
+    {
         return $this->data;
     }
-	/**
-	 * 判断是否是空数组/集合
-	 * @param mixed $data 数据
-	 * @param int $code 状态码
-	 * @return int
-	 */
-	protected function validates($data, $code)
-	{
-		if ((is_string($data) && empty($data)) ||
-			count($data) < 1) {
-			$code = 4004;
-		}
-		return $code;
-	}
+
+    /**
+     * 判断是否是空数组/集合
+     * @param mixed $data 数据
+     * @param int $code 状态码
+     * @return int
+     */
+    protected function validates($data, $code)
+    {
+        if ((is_string($data) && empty($data)) ||
+            count($data) < 1) {
+            $code = 4004;
+        }
+        return $code;
+    }
 }
