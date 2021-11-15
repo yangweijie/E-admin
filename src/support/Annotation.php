@@ -34,7 +34,7 @@ class Annotation
                     }
                 }
                 $descArr = array_slice($arr,$varIndex+1);
-                $desc = trim(implode('',$descArr));
+                $desc = trim(implode(' ',$descArr));
                 if(preg_match("/\{(.*)\}/U",$desc,$match)){
                     $desc = str_replace($match[0],'',$desc);
                     $param['value'] = $match[1];
@@ -49,13 +49,13 @@ class Annotation
                 $arr = explode(' ',$comment);
                 array_shift($arr);
                 $param['resource'] = array_shift($arr);
-                $param['desc'] = trim(implode('',$arr));
+                $param['desc'] = trim(implode(' ',$arr));
                 $data['response'][] = $param;
             }elseif (preg_match('/^@header/i', $comment)){
                 $arr = explode(' ',$comment);
                 array_shift($arr);
                 $param['key'] = array_shift($arr);
-                $desc = trim(implode('',$arr));
+                $desc = trim(implode(' ',$arr));
                 if(preg_match("/\{(.*)\}/U",$desc,$match)){
                     $desc = str_replace($match[0],'',$desc);
                     $param['value'] = $match[1];
