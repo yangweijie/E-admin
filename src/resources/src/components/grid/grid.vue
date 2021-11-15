@@ -439,8 +439,10 @@
                           const table = dragTable.value.$el.querySelectorAll('.ant-table-body > table')[0]
                           if(table.clientWidth > el.clientWidth){
                             item.fixed = 'right'
-                            //高度自适应
-                            autoHeight(true)
+                            setTimeout(()=>{
+                              //高度自适应
+                              autoHeight(true)
+                            })
                           }
                         }
                       }
