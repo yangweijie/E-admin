@@ -58,15 +58,7 @@ trait  ApiJson
     {
         $this->data[$key] = $data;
         $this->example[$key] = $desc;
-        if($data instanceof Resource){
-            $example = $data->getExample();
-            $data->clearExample();
-            foreach ($example as $field=>$desc){
-                $this->example[$key.'.'.$field] = $desc;
-            }
-        }else{
-            $this->createExample($data,$key);
-        }
+        $this->createExample($data,$key);
         return $this;
     }
 
@@ -77,10 +69,18 @@ trait  ApiJson
 
     protected function createExample($data, $parentKey = null)
     {
-        if ($data instanceof Collection && $data->count() > 0) {
+        if($data instanceof Resource){
+            $example = $data->getExample();
+            $data->clearExample();
+            foreach ($example as $field=>$desc){
+                if(!is_null($parentKey)){
+                    $this->example[$parentKey.'.'.$field] = $desc;
+                }else{
+                    $this->example[$field] = $desc;
+                }
+            }
+        }elseif ($data instanceof Collection && $data->count() > 0) {
             $data = $data[0];
-        } elseif (is_array($data)) {
-
         }
         if ($data instanceof Model) {
             $fields = $data->getFields();
@@ -135,18 +135,5 @@ trait  ApiJson
         return $this->data;
     }
 
-    /**
-     * 判断是否是空数组/集合
-     * @param mixed $data 数据
-     * @param int $code 状态码
-     * @return int
-     */
-    protected function validates($data, $code)
-    {
-        if ((is_string($data) && empty($data)) ||
-            count($data) < 1) {
-            $code = 4004;
-        }
-        return $code;
-    }
+  
 }
