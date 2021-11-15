@@ -304,8 +304,6 @@ export function empty(value) {
     }
 }
 export function offsetTop(el) {
-    console.log(el)
-    console.log(el.offsetTop)
     if(el.parentElement) {
         return offsetTop(el.parentElement) + el.offsetTop
     }

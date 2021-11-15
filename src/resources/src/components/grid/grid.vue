@@ -212,7 +212,10 @@
                 type:Array,
                 default:[]
             },
-            autoHeight:Boolean,
+            autoHeight:{
+              type:Boolean,
+              default:false
+            },
             autoLayout: {
               type:Boolean,
               default:true
@@ -381,41 +384,40 @@
                 if(proxyData[props.filterField]){
                     filterInitData = JSON.parse(JSON.stringify(proxyData[props.filterField]))
                 }
-                if(props.autoHeight){
-                  autoHeight()
-                }
+                autoHeight(props.autoHeight)
                 dragSort()
             })
-            function autoHeight(){
+            function autoHeight(auto=false){
               //自适应最大高度
-              if(!ctx.attrs.scroll.y){
+              if(!ctx.attrs.scroll.y && auto){
                 ctx.attrs.scroll.y = window.innerHeight - offsetTop(tableBox.value) - 65
+              }
+              try {
+                if(ctx.attrs.scroll.y){
+                  columns.value.forEach(column=>{
+                    let width = 0
+                    if(!column.width){
+                      document.getElementsByClassName('eadmin_table_th_'+column.prop).forEach(item=>{
+                        let offsetWidth = item.parentNode.parentNode.parentNode.parentNode.offsetWidth
+                        if(width < offsetWidth){
+                          width = offsetWidth
+                        }
+                      })
+                      document.getElementsByClassName('eadmin_table_td_'+column.prop).forEach(item=>{
+                        if(width < item.parentNode.offsetWidth){
+                          width = item.parentNode.offsetWidth
+                        }
+                      })
+                      column.width = width+1
+                    }
+                  })
+                }
+              }catch (e) {
+
               }
             }
             function tableAutoWidth(){
-                // try {
-                //     if(ctx.attrs.scroll.y && !props.autoHeight){
-                //         columns.value.forEach(column=>{
-                //             let width = 0
-                //             if(!column.width){
-                //                 document.getElementsByClassName('eadmin_table_th_'+column.prop).forEach(item=>{
-                //                     let offsetWidth = item.parentNode.parentNode.parentNode.parentNode.offsetWidth
-                //                     if(width < offsetWidth){
-                //                         width = offsetWidth
-                //                     }
-                //                 })
-                //                 document.getElementsByClassName('eadmin_table_td_'+column.prop).forEach(item=>{
-                //                     if(width < item.parentNode.offsetWidth){
-                //                         width = item.parentNode.offsetWidth
-                //                     }
-                //                 })
-                //                 column.width = width
-                //             }
-                //         })
-                //     }
-                // }catch (e) {
-                //
-                // }
+
                 nextTick(()=>{
                     //操作列自适应
                   if(props.autoLayout){
@@ -438,7 +440,7 @@
                           if(table.clientWidth > el.clientWidth){
                             item.fixed = 'right'
                             //高度自适应
-                            autoHeight()
+                            autoHeight(true)
                           }
                         }
                       }
