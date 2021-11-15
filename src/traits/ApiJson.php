@@ -71,7 +71,6 @@ trait  ApiJson
     {
         if($data instanceof Resource){
             $example = $data->getExample();
-            $data->clearExample();
             foreach ($example as $field=>$desc){
                 if(!is_null($parentKey)){
                     $this->example[$parentKey.'.'.$field] = $desc;
@@ -135,5 +134,5 @@ trait  ApiJson
         return $this->data;
     }
 
-  
+
 }
