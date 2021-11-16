@@ -65,7 +65,12 @@ class Annotation
             }elseif (preg_match('/^@group/i', $comment)){
                 $arr = explode(' ',$comment);
                 if(isset($arr[1])){
-                    $data['group'] = $arr[1];
+                    $data['group'] = trim($arr[1]);
+                }
+            }elseif (preg_match('/^@sort/i', $comment)){
+                $arr = explode(' ',$comment);
+                if(isset($arr[1])){
+                    $data['sort'] = trim($arr[1]);
                 }
             }
         }
