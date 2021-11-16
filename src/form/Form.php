@@ -383,7 +383,7 @@ class Form extends Component
                 ($component instanceof Cascader || $component instanceof Map) &&
                 $attr != 'modelValue' &&
                 is_array($value) &&
-                (!empty($component->getDefault()) && !empty($component->getValue()))
+                (!empty($component->getDefault()) || !empty($component->getValue()))
             ) {
                 $val = array_shift($value);
                 $this->setData($field, $val);
