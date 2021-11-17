@@ -86,8 +86,8 @@ use think\Model;
  * @method \Eadmin\component\form\field\Cascader cascader(...$field, $label = '') 级联选择器
  * @method \Eadmin\component\form\field\Transfer transfer($field, $label = '') 穿梭框
  * @method \Eadmin\component\form\field\Icon icon($field, $label = '') 图标选择器
- * @method \Eadmin\component\form\field\SelectTable selectTable($field, $label = '') 表格选择器  TODO
- * @method \Eadmin\component\form\field\Map maps($lng, $lat, $address, $label = '') 高德地图  TODO
+ * @method \Eadmin\component\form\field\SelectTable selectTable($field, $label = '') 表格选择器
+ * @method \Eadmin\component\form\field\Map maps($lng, $lat, $address, $label = '') 高德地图
  * @method \Eadmin\component\form\field\DynamicTag tag($field, $label = '') 动态标签
  * @method \Eadmin\component\form\field\Checktag checkTag($field, $label = '') check标签
  * @method \Eadmin\component\form\field\Spec spec($field, $label = '') 规格
@@ -391,7 +391,7 @@ class Form extends Component
                 $value = empty($value) ? null : $value;
                 $this->setData($field, $value);
             } elseif (
-                ($component instanceof Cascader || $component instanceof Map) &&
+                ($component instanceof Cascader || method_exists($component,'bindMapField')) &&
                 $attr != 'modelValue' &&
                 is_array($value) &&
                 (!empty($component->getDefault()) || !empty($component->getValue()))
@@ -400,14 +400,12 @@ class Form extends Component
                 $this->setData($field, $val);
                 $component->default($value);
                 $component->value($value);
-            } elseif ($component instanceof Map && $attr == 'modelValue' && is_array($value)) {
+            } elseif (method_exists($component,'bindMapField') && $attr == 'modelValue' && is_array($value)) {
                 $this->setData($field, end($value));
             } else {
                 $this->setData($field, $value ?? '');
             }
-
             if (is_null($data)) {
-
                 $component->bindAttr($attr, $this->bindAttr('model') . '.' . $field, true);
             }
             $component->removeBind($field);
@@ -755,10 +753,10 @@ class Form extends Component
             $component->bindFields($arguments);
             $prop = $component->bindAttr('modelValue');
             $this->except([$prop]);
-        } elseif ($name == 'maps') {
+        } elseif (method_exists($component,'bindMapField')) {
             $field = array_pop($arguments);
             $component = $class::create($field);
-            $component->bindFields($arguments);
+            $component->bindMapField($arguments);
             $prop = $component->bindAttr('modelValue');
         }
         if ($component instanceof Input) {

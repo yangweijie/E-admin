@@ -18,7 +18,7 @@ class Map extends Field
     }
 
 
-    public function bindFields($fields)
+    public function bindMapField($fields)
     {
         $this->bindAttr('lng', $fields[0], true);
         $this->bindAttr('lat', $fields[1], true);
