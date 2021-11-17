@@ -14,7 +14,7 @@ return [
     ],
     'options'=>[
         'admin_visible'=>[
-            [1 => '显示'], 
+            [1 => '显示'],
             [0 => '隐藏']
         ]
     ],
@@ -28,5 +28,6 @@ return [
         'auth_manage'=>'权限管理',
         'access_auth_manage'=>'访问权限管理',
         'backup'=>'数据库备份',
+        'attachment'=>'附件管理',
     ]
 ];

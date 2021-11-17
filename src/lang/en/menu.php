@@ -28,5 +28,6 @@ return [
         'auth_manage' => 'User',
         'access_auth_manage' => 'Permissions',
         'backup' => 'Database backup',
+        'attachment'=>'Attachment',
     ]
 ];

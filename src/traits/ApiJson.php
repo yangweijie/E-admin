@@ -88,6 +88,7 @@ trait  ApiJson
                 if(!empty($parentKey)){
                     $key = $parentKey.'.'.$field;
                 }
+
                 if ($row['primary'] && empty($row['comment'])) {
                     $table = $data->getTable();
                     $arr = Db::query("show table status like '$table'");

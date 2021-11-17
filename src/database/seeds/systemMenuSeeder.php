@@ -105,6 +105,17 @@ class systemMenuSeeder extends Seeder
                 ),
             8 =>
                 array(
+                    'id'     => 1015,
+                    'pid'    => 4,
+                    'name'   => 'filesystem',
+                    'icon'   => 'el-icon-files',
+                    'url'    => 'filesystem',
+                    'sort'   => 0,
+                    'mark'   => '',
+                    'status' => 1,
+                ),
+            9 =>
+                array(
                     'id'     => 1084,
                     'pid'    => 0,
                     'name'   => 'index',
