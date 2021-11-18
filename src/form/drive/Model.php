@@ -33,7 +33,18 @@ class Model implements FormInterface
         $this->model   = $data;
         $this->pkField = $this->model->getPk();
     }
-
+    protected function methodExists($class,$method){
+       foreach (class_parents($class) as $parent){
+           if(method_exists($parent,$method))
+           {
+               return false;
+           }
+       }
+        if (method_exists($class, $method)) {
+            return true;
+        }
+        return false;
+    }
     /**
      * 保存数据
      * @param array $data 数据
@@ -52,7 +63,7 @@ class Model implements FormInterface
             }
             $result = $this->model->save($data);
             foreach ($data as $field => $value) {
-                if (method_exists($this->model, $field)) {
+                if ($this->methodExists($this->model, $field)) {
                     //多对多关联保存
                     if ($this->model->$field() instanceof BelongsToMany) {
                         $relationData = $value;
