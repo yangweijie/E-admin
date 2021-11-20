@@ -16,6 +16,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use think\App;
 use think\facade\Cache;
 use think\facade\Console;
@@ -59,7 +61,7 @@ class PlugService
     {
         $this->app = app();
         $this->client = new Client([
-            'base_uri' => 'https://www.ex-admin.com/api/Plugin/',
+            'base_uri' => 'http://exadmin.test/api/Plugin/',
             'verify' => false,
         ]);
         $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'plugin');
@@ -127,7 +129,7 @@ class PlugService
             }
         }
         if (!Cache::has('plugverify' . date('Y-m-d'))) {
-           // $this->verify();
+           $this->verify();
         }
     }
 
@@ -156,6 +158,25 @@ class PlugService
     }
 
     /**
+     * 插件是否存在
+     * @param $name
+     * @return bool
+     */
+    public function exist($name){
+        $response = $this->client->post('exist', [
+            'form_params' => [
+                'name' => $name,
+            ]
+        ]);
+        $content = $response->getBody()->getContents();
+        $content = json_decode($content, true);
+        if($content['code'] == 200){
+            return false;
+        }else{
+            return true;
+        }
+    }
+    /**
      * 获取注册插件服务
      * @param null $name 插件名称
      * @return PlugServiceProvider
@@ -183,15 +204,16 @@ class PlugService
      * 获取所有插件
      * @param string $search 搜索的关键词
      */
-    public function all($search = '', $cate_id = 0, $page = 1, $size = 20)
+    public function all($search = '', $cate_id = 0, $page = 1, $size = 20,$names=[])
     {
         if (count($this->plugs) == 0) {
-            $response = $this->client->get("list", [
-                'query' => [
+            $response = $this->client->post("list", [
+                'form_params' => [
                     'cate_id' => $cate_id,
                     'page' => $page,
                     'size' => $size,
                     'search' => $search,
+                    'names' => $names,
                 ]
             ]);
             $content = $response->getBody()->getContents();
@@ -204,6 +226,7 @@ class PlugService
                 if (in_array($plug['name'], $names)) {
                     $info = $this->info($plug['name']);
                     $plug['version'] = $info['version'];
+                    $plug['status'] = $this->info($plug['name'])['status'];
                     $plug['install'] = true;
                 }
             }
@@ -224,16 +247,28 @@ class PlugService
     public function installed($search = '')
     {
         $plugs = [];
+        $names = [];
         foreach ($this->plugPaths as $plug) {
             $info = $this->info(basename($plug));
+            $names[] = $info['name'];
+        }
+        $onlinePlugs = $this->all('',0,1,1000,$names);
+        $names = array_column($onlinePlugs,'name');
+        foreach ($this->plugPaths as $plug) {
+            $info = $this->info(basename($plug));
+            $info['install'] = true;
+            $info['versions'] = [];
+            $info['requires'] = [];
+            $index = array_search($info['name'],$names);
+            if($index !== false){
+                $info = $onlinePlugs[$index];
+            }
             if (isset($this->serviceProvider[$info['name']])) {
                 $service = $this->serviceProvider[$info['name']];
                 if (method_exists($service, 'setting')) {
                     $info['setting'] = app()->invoke([$service, 'setting']);
                 }
             }
-            $info['install'] = true;
-            $info['versions'] = [];
             $plugs[] = $info;
         }
         return $plugs;
@@ -358,6 +393,49 @@ class PlugService
     }
 
     /**
+     * 在线安装
+     * @param string $name 插件名称
+     * @param string $version 版本
+     * @return bool
+     */
+    public function onlineInstall($name,$version){
+        $plugZip = app()->getRuntimePath() . 'plug' . time() . '.zip';
+        $this->client->get('install', [
+            'query'=>[
+              'name'=>$name,
+              'version'=>$version,
+            ],
+            'headers'=>[
+                'Authorization'=>Cache::get($this->loginToken)
+            ],
+            'save_to' => $plugZip
+        ]);
+        $filesystem = new Filesystem();
+        try{
+            $zip = new \ZipArchive();
+            if ($zip->open($plugZip) === true) {
+                $path = app()->getRuntimePath().'plugin';
+                if (!is_dir($path)) {
+                    mkdir($path, 0755, true);
+                }
+                $zip->extractTo($path);
+                $zip->close();
+                $finder = new Finder();
+                foreach ($finder->in($path)->files() as $file){
+                    $this->install($file->getRealPath());
+                }
+                $filesystem->remove($path);
+                unlink($plugZip);
+                return true;
+            }else{
+                unlink($plugZip);
+                return false;
+            }
+        }catch (\Exception $exception){
+            return false;
+        }
+    }
+    /**
      * 安装
      * @param string $fileZip zip压缩包
      * @return mixed
@@ -372,23 +450,24 @@ class PlugService
                 $path = $this->plugPathBase . '/' . $info['name'];
                 if (!is_dir($path)) {
                     mkdir($path, 0755, true);
+                    $zip->extractTo($path);
+                    //关闭
+                    $zip->close();
+                    $this->dataMigrate('run', $path);
+                    $seed = $path . '/database' . DIRECTORY_SEPARATOR . 'seeds';
+                    if (is_dir($seed)) {
+                        Console::call('seed:eadmin', ['path' => $seed]);
+                    }
+                    $this->initialize();
+                    $this->register();
+                    //添加菜单
+                    $serviceProvider = $this->getServiceProviders($info['name']);
+                    $serviceProvider->addMenus();
+                    //生成ide提示
+                    $this->buildIde();
+                    return true;
                 }
-                $zip->extractTo($path);
-                //关闭
-                $zip->close();
-                $this->dataMigrate('run', $path);
-                $seed = $path . '/database' . DIRECTORY_SEPARATOR . 'seeds';
-                if (is_dir($seed)) {
-                    Console::call('seed:eadmin', ['path' => $seed]);
-                }
-                $this->initialize();
-                $this->register();
-                //添加菜单
-                $serviceProvider = $this->getServiceProviders($info['name']);
-                $serviceProvider->addMenus();
-                //生成ide提示
-                $this->buildIde();
-                return true;
+                return false;
             } else {
                 return false;
             }
@@ -427,14 +506,13 @@ PHP;
     /**
      * 卸载
      * @param string $name 插件名称
-     * @param string $path 插件路径
      */
-    public function uninstall($name, $path)
+    public function uninstall($name)
     {
+        $path = $this->plugPathBase.'/'.$name;
         $this->dataMigrate('rollback', $path);
         $filesystem = new \Symfony\Component\Filesystem\Filesystem;
         $filesystem->remove($path);
-        Db::name($this->table)->where('name', $name)->delete();
         Db::name('system_menu')->where('mark', $name)->delete();
         Db::name('system_config')->where('mark', $name)->delete();
         Db::name('system_config_cate')->where('mark', $name)->delete();

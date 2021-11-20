@@ -6,6 +6,7 @@ namespace Eadmin\controller;
 use Eadmin\Admin;
 use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Card;
+use Eadmin\component\basic\Dropdown;
 use Eadmin\component\basic\Html;
 use Eadmin\component\basic\Space;
 use Eadmin\component\basic\Tabs;
@@ -80,7 +81,6 @@ class Plug extends Controller
         $grid->column('version', '版本');
         $grid->actions(function (Actions $actions, $rows) {
             $actions->hideDel();
-
             $timeLine = TimeLine::create();
             foreach ($rows['versions'] as $version) {
                 $descs = explode("\n", $version['desc']);
@@ -88,11 +88,11 @@ class Plug extends Controller
                 foreach ($descs as $desc) {
                     $html->content(Html::div()->content($desc));
                 }
-                if (count($version['require']) > 0) {
+                if (count($version['requires']) > 0) {
                     $html->content(Html::div()->content('依赖插件：')->style(['marginTop' => '5px']));
                 }
                 $space = Space::create();
-                foreach ($version['require'] as $require) {
+                foreach ($version['requires'] as $require) {
                     $space->content(Tag::create($require['title'])->size('mini'));
                 }
                 $html->content($space);
@@ -121,27 +121,29 @@ class Plug extends Controller
                         Button::create('启用')->sizeSmall()->typeSuccess()->save(['id' => $rows['name'], 'status' => 1], 'plug/enable', '确认启用？')
                     );
                 }
-//                $plug = array_column($rows['version'], 'require', 'version');
-//
-//                $require = $plug[$rows['install_version']];
-//                $actions->append(
-//                    Button::create('卸载')
-//                        ->sizeSmall()
-//                        ->typeDanger()
-//                        ->when(count($require) > 0, function (Button $button) use ($rows, $require) {
-//                            return $button->dialog()->content($this->uninstallAll($rows['name'], $rows['path'], $require));
-//                        }, function (Button $button) use ($rows) {
-//                            return $button->save(['id' => $rows['name'], 'path' => $rows['path']], 'plug/uninstall', '确认卸载？');
-//                        })
-//                );
+                $plug = array_column($rows['versions'], 'requires', 'version');
+                $require = $plug[$rows['version']] ?? [];
+                $actions->append(
+                    Button::create('卸载')
+                        ->sizeSmall()
+                        ->typeDanger()
+                        ->when(count($require) > 0, function (Button $button) use ($rows, $require) {
+                            return $button->dialog()->content($this->uninstallAll($rows['name'], $rows['path'], $require));
+                        }, function (Button $button) use ($rows) {
+                            return $button->save(['name' => $rows['name']], 'plug/uninstall', '确认卸载？');
+                        })
+                );
             } else {
-//                $actions->append(
-//                    Button::create('安装')
-//                        ->sizeSmall()
-//                        ->typePrimary()
-//                        ->dialog()
-//                        ->content($this->install($rows['composer'], $rows['version']))
-//                );
+                $dropdown = Dropdown::create(
+                    Button::create('安装'. ' <i class="el-icon-arrow-down" />')
+                    ->sizeSmall()
+                    ->typePrimary()
+                );
+                foreach ($rows['versions'] as $row){
+                    $dropdown->item($row['version'])->save(['name'=>$rows['name'],'version'=>$row['version']],'plug/install','确认安装？');
+                }
+
+                $actions->append($dropdown);
             }
         });
         $grid->hideDeleteButton();
@@ -189,31 +191,22 @@ class Plug extends Controller
             admin_error_message('安装失败');
         }
     }
+
     /**
      * 安装
-     * @param $composer
-     * @param $data
-     * @auth false
-     * @login true
-     * @return Form
+     * @param $name 插件名称
+     * @param $version 版本
      */
-    public function install($composer, $data)
+    public function install($name, $version)
     {
-        $options = array_column($data, 'version', 'id');
-        $form = new Form([]);
-        $form->select('id', '版本')->options($options)->required();
-        $form->actions(function (FormAction $formAction) {
-            $formAction->submitButton()->content('安装');
-            $formAction->hideResetButton();
-        });
-        $form->saving(function ($post) use ($data, $composer) {
-            $this->requireInstall($data, $post['id']);
-            $urls = array_column($data, 'url', 'id');
-            $versions = array_column($data, 'version', 'id');
-            Admin::plug()->install($composer, $urls[$post['id']], $versions[$post['id']]);
+        if(!Admin::plug()->isLogin()){
+            admin_error_message('请登陆');
+        }
+        $res = Admin::plug()->onlineInstall($name,$version);
+        if($res){
             admin_success_message('安装完成');
-        });
-        return $form;
+        }
+        admin_error_message('安装失败');
     }
 
     /**
@@ -223,9 +216,8 @@ class Plug extends Controller
      */
     public function uninstall()
     {
-        $path = $this->request->put('path');
-        $name = $this->request->put('id');
-        Admin::plug()->uninstall($name, $path);
+        $name = $this->request->put('name');
+        Admin::plug()->uninstall($name);
         admin_success_message('卸载完成');
     }
 
@@ -277,6 +269,9 @@ class Plug extends Controller
         $form->text('title', '名称')->required();
         $form->text('description', '描述');
         $form->saving(function ($post) {
+            if(Admin::plug()->exist($post['name'])){
+                admin_error_message('插件标识已存在');
+            }
             $name = $post['name'];
             $cmd['name'] = $name;
             $cmd['title'] = $post['title'];
