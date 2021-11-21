@@ -200,7 +200,7 @@ class Plug extends Controller
     public function install($name, $version)
     {
         if(!Admin::plug()->isLogin()){
-            admin_error_message('请登陆');
+            admin_error_message('请先登陆');
         }
         $res = Admin::plug()->onlineInstall($name,$version);
         if($res){
@@ -269,6 +269,9 @@ class Plug extends Controller
         $form->text('title', '名称')->required();
         $form->text('description', '描述');
         $form->saving(function ($post) {
+            if(!Admin::plug()->isLogin()){
+                admin_error_message('请先登陆');
+            }
             if(Admin::plug()->exist($post['name'])){
                 admin_error_message('插件标识已存在');
             }
@@ -286,7 +289,7 @@ class Plug extends Controller
         });
         return $form;
     }
-
+    
     /**
      * 启用/禁用
      * @auth false

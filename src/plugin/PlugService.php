@@ -61,7 +61,7 @@ class PlugService
     {
         $this->app = app();
         $this->client = new Client([
-            'base_uri' => 'http://exadmin.test/api/Plugin/',
+            'base_uri' => 'https://www.ex-admin.com/api/Plugin/',
             'verify' => false,
         ]);
         $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'plugin');
@@ -156,7 +156,35 @@ class PlugService
 
         }
     }
-
+    public function authorize($info){
+        $response = $this->client->post('authorize', [
+            'headers'=>[
+                'Authorization'=>Cache::get($this->loginToken)
+            ],
+            'form_params' => [
+                'info' => $info,
+            ]
+        ]);
+        $content = $response->getBody()->getContents();
+        $content = json_decode($content, true);
+        if(empty($content['data'])){
+            return false;
+        }
+        return $content['data'];
+    }
+    protected function valid($info){
+        $response = $this->client->post('valid', [
+            'form_params' => [
+                'info' => $info,
+            ]
+        ]);
+        $content = $response->getBody()->getContents();
+        $content = json_decode($content, true);
+        if($content['code'] == 200){
+            return true;
+        }
+        return false;
+    }
     /**
      * 插件是否存在
      * @param $name
@@ -373,6 +401,10 @@ class PlugService
         ) {
             return false;
         }
+        $info = Composer::parse($directory . '/info.json');
+        if(!isset($info['authorize_key'])){
+            return false;
+        }
         return true;
     }
 
@@ -447,12 +479,18 @@ class PlugService
             if ($zip->open($fileZip) === true) {
                 $info = $zip->getFromName('info.json');
                 $info = json_decode($info, true);
+                
                 $path = $this->plugPathBase . '/' . $info['name'];
                 if (!is_dir($path)) {
                     mkdir($path, 0755, true);
                     $zip->extractTo($path);
                     //关闭
                     $zip->close();
+                    if(!$this->checkFiles($path) || !$this->valid($info)){
+                        $filesystem = new Filesystem();
+                        $filesystem->remove($path);
+                        return false;
+                    }
                     $this->dataMigrate('run', $path);
                     $seed = $path . '/database' . DIRECTORY_SEPARATOR . 'seeds';
                     if (is_dir($seed)) {

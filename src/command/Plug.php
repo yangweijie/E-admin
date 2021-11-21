@@ -4,6 +4,8 @@
 namespace Eadmin\command;
 
 
+use Eadmin\Admin;
+use Symfony\Component\Filesystem\Filesystem;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
@@ -67,10 +69,15 @@ class Plug extends Command
         file_put_contents($plugNameDir.'config.php','<?php return [];');
         $res =  $this->composerFile($plugNameDir);
         if($res){
+            $info = Admin::plug()->info($this->package);
+            $key = Admin::plug()->authorize($info);
+            Admin::plug()->setInfo($this->package,['authorize_key'=>$key]);
             $this->serviceProviderFile($plugNameDir);
             file_put_contents($plugNameDir.'README.md','# Ex-admin Extension');
             $output->writeln('<info>created successfully.</info>');
         }else{
+            $filesystem = new Filesystem();
+            $filesystem->remove($plugNameDir);
             $output->error('创建失败 (Creation failed)');
         }
     }
