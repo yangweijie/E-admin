@@ -63,6 +63,7 @@ class PlugService
         $this->client = new Client([
             'base_uri' => 'https://www.ex-admin.com/api/Plugin/',
             'verify' => false,
+            'timeout'=>10
         ]);
         $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'plugin');
         foreach (glob($this->plugPathBase . '/*') as $file) {
@@ -128,7 +129,7 @@ class PlugService
                 }
             }
         }
-        if (!Cache::has('plugverify' . date('Y-m-d'))) {
+        if (count($this->plugPaths) > 0 && !Cache::has('plugverify' . date('Y-m-d'))) {
            $this->verify();
         }
     }

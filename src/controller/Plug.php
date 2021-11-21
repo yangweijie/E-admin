@@ -121,6 +121,7 @@ class Plug extends Controller
                         Button::create('启用')->sizeSmall()->typeSuccess()->save(['id' => $rows['name'], 'status' => 1], 'plug/enable', '确认启用？')
                     );
                 }
+              
                 $plug = array_column($rows['versions'], 'requires', 'version');
                 $require = $plug[$rows['version']] ?? [];
                 $actions->append(
