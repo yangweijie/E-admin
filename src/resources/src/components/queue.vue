@@ -1,32 +1,42 @@
 <template>
-  <div class="el-notification right" role="alert" style="bottom: 92px;" v-if="visible">
+  <span @click="exec"><slot></slot></span>
+  <teleport to="body">
+  <div class="el-notification right" role="alert" style="bottom: 20px;" v-if="visible">
     <div class="el-notification__group" style="width: 100%">
       <h2 class="el-notification__title" v-html="title"></h2>
       <div class="el-notification__content"><el-progress :percentage="progress" :status="status"></el-progress></div>
       <div class="el-notification__closeBtn el-icon-close" @click="close"></div></div>
   </div>
+  </teleport>
 </template>
 
 <script>
 import {defineComponent, reactive, toRefs,onBeforeUnmount,onDeactivated} from "vue";
 import request from '@/utils/axios'
-
-
 export default defineComponent({
   name: "EadminQueue",
   props: {
-    queueId: Number,
+    queueId: [String,Number],
     title: String,
   },
   setup(props) {
     const state = reactive({
       progress: 0,
       status: '',
-      visible:true,
+      visible:false,
     })
-    const timer = setInterval(() => {
-      queue()
-    }, 500)
+    let timer = null
+    function exec(){
+      if(timer){
+        state.progress=0
+        state.status= ''
+        clearInterval(timer)
+      }
+      state.visible = true
+      timer = setInterval(() => {
+        queue()
+      }, 500)
+    }
     onBeforeUnmount(()=>{
       close()
     })
@@ -56,6 +66,7 @@ export default defineComponent({
       })
     }
     return {
+      exec,
       close,
       ...toRefs(state)
     }

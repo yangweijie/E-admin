@@ -7,25 +7,31 @@ use think\facade\Db;
 
 /**
  * 队列执行进度通知
+ * @method $this queueId($value)
  */
 class Queue extends Component
 {
     protected $name = 'EadminQueue';
-    public function __construct($queueId)
+    public function __construct($content)
     {
         parent::__construct();
-        $title = Db::name('system_queue')->where('id',$queueId)->value('name');
-        $this->attr('title',$title);
-        $this->attr('queueId',$queueId);
+        $this->content($content);
     }
-
     /**
-     * 创建
-     * @param $queueId 队列id sysqueue函数返回
-     * @return Queue
+     * 执行队列
+     * @param string $title 标题
+     * @param string $job 任务
+     * @param array $data 数据
+     * @return $this
      */
-    public static function create($queueId)
+    public function exec($title, $job, array $data){
+        $id = sysqueue($title,$job,$data);
+        $this->queueId($id);
+        $this->attr('title',$title);
+        return $this;
+    }
+    public static function create($content)
     {
-        return new self();
+        return new self($content);
     }
 }
