@@ -20,6 +20,7 @@ abstract class Queue
     protected $queueId = 0;
     protected $time;
     protected $queue;
+
     public function init($job)
     {
         $this->time = microtime(true);
@@ -35,10 +36,11 @@ abstract class Queue
      * @param int $count 当前记录总数
      * @param string|null $message 描述
      */
-    public function percentage(int $total,int $count,string $message = null){
+    public function percentage(int $total, int $count, string $message = null)
+    {
         $total = $total < 1 ? 1 : $total;
         $progress = sprintf("%.2f", $count / $total * 100);
-        $this->progress($message,$progress);
+        $this->progress($message, $progress);
     }
 
     /**
@@ -60,15 +62,18 @@ abstract class Queue
 
                 $update['task_time'] = microtime(true) - $this->time;
             }
+
             Db::name($this->tableName)->where('id', $this->queueId)->update($update);
+
         }
         $cacheKey = 'queue_' . $this->queueId . '_progress';
         $data = Cache::get($cacheKey) ?: [];
+
         if (!isset($data['status'])) {
             $data['progress'] = 0;
         }
         if (!isset($data['status'])) {
-            $data['status'] = 1;
+            $data['status'] = Db::name($this->tableName)->where('id', $this->queueId)->value('status');
         }
         if (is_numeric($progress)) {
             $data['progress'] = $progress;
@@ -97,55 +102,64 @@ abstract class Queue
     //执行失败
     public function error($message)
     {
-        $this->job->delete();
         $this->progress($message, 100, 4);
     }
 
     //执行完成
     public function success($message)
     {
-        $this->job->delete();
         $this->progress($message, 100, 3);
     }
-    private function isQueued(){
-        if($this->queue['is_queue'] == 1){
-            $res = Db::name($this->tableName)
-                ->where('queue',$this->queue['queue'])
-                ->where('is_queue',1)
-                ->where('id','<>',$this->queueId)
-                ->where('status','<',3)
-                ->find();
-            if($res){
+    private function isQueued()
+    {
+        if ($this->queue['is_queue'] == 1) {
+            Db::startTrans();
+            try {
+                $res = Db::name($this->tableName)
+                    ->where('queue', $this->queue['queue'])
+                    ->where('is_queue', 1)
+                    ->where('id', '<>', $this->queueId)
+                    ->where('status', 2)
+                    ->lock(true)
+                    ->find();
+                Db::commit();
+            } catch (\Exception $exception) {
+                Db::rollback();
+            }
+            if ($res) {
                 return true;
             }
         }
         return false;
     }
+
     public function fire(Job $job, $data)
     {
         $this->init($job);
-        if($this->queue && $this->queue['status'] < 3){
-            if($this->isQueued()){
-                $this->progress('任务排队中', 0, 0);
-                $this->release(1);
+        if ($this->queue && $this->queue['status'] < 3) {
+            if ($this->isQueued()) {
+                $this->progress('任务排队中');
+                $this->release(3);
+                return false;
             }
-            if($this->queue['status'] == 2){
+            if ($this->queue['status'] == 2) {
                 $this->progress('任务进程被中断，重试任务开始', 0, 2);
-            }else{
+            } else {
                 $this->progress('任务开始', 0, 2);
             }
+            $result = false;
+            $this->job->delete();
             try {
-                if ($this->handle($data)) {
-                    $this->success('<b style="color: green">任务完成</b>'.PHP_EOL.PHP_EOL);
-                } else {
-                    $this->error('<b style="color: red">任务失败</b>');
-                }
+                $result = $this->handle($data);
             } catch (\Throwable $exception) {
                 $this->error('<b style="color: red">任务失败错误信息</b>：' . $exception->getMessage());
                 $this->error('<b style="color: red">任务失败追踪错误</b>：' . $exception->getTraceAsString());
             }
-        }else{
-            $this->error('<b style="color: red">任务失败</b>');
+            if ($result) {
+                $this->success('<b style="color: green">任务完成</b>' . PHP_EOL . PHP_EOL);
+                return true;
+            }
         }
+        $this->error('<b style="color: red">任务失败</b>');
     }
 }

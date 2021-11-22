@@ -22,7 +22,7 @@ use Eadmin\service\QueueService;
 class Queue extends Controller
 {
     protected $title = '队列任务';
-    protected $status = [1 => '等待处理', 2 => '正在执行', 3 => '已完成', 4 => '已失败'];
+    protected $status = [0=>'排队中',1 => '等待处理', 2 => '正在执行', 3 => '已完成', 4 => '已失败'];
 
     /**
      * 列表
@@ -51,7 +51,7 @@ class Queue extends Controller
                     Html::create('创建时间: ' . $data['create_time'])->tag('p'),
                 ]);
             });
-            $grid->column('status', '状态')->using($this->status, [1 => 'info', 2 => '', 3 => 'success', 4 => 'danger']);
+            $grid->column('status', '状态')->using($this->status, [0=>'warning',1 => 'info', 2 => '', 3 => 'success', 4 => 'danger']);
             $grid->filter(function (Filter $filter) {
                 $filter->like('name', '名称');
                 $filter->eq('status', '状态')->select($this->status);

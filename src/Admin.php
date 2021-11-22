@@ -336,8 +336,7 @@ class Admin
      */
     public static function queue($title, $job, array $data, $delay = 0,$queue=false)
     {
-        $queue = new QueueService();
-        return $queue->queue($title, $job, $data, $delay,$queue);
+        return (new QueueService())->queue($title, $job, $data, $delay,$queue);
     }
 
     /**
