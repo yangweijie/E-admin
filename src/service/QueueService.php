@@ -16,6 +16,7 @@ class QueueService extends Queue
     }
     public function retry(){
         $queue = SystemQueue::find($this->queueId);
+        $queue->save(['status'=>1]);
         $data = $queue['queue_data'];
         $this->progress('任务重试');
         $data['system_queue_id'] = $this->queueId;

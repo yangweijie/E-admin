@@ -19,18 +19,14 @@ abstract class Queue
     protected $tableName = 'system_queue';
     protected $queueId = 0;
     protected $time;
-
+    protected $queue;
     public function init($job)
     {
         $this->time = microtime(true);
         $this->job = $job;
         $data = json_decode($this->job->getRawBody(), true);
         $this->queueId = $data['data']['system_queue_id'];
-        if(!Db::name($this->tableName)->find($this->queueId)){
-            $this->job->delete();
-            throw new \Exception('队列已删除');
-        }
-        $this->progress('任务开始', 0, 2);
+        $this->queue = Db::name($this->tableName)->find($this->queueId);
     }
 
     /**
@@ -115,15 +111,20 @@ abstract class Queue
     public function fire(Job $job, $data)
     {
         $this->init($job);
-        try {
-            if ($this->handle($data)) {
-                $this->success('<b style="color: green">任务完成</b>'.PHP_EOL.PHP_EOL);
-            } else {
-                $this->error('<b style="color: red">任务失败</b>');
+        if($this->queue && $this->queue['status'] == 1){
+            $this->progress('任务开始', 0, 2);
+            try {
+                if ($this->handle($data)) {
+                    $this->success('<b style="color: green">任务完成</b>'.PHP_EOL.PHP_EOL);
+                } else {
+                    $this->error('<b style="color: red">任务失败</b>');
+                }
+            } catch (\Throwable $exception) {
+                $this->error('<b style="color: red">任务失败错误信息</b>：' . $exception->getMessage());
+                $this->error('<b style="color: red">任务失败追踪错误</b>：' . $exception->getTraceAsString());
             }
-        } catch (\Throwable $exception) {
-            $this->error('<b style="color: red">任务失败错误信息</b>：' . $exception->getMessage());
-            $this->error('<b style="color: red">任务失败追踪错误</b>：' . $exception->getTraceAsString());
+        }else{
+            $this->job->delete();
         }
     }
 }
