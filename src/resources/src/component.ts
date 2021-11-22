@@ -1,9 +1,6 @@
 import app from  './app'
 import { defineAsyncComponent } from 'vue'
 import render from './components/render.vue'
-import video from './components/video.vue'
-
-app.component(video.name,video)
 app.component(render.name,render)
 const form = defineAsyncComponent(() =>
     import('./components/form/form.vue')
@@ -51,6 +48,9 @@ const dropdown = defineAsyncComponent(() =>
     import('./components/dropdown/dropdown.vue')
 )
 
+const video = defineAsyncComponent(() =>
+    import('./components/video.vue')
+)
 
 const downloadFile = defineAsyncComponent(() =>
     import('./components/downloadFile.vue')
@@ -106,6 +106,10 @@ const EadminCheckTag = defineAsyncComponent(() =>
 const EadminSidebarGrid = defineAsyncComponent(() =>
     import('./components/grid/sidebarGrid.vue')
 )
+const EadminQueue = defineAsyncComponent(() =>
+    import('./components/queue.vue')
+)
+app.component('EadminQueue',EadminQueue)
 app.component('EadminSidebarGrid',EadminSidebarGrid)
 app.component('EadminCheckTag',EadminCheckTag)
 app.component('EadminStep',EadminStep)
@@ -125,6 +129,7 @@ app.component('EadminIcon',icon)
 app.component('EadminEditor',tinymce)
 app.component('EadminDownloadFile',downloadFile)
 app.component('EadminLog',debugLog)
+app.component('EadminVideo',video)
 app.component('EadminDropdownItem',DropdownItem)
 app.component('EadminDropdown',dropdown)
 app.component('EadminSelectTable',selectTable)

@@ -170,7 +170,7 @@
         <el-dialog :title="trans('grid.exportProgressl')" v-model="excel.excelVisible" width="30%" :before-close="excelVisibleClose" :close-on-click-modal="false">
             <div style="text-align: center">
                 <el-progress type="circle" :percentage="excel.progress" :status="excel.status"></el-progress>
-                <div v-if="excel.status == 'success'">{{ trans('grid.exportSuccess') }}<el-link :href="excel.file" type="primary">{{ trans('grid.download') }}</el-link></div>
+                <div v-if="excel.status == 'success'">{{ trans('grid.exportSuccess') }}<el-link :href="excel.file" target="_blank" type="primary">{{ trans('grid.download') }}</el-link></div>
                 <div v-else-if="excel.status == 'exception'" style="color: red">{{ trans('grid.exportFail') }}</div>
             </div>
         </el-dialog>
