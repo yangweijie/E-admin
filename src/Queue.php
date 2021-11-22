@@ -43,13 +43,13 @@ abstract class Queue
 
     /**
      * 更新进度
-     * @param string|null $message 描述
      * @param null $progress 百分比
+     * @param string|null $message 描述
      * @param null $status 状态 3完成，4失败
      * @return array|mixed
      * @throws \think\db\exception\DbException
      */
-    public function progress(string $message = null, $progress = null, $status = null)
+    public function progress($progress = null, string $message = null, $status = null)
     {
         if (is_numeric($status)) {
             $update['status'] = $status;

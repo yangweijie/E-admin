@@ -33,7 +33,7 @@ class Queue extends Command
     // 获取路径
     protected function getPath()
     {
-        return Env::get('root_path') . 'app' . DIRECTORY_SEPARATOR . 'common'.DIRECTORY_SEPARATOR . 'queue';
+        return Env::get('root_path') . 'app' . DIRECTORY_SEPARATOR .  'queue';
     }
 
     /**
