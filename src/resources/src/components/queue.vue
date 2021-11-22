@@ -30,6 +30,7 @@ export default defineComponent({
     let timer = null
     let alert = 0
     function exec(){
+      alert = 0
       request(props.url).then(res=>{
         if(timer){
           state.progress=0
