@@ -24,7 +24,7 @@ class Queue extends Component
      * @param array $data 数据
      * @return $this
      */
-    public function exec($title, $job, array $data){
+    public function exec($title, $job, array $data=[]){
         $id = sysqueue($title,$job,$data);
         $this->queueId($id);
         $this->attr('title',$title);

@@ -21,7 +21,7 @@ if (!function_exists('sysqueue')) {
      * @param int $delay 延迟时间
      * @return mixed
      */
-    function sysqueue($title, $job, array $data, $delay = 0)
+    function sysqueue($title, $job, array $data = [], $delay = 0)
     {
         return Admin::queue($title, $job, $data, $delay);
     }
