@@ -26,6 +26,10 @@ abstract class Queue
         $this->job = $job;
         $data = json_decode($this->job->getRawBody(), true);
         $this->queueId = $data['data']['system_queue_id'];
+        if(!Db::name($this->tableName)->find($this->queueId)){
+            $this->job->delete();
+            throw new \Exception('队列已删除');
+        }
         $this->progress('任务开始', 0, 2);
     }
 
