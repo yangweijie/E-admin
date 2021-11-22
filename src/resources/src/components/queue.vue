@@ -1,12 +1,12 @@
 <template>
   <span @click="exec"><slot></slot></span>
   <teleport to="body">
-  <div class="el-notification right" role="alert" style="bottom: 20px;" v-if="visible">
-    <div class="el-notification__group" style="width: 100%">
-      <h2 class="el-notification__title" v-html="title"></h2>
-      <div class="el-notification__content"><el-progress :percentage="progress" :status="status"></el-progress></div>
-      <div class="el-notification__closeBtn el-icon-close" @click="close"></div></div>
-  </div>
+    <div class="el-notification right" role="alert" style="bottom: 20px;" v-if="visible">
+      <div class="el-notification__group" style="width: 100%">
+        <h2 class="el-notification__title" v-html="title"></h2>
+        <div class="el-notification__content"><el-progress :percentage="progress" :status="status"></el-progress></div>
+        <div class="el-notification__closeBtn el-icon-close" @click="close"></div></div>
+    </div>
   </teleport>
 </template>
 
@@ -16,8 +16,8 @@ import request from '@/utils/axios'
 export default defineComponent({
   name: "EadminQueue",
   props: {
-    queueId: [String,Number],
     title: String,
+    url:String,
   },
   setup(props) {
     const state = reactive({
@@ -27,15 +27,18 @@ export default defineComponent({
     })
     let timer = null
     function exec(){
-      if(timer){
-        state.progress=0
-        state.status= ''
-        clearInterval(timer)
-      }
-      state.visible = true
-      timer = setInterval(() => {
-        queue()
-      }, 500)
+      request(props.url).then(res=>{
+        if(timer){
+          state.progress=0
+          state.status= ''
+          clearInterval(timer)
+        }
+        state.visible = true
+        timer = setInterval(() => {
+          queue(res)
+        }, 500)
+      })
+
     }
     onBeforeUnmount(()=>{
       close()
@@ -47,11 +50,11 @@ export default defineComponent({
       state.visible = false
       clearInterval(timer)
     }
-    function queue(){
+    function queue(id){
       request({
         url: 'queue/progress',
         params: {
-          id: props.queueId
+          id: id
         }
       }).then(result=>{
         state.progress = result.data.progress
