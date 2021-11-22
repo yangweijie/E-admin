@@ -22,6 +22,7 @@ return [
             'add' => '新增',
             'remove' => '移除',
         ],
+        'queue_message'=>'任务已进入队列，正在排队中，请耐心等待',
         'grid' => [
             'confirmRecoverySelected'=>'此操作将恢复选中数据？',
             'confirmClearSelected'=>'此操作将删除选中数据？',

@@ -331,12 +331,13 @@ class Admin
      * @param string $job 任务
      * @param array $data 数据
      * @param int $delay 延迟时间
+     * @param bool $queue 多进程下默认并发执行,true排队执行
      * @return mixed
      */
-    public static function queue($title, $job, array $data, $delay = 0)
+    public static function queue($title, $job, array $data, $delay = 0,$queue=false)
     {
         $queue = new QueueService();
-        return $queue->queue($title, $job, $data, $delay);
+        return $queue->queue($title, $job, $data, $delay,$queue);
     }
 
     /**

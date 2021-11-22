@@ -19,11 +19,12 @@ if (!function_exists('sysqueue')) {
      * @param string $job 任务
      * @param array $data 数据
      * @param int $delay 延迟时间
+     * @param bool $queue 多进程下默认并发执行,true排队执行
      * @return mixed
      */
-    function sysqueue($title, $job, array $data = [], $delay = 0)
+    function sysqueue($title, $job, array $data = [], $delay = 0,$queue=false)
     {
-        return Admin::queue($title, $job, $data, $delay);
+        return Admin::queue($title, $job, $data, $delay,$queue);
     }
 }
 if (!function_exists('sysconf')) {

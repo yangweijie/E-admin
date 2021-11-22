@@ -22,6 +22,7 @@ return [
             'add' => 'Add',
             'remove' => 'Remove',
         ],
+        'queue_message'=>'The task has entered the queue and is being queued. Please wait patiently',
         'grid' => [
             'confirmRecoverySelected'=>'This action will restore the selected data？',
             'confirmClearSelected'=>'This action will delete the selected data？',

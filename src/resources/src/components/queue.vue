@@ -12,7 +12,9 @@
 
 <script>
 import {defineComponent, reactive, toRefs,onBeforeUnmount,onDeactivated} from "vue";
+import {ElMessage} from 'element-plus'
 import request from '@/utils/axios'
+import {trans} from '@/utils'
 export default defineComponent({
   name: "EadminQueue",
   props: {
@@ -26,6 +28,7 @@ export default defineComponent({
       visible:false,
     })
     let timer = null
+    let alert = 0
     function exec(){
       request(props.url).then(res=>{
         if(timer){
@@ -57,6 +60,10 @@ export default defineComponent({
           id: id
         }
       }).then(result=>{
+        if(result.data.status === 0 && alert === 0){
+          alert = 1
+          ElMessage.warning(trans('queue_message'))
+        }
         state.progress = result.data.progress
         if(result.data.status == 4){
           state.status = 'exception'

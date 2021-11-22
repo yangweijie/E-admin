@@ -3,6 +3,7 @@
 namespace Eadmin\component\basic;
 
 use Eadmin\component\Component;
+use Eadmin\model\SystemQueue;
 use think\app\Url;
 use think\facade\Db;
 

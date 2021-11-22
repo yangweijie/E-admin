@@ -107,15 +107,32 @@ abstract class Queue
         $this->job->delete();
         $this->progress($message, 100, 3);
     }
-
+    private function isQueued(){
+        if($this->queue['is_queue'] == 1){
+            $res = Db::name($this->tableName)
+                ->where('queue',$this->queue['queue'])
+                ->where('is_queue',1)
+                ->where('id','<>',$this->queueId)
+                ->where('status','<',3)
+                ->find();
+            if($res){
+                return true;
+            }
+        }
+        return false;
+    }
     public function fire(Job $job, $data)
     {
         $this->init($job);
         if($this->queue && $this->queue['status'] < 3){
-            if($this->queue['status'] == 1){
-                $this->progress('任务开始', 0, 2);
-            }else{
+            if($this->isQueued()){
+                $this->progress('任务排队中', 0, 0);
+                $this->release(1);
+            }
+            if($this->queue['status'] == 2){
                 $this->progress('任务进程被中断，重试任务开始', 0, 2);
+            }else{
+                $this->progress('任务开始', 0, 2);
             }
             try {
                 if ($this->handle($data)) {

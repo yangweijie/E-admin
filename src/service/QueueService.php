@@ -28,13 +28,15 @@ class QueueService extends Queue
      * @param string $job 任务
      * @param array $data 数据
      * @param int $delay 延迟时间
+     * @param bool $queue 多进程下默认并发执行,true排队执行
      * @return int|string
      */
-    public function queue($title, $job, array $data, $delay = 0)
+    public function queue($title, $job, array $data, $delay = 0,$queue)
     {
         $id = Db::name('system_queue')->insertGetId([
             'name' => $title,
             'queue' => $job,
+            'is_queue' => (int)$queue,
             'queue_data' => json_encode($data),
             'plan_time' => date('Y-m-d H:i:s', time() + $delay),
         ]);

@@ -33,6 +33,7 @@ class CreateSystemQueue extends Migrator
         $table->addColumn(Column::string('queue')->setComment('队列名称'));
         $table->addColumn(Column::text('queue_data')->setNullable()->setComment('队列数据'));
         $table->addColumn(Column::boolean('status')->setDefault(1)->setComment('状态:1等待处理，2正在执行，3已完成，4已失败'));
+        $table->addColumn(Column::boolean('is_queue')->setDefault(0)->setComment('0并发，1排队'));
         $table->addColumn(Column::string('task_time',100)->setNullable()->setComment('耗时毫秒'));
         $table->addColumn(Column::dateTime('plan_time')->setDefault('CURRENT_TIMESTAMP')->setComment('计划时间'));
         $table->addColumn(Column::dateTime('exec_time')->setDefault('CURRENT_TIMESTAMP')->setComment('执行时间'));
