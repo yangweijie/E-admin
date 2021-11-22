@@ -35,7 +35,7 @@ export default defineComponent({
         }
         state.visible = true
         timer = setInterval(() => {
-          queue(res)
+          queue(res.data)
         }, 500)
       })
 
