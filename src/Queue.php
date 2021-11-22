@@ -111,8 +111,12 @@ abstract class Queue
     public function fire(Job $job, $data)
     {
         $this->init($job);
-        if($this->queue && $this->queue['status'] == 1){
-            $this->progress('任务开始', 0, 2);
+        if($this->queue && $this->queue['status'] < 3){
+            if($this->queue['status'] == 1){
+                $this->progress('任务开始', 0, 2);
+            }else{
+                $this->progress('任务进程被中断，重试任务开始', 0, 2);
+            }
             try {
                 if ($this->handle($data)) {
                     $this->success('<b style="color: green">任务完成</b>'.PHP_EOL.PHP_EOL);
@@ -124,7 +128,7 @@ abstract class Queue
                 $this->error('<b style="color: red">任务失败追踪错误</b>：' . $exception->getTraceAsString());
             }
         }else{
-            $this->job->delete();
+            $this->error('<b style="color: red">任务失败</b>');
         }
     }
 }
