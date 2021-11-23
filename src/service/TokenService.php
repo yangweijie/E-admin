@@ -50,7 +50,7 @@ class TokenService
         $this->config = config('admin.token.' . $type);
         $this->key = substr(md5($this->config['key']), 8, 16);
         $this->model = $this->config['model'];
-        $this->unique = $this->config['model'];
+        $this->unique = $this->config['unique'];
         $this->expire = $this->config['expire'] ?? 7200;
         $this->authFields = $this->config['auth_field'] ?? [];
         if (isset($this->config['debug']) && $this->config['debug']) {
