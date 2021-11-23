@@ -184,6 +184,15 @@ class SidebarGrid extends Component
     }
 
     /**
+     * 隐藏侧边栏全部
+     * @param bool $bool
+     * @return $this
+     */
+    public function hideAll($bool=true){
+        $this->sidebar->attr('hideAll', $bool);
+        return $this;
+    }
+    /**
      * 设置布局栅格
      * @param int $left
      * @param int $right
@@ -209,6 +218,7 @@ class SidebarGrid extends Component
             ->expandOnClickNode(false)
             ->highlightCurrent();
         $this->sidebar = new \Eadmin\component\grid\Sidebar();
+        $this->sidebar->attr('field','group_id');
         $this->sidebar->attr('tree', $this->tree);
         if($this->grid){
             $this->sidebar->bindAttr('gridValue', $this->grid->bindAttr('modelValue'), true);
@@ -218,17 +228,21 @@ class SidebarGrid extends Component
     public function jsonSerialize()
     {
         $this->sidebar->attr('remoteParams',$this->getCallMethod());
+        $this->grid->attr('SidebarGrid',$this->sidebar->attr('field'));
         //删除
         if(request()->has('eadmin_sidebar_delete')){
             $this->model->where($this->model->getPk(),request()->param('id'))->delete();
             admin_success_message(admin_trans('admin.delete_complete'));
         }
+        $data = $this->db->select()->toArray();
+        if ($this->treePid) {
+            $data = Admin::tree($data, $this->treeId, $this->treePid);
+        }else{
+            $this->sidebar->attr('dataSource',$data);
+        }
         //加载数据
         if(request()->has('eadmin_sidebar_data')){
-            $data = $this->db->select()->toArray();
-            if ($this->treePid) {
-                $data = Admin::tree($data, $this->treeId, $this->treePid);
-            }
+
             throw new HttpResponseException(json([
                 'code' => 200,
                 'data' => $data,

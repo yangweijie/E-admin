@@ -339,6 +339,10 @@
 
             watch(loading, (value) => {
                 if (value) {
+                    //SidebarGrid 赋值添加按钮
+                    if(ctx.attrs.SidebarGrid && props.addButton && props.addButton.attribute.params.hasOwnProperty([ctx.attrs.SidebarGrid]) && props.addButton.name === 'EadminDialog'){
+                        props.addButton.attribute.params[ctx.attrs.SidebarGrid]  = props.addParams[ctx.attrs.SidebarGrid]
+                    }
                     loadData()
                 }
             })

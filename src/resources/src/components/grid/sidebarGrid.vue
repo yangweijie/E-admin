@@ -39,6 +39,7 @@
             hideTools: Boolean,
             gridValue: Boolean,
             header: Boolean,
+            hideAll: Boolean,
             tree: Object,
             default: {
               type:  [String, Number],
@@ -70,9 +71,19 @@
                 current:props.default,
                 keyword:'',
                 editUrl:'',
-                dataSource: [],
+                dataSource: props.dataSource,
             })
-            getData()
+            if(!props.hideAll){
+                const all = {}
+                all[props.tree.attribute.nodeKey] = ''
+                all[props.tree.attribute.props.label] = '全部'
+                state.dataSource.unshift(all)
+            }
+            if(props.default){
+                let params = {}
+                params[props.field] = props.default
+                ctx.emit('update:gridParams',params)
+            }
             const addParams = computed(()=>{
                 let params = {}
                 params[props.field] = state.current
@@ -83,6 +94,7 @@
             })
             function onNodeClick(row) {
                 state.current = row[props.tree.attribute.nodeKey]
+
                 let params = {}
                 params[props.field] = state.current
                 if(state.current){
@@ -117,14 +129,21 @@
                 }
                 return arr
             }
+            const treeData = computed(()=>{
+                const data =  filterTree(state.dataSource)
+                ctx.emit('update:dataSource',data)
+                return data
+            })
             function getData() {
                 let name = props.tree.attribute.props.label
                 let id = props.tree.attribute.nodeKey
                 let data = []
                 let all = {}
-                all[id] = ''
-                all[name] = '全部'
-                data.push(all)
+                if(!props.hideAll){
+                    all[id] = ''
+                    all[name] = '全部'
+                    data.push(all)
+                }
                 http({
                     url:'/eadmin.rest',
                     params:Object.assign({eadmin_sidebar_data:true},ctx.attrs.remoteParams)
@@ -144,11 +163,7 @@
                     })
                 })
             }
-            const treeData = computed(()=>{
-              const data =  filterTree(state.dataSource)
-              ctx.emit('update:dataSource',data)
-              return data
-            })
+
             return {
                 trans,
                 del,
