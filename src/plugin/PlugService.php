@@ -63,12 +63,13 @@ class PlugService
         $this->client = new Client([
             'base_uri' => 'https://www.ex-admin.com/api/Plugin/',
             'verify' => false,
-            'timeout'=>10
+            'timeout' => 10
         ]);
         $this->plugPathBase = app()->getRootPath() . config('admin.extension.dir', 'plugin');
         foreach (glob($this->plugPathBase . '/*') as $file) {
             if (is_dir($file) && $this->checkFiles($file)) {
-                $this->plugPaths[] = $file;
+                $name = basename($file);
+                $this->plugPaths[$name] = $file;
             }
         }
         $this->loginToken = md5(Request::header('Authorization') . 'plug');
@@ -108,29 +109,25 @@ class PlugService
     public function register()
     {
         $loader = Composer::loader();
-        foreach ($this->plugPaths as $plugPaths) {
-            $file = $plugPaths . DIRECTORY_SEPARATOR . 'info.json';
-            if (is_file($file)) {
-                $arr = Composer::parse($file);
-                $arr['plug_path'] = $plugPaths;
-                $psr4 = Arr::get($arr, 'namespace');
-                $name = Arr::get($arr, 'name');
-                $loader->addPsr4(Arr::get($arr, 'namespace') . '\\', $plugPaths);
-                $serviceProvider = Arr::get($arr, 'services');
-                if ($serviceProvider && $arr['status']) {
-                    $configPath = $plugPaths . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'config.php';
-                    $this->app->register($serviceProvider);
-                    $service = $this->app->getService($serviceProvider);
-                    $this->serviceProvider[$name] = $service;
-                    $this->app->bind($serviceProvider, $service);
-                    if (method_exists($service, 'withinfo')) {
-                        $service->withinfo($arr);
-                    }
+        foreach ($this->plugPaths as $name => $plugPaths) {
+            $arr = $this->info($name);
+            $arr['plug_path'] = $plugPaths;
+            $psr4 = Arr::get($arr, 'namespace');
+            $loader->addPsr4(Arr::get($arr, 'namespace') . '\\', $plugPaths);
+            $serviceProvider = Arr::get($arr, 'services');
+            if ($serviceProvider && $arr['status']) {
+                $configPath = $plugPaths . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'config.php';
+                $this->app->register($serviceProvider);
+                $service = $this->app->getService($serviceProvider);
+                $this->serviceProvider[$name] = $service;
+                $this->app->bind($serviceProvider, $service);
+                if (method_exists($service, 'withinfo')) {
+                    $service->withinfo($arr);
                 }
             }
         }
         if (count($this->plugPaths) > 0 && !Cache::has('plugverify' . date('Y-m-d'))) {
-           $this->verify();
+            $this->verify();
         }
     }
 
@@ -153,14 +150,16 @@ class PlugService
             if ($response->getStatusCode() == 200) {
                 Cache::set('plugverify' . date('Y-m-d'), 1, 60 * 60 * 24);
             }
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
 
         }
     }
-    public function authorize($info){
+
+    public function authorize($info)
+    {
         $response = $this->client->post('authorize', [
-            'headers'=>[
-                'Authorization'=>Cache::get($this->loginToken)
+            'headers' => [
+                'Authorization' => Cache::get($this->loginToken)
             ],
             'form_params' => [
                 'info' => $info,
@@ -168,12 +167,14 @@ class PlugService
         ]);
         $content = $response->getBody()->getContents();
         $content = json_decode($content, true);
-        if(empty($content['data'])){
+        if (empty($content['data'])) {
             return false;
         }
         return $content['data'];
     }
-    protected function valid($info){
+
+    protected function valid($info)
+    {
         $response = $this->client->post('valid', [
             'form_params' => [
                 'info' => $info,
@@ -181,17 +182,19 @@ class PlugService
         ]);
         $content = $response->getBody()->getContents();
         $content = json_decode($content, true);
-        if($content['code'] == 200){
+        if ($content['code'] == 200) {
             return true;
         }
         return false;
     }
+
     /**
      * 插件是否存在
      * @param $name
      * @return bool
      */
-    public function exist($name){
+    public function exist($name)
+    {
         $response = $this->client->post('exist', [
             'form_params' => [
                 'name' => $name,
@@ -199,12 +202,13 @@ class PlugService
         ]);
         $content = $response->getBody()->getContents();
         $content = json_decode($content, true);
-        if($content['code'] == 200){
+        if ($content['code'] == 200) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
+
     /**
      * 获取注册插件服务
      * @param null $name 插件名称
@@ -233,7 +237,7 @@ class PlugService
      * 获取所有插件
      * @param string $search 搜索的关键词
      */
-    public function all($search = '', $cate_id = 0, $page = 1, $size = 20,$names=[])
+    public function all($search = '', $cate_id = 0, $page = 1, $size = 20, $names = [])
     {
         if (count($this->plugs) == 0) {
             $response = $this->client->post("list", [
@@ -277,19 +281,19 @@ class PlugService
     {
         $plugs = [];
         $names = [];
-        foreach ($this->plugPaths as $plug) {
-            $info = $this->info(basename($plug));
+        foreach ($this->plugPaths as $name => $plug) {
+            $info = $this->info($name);
             $names[] = $info['name'];
         }
-        $onlinePlugs = $this->all('',0,1,1000,$names);
-        $names = array_column($onlinePlugs,'name');
-        foreach ($this->plugPaths as $plug) {
-            $info = $this->info(basename($plug));
+        $onlinePlugs = $this->all('', 0, 1, 1000, $names);
+        $names = array_column($onlinePlugs, 'name');
+        foreach ($this->plugPaths as $name => $plug) {
+            $info = $this->info($name);
             $info['install'] = true;
             $info['versions'] = [];
             $info['requires'] = [];
-            $index = array_search($info['name'],$names);
-            if($index !== false){
+            $index = array_search($info['name'], $names);
+            if ($index !== false) {
                 $info = $onlinePlugs[$index];
             }
             if (isset($this->serviceProvider[$info['name']])) {
@@ -403,7 +407,7 @@ class PlugService
             return false;
         }
         $info = Composer::parse($directory . '/info.json');
-        if(!isset($info['authorize_key'])){
+        if (!isset($info['authorize_key'])) {
             return false;
         }
         return true;
@@ -431,43 +435,45 @@ class PlugService
      * @param string $version 版本
      * @return bool
      */
-    public function onlineInstall($name,$version){
+    public function onlineInstall($name, $version)
+    {
         $plugZip = app()->getRuntimePath() . 'plug' . time() . '.zip';
         $this->client->get('install', [
-            'query'=>[
-              'name'=>$name,
-              'version'=>$version,
+            'query' => [
+                'name' => $name,
+                'version' => $version,
             ],
-            'headers'=>[
-                'Authorization'=>Cache::get($this->loginToken)
+            'headers' => [
+                'Authorization' => Cache::get($this->loginToken)
             ],
             'save_to' => $plugZip
         ]);
         $filesystem = new Filesystem();
-        try{
+        try {
             $zip = new \ZipArchive();
             if ($zip->open($plugZip) === true) {
-                $path = app()->getRuntimePath().'plugin';
+                $path = app()->getRuntimePath() . 'plugin';
                 if (!is_dir($path)) {
                     mkdir($path, 0755, true);
                 }
                 $zip->extractTo($path);
                 $zip->close();
                 $finder = new Finder();
-                foreach ($finder->in($path)->files() as $file){
+                foreach ($finder->in($path)->files() as $file) {
                     $this->install($file->getRealPath());
                 }
                 $filesystem->remove($path);
                 unlink($plugZip);
                 return true;
-            }else{
+            } else {
                 unlink($plugZip);
                 return false;
             }
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return false;
         }
     }
+
     /**
      * 安装
      * @param string $fileZip zip压缩包
@@ -480,14 +486,14 @@ class PlugService
             if ($zip->open($fileZip) === true) {
                 $info = $zip->getFromName('info.json');
                 $info = json_decode($info, true);
-                
+
                 $path = $this->plugPathBase . '/' . $info['name'];
                 if (!is_dir($path)) {
                     mkdir($path, 0755, true);
                     $zip->extractTo($path);
                     //关闭
                     $zip->close();
-                    if(!$this->checkFiles($path) || !$this->valid($info)){
+                    if (!$this->checkFiles($path) || !$this->valid($info)) {
                         $filesystem = new Filesystem();
                         $filesystem->remove($path);
                         return false;
@@ -521,15 +527,15 @@ class PlugService
         $doc = '';
         $count = count($this->plugPaths);
         $this->plugPaths = array_unique($this->plugPaths);
-        foreach ($this->plugPaths as $index => $plug) {
-            $name = basename($plug);
+        $i = 0;
+        foreach ($this->plugPaths as $name => $plug) {
             $info = $this->info($name);
-            $name = $info['name'];
             $title = $info['title'];
             $doc .= " * @property $name\\" . ucfirst($name) . "Service \$$name $title";
-            if (($index + 1) != $count) {
+            if (($i + 1) != $count) {
                 $doc .= PHP_EOL;
             }
+            $i++;
         }
         $content = <<<PHP
 <?php
@@ -546,9 +552,25 @@ PHP;
      * 卸载
      * @param string $name 插件名称
      */
-    public function uninstall($name)
+    public function uninstall($name,$except=[])
     {
-        $path = $this->plugPathBase.'/'.$name;
+        //查找插件依赖关系
+        $plugs = array_keys($this->plugPaths);
+        $requires = [];
+        $except[] = $name;
+        foreach ($plugs as $plug) {
+            if (in_array($plug,$except)) continue;
+            $info = $this->info($plug);
+            $requires = array_merge($requires, array_keys($info['plugin']));
+        }
+        $info = $this->info($name);
+        $requires = array_diff(array_keys($info['plugin']), $requires);
+
+        //卸载依赖插件
+        foreach ($requires as $require) {
+            $this->uninstall($require,$except);
+        }
+        $path = $this->plugPathBase . '/' . $name;
         $this->dataMigrate('rollback', $path);
         $filesystem = new \Symfony\Component\Filesystem\Filesystem;
         $filesystem->remove($path);

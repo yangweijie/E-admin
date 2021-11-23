@@ -121,18 +121,11 @@ class Plug extends Controller
                         Button::create('启用')->sizeSmall()->typeSuccess()->save(['id' => $rows['name'], 'status' => 1], 'plug/enable', '确认启用？')
                     );
                 }
-              
-                $plug = array_column($rows['versions'], 'requires', 'version');
-                $require = $plug[$rows['version']] ?? [];
                 $actions->append(
                     Button::create('卸载')
                         ->sizeSmall()
                         ->typeDanger()
-                        ->when(count($require) > 0, function (Button $button) use ($rows, $require) {
-                            return $button->dialog()->content($this->uninstallAll($rows['name'], $rows['path'], $require));
-                        }, function (Button $button) use ($rows) {
-                            return $button->save(['name' => $rows['name']], 'plug/uninstall', '确认卸载？');
-                        })
+                        ->save(['name' => $rows['name']], 'plug/uninstall', '确认卸载？')
                 );
             } else {
                 $dropdown = Dropdown::create(
@@ -166,6 +159,10 @@ class Plug extends Controller
         return $grid;
     }
 
+    /**
+     * 登录
+     * @return Form
+     */
     public function login()
     {
         return Form::create([], function (Form $form) {
@@ -183,6 +180,9 @@ class Plug extends Controller
         });
     }
 
+    /**
+     * 本地安装
+     */
     public function zipInstall(){
         $file = $this->request->file('file');
         $res = Admin::plug()->install($file->getRealPath());
@@ -222,41 +222,7 @@ class Plug extends Controller
         admin_success_message('卸载完成');
     }
 
-    protected function getRequires($require)
-    {
-        $options = array_column($require, 'title', 'composer');
-        foreach ($require as $req) {
-            foreach ($req['version'] as $row) {
-                $options = array_merge($options, $this->getRequires($row['require']));
-            }
-        }
-        return $options;
-    }
 
-    /**
-     * 卸载
-     * @auth false
-     * @login true
-     */
-    public function uninstallAll($composer, $path, $require)
-    {
-
-        $form = new Form([]);
-        $form->checkbox('requires', '卸载依赖')->options($this->getRequires($require));
-        $form->actions(function (FormAction $formAction) {
-            $formAction->submitButton()->content('卸载');
-            $formAction->hideResetButton();
-            $formAction->confirm('确认卸载?');
-        });
-        $form->saving(function ($post) use ($composer, $path) {
-            foreach ($post['requires'] as $require) {
-                Admin::plug()->uninstall($require, Admin::plug()->getBasePath() . '/' . $require);
-            }
-            Admin::plug()->uninstall($composer, $path);
-            admin_success_message('卸载完成');
-        });
-        return $form;
-    }
 
     /**
      * 创建扩展
@@ -290,7 +256,7 @@ class Plug extends Controller
         });
         return $form;
     }
-    
+
     /**
      * 启用/禁用
      * @auth false
@@ -302,24 +268,4 @@ class Plug extends Controller
         admin_success_message('操作完成');
     }
 
-    /**
-     * @param $data
-     * @param $version
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
-     */
-    protected function requireInstall($data, $version)
-    {
-        $urls = array_column($data, 'url', 'id');
-        $versions = array_column($data, 'version', 'id');
-        $requires = array_column($data, 'require', 'id');
-        $requires = $requires[$version];
-        foreach ($requires as $require) {
-            if (Admin::plug()->isInstall($require['composer'])) {
-                Admin::plug()->install($require['composer'], $require['url'], $require['version_number']);
-                $this->requireInstall($require['version'], $require['id']);
-            }
-        }
-    }
 }

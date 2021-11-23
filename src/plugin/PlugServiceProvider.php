@@ -184,7 +184,9 @@ PHP;
                 }
                 $route = '<controller>/' . $method . $function;
                 $rule = '<controller>' . $rule . $function;
-                $this->app->route->any($rule, $namespace . $route);
+
+//                $this->app->route->any($rule, $namespace . $route);
+                $this->app->route->any($rule, PlugDispatch::class);
             }else{
                 $namespace = $this->getNamespace();
                 $namespace .= 'controller\\';
