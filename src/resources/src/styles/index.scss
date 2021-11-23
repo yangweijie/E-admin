@@ -85,6 +85,9 @@ body *::-webkit-scrollbar-thumb:hover {
 .eadmin-editable-cell{
   position: relative;
   min-height: 30px;
+  display: flex;
+  align-items: center;
+  padding-right: 25px;
 }
 .eadmin-editable-cell .editable-cell-icon{
   position: absolute;
@@ -93,14 +96,14 @@ body *::-webkit-scrollbar-thumb:hover {
   cursor: pointer;
 }
 .eadmin-editable-cell .editable-cell-icon {
-  margin-top: 4px;
+
   display: none;
 }
 .eadmin-editable-cell:hover .editable-cell-icon{
   display: inline-block;
 }
 .eadmin-editable-cell .editable-cell-icon:hover {
-  margin-top: 4px;
+
   color: $--color-primary;
 }
 .eadmin-horizontal{

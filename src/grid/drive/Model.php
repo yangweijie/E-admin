@@ -266,7 +266,7 @@ class Model implements GridInterface
         } else {
             $res = $this->model->removeWhereField($this->softDeleteField)->strict(false)->whereIn($pk, $ids)->update($data);
             if ($res !== false) {
-                admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.save_success'))->redirect($url);
+                admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.save_success'));
             } else {
                 admin_error_message(admin_trans('admin.save_fail'));
             }

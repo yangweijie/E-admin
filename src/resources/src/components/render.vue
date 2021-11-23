@@ -170,6 +170,7 @@
                             }
                             if(eventBind.data.field){
                                 eventBind.data[eventBind.data.field] = value
+                                delete eventBind.data.field
                             }
                             request({
                                 url:eventBind.url,
@@ -177,7 +178,9 @@
                                 data:eventBind.data
                             }).then(res=>{
                               if(slotProps && slotProps.grid){
-                                setObjectValue(modelValue,eventBind.data.eadmin_editable_bind,0)
+                                if(!res.data.always_show){
+                                  setObjectValue(modelValue,eventBind.data.eadmin_editable_bind,0)
+                                }
                                 //刷新editable行数据
                                 const index = findArrKey(modelValue[slotProps.grid+'data'],res.data.eadmin_id,'eadmin_id')
                                 modelValue[slotProps.grid+'data'][index] = res.data
