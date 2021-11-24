@@ -107,7 +107,7 @@ class SidebarGrid extends Component
      */
     public function default($value)
     {
-        $this->sidebar->attr('default', $value);
+        $this->sidebar->attr('defaultValue', $value);
         return $this;
     }
 

@@ -19,7 +19,7 @@
             <el-input prefix-icon="el-icon-search" size="small" v-model="keyword"></el-input>
         </div>
         <div class="tree-group">
-            <el-tree v-bind="tree.attribute" :data="treeData" :current-node-key="current" @node-click="onNodeClick"></el-tree>
+            <el-tree v-bind="tree.attribute" highlight-current :data="treeData" :current-node-key="current" @node-click="onNodeClick"></el-tree>
         </div>
     </el-card>
 </template>
@@ -41,7 +41,7 @@
             header: Boolean,
             hideAll: Boolean,
             tree: Object,
-            default: {
+            defaultValue: {
               type:  [String, Number],
               default:'',
             },
@@ -68,7 +68,7 @@
             ctx.emit('update:gridParams',props.params)
             const {loading,http} = useHttp()
             const state = reactive({
-                current:props.default,
+                current:props.defaultValue,
                 keyword:'',
                 editUrl:'',
                 dataSource: props.dataSource,
@@ -94,7 +94,7 @@
             })
             function onNodeClick(row) {
                 state.current = row[props.tree.attribute.nodeKey]
-
+console.log(state.current)
                 let params = {}
                 params[props.field] = state.current
                 if(state.current){
@@ -132,6 +132,7 @@
             const treeData = computed(()=>{
                 const data =  filterTree(state.dataSource)
                 ctx.emit('update:dataSource',data)
+                console.log(data)
                 return data
             })
             function getData() {
@@ -149,6 +150,10 @@
                     params:Object.assign({eadmin_sidebar_data:true},ctx.attrs.remoteParams)
                 }).then(res=>{
                     state.dataSource = data.concat(res.data)
+                    if(state.dataSource.length > 0){
+                        console.log(state.dataSource[0])
+                        onNodeClick(state.dataSource[0])
+                    }
                 })
             }
             function del() {
