@@ -236,5 +236,32 @@ if (!function_exists('plug')) {
         return new \Eadmin\plugin\Manage();
     }
 }
+if (!function_exists('plug_url')) {
+    /**
+     * 插件控制器生成url
+     * @return string
+     */
+    function plug_url($url,$vars=[])
+    {
+        $backtrace = debug_backtrace(1, 2);
+        $class = array_pop($backtrace);
+        $class = $class['class'];
+        $arr = explode('/',$url);
+        if (count($arr) == 3){
+            $url = "plugin/{$arr[0]}/{$arr[1]}/$arr[2]";
+            return $url;
+        }
+        if(\think\helper\Str::startsWith($class,'plugin')){
+            $classArr = explode('\\',$class);
+            $plugName = $classArr[1];
+            if(count($arr) == 1){
+                $url = "plugin/$plugName/{$classArr[3]}/{$arr[0]}";
+            }elseif (count($arr) == 2){
+                $url = "plugin/$plugName/{$arr[0]}/$arr[1]";
+            }
+        }
+        return $url;
+    }
+}
 
 

@@ -264,12 +264,7 @@ class Model implements GridInterface
             $res = Db::execute("update {$this->model->getTable()} inner join {$sortSql} a on a.{$pk}={$this->model->getTable()}.{$pk} set {$this->sortField}=a.rownum");
             admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.sort_success'));
         } else {
-            $res = $this->model->removeWhereField($this->softDeleteField)->strict(false)->whereIn($pk, $ids)->update($data);
-            if ($res !== false) {
-                admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.save_success'));
-            } else {
-                admin_error_message(admin_trans('admin.save_fail'));
-            }
+            return $this->model->removeWhereField($this->softDeleteField)->strict(false)->whereIn($pk, $ids)->update($data);
         }
     }
 

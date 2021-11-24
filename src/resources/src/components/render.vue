@@ -168,9 +168,8 @@
                             if(data.attribute.valueFormat){
                               value = dateFormat(value,data.attribute.valueFormat)
                             }
-                            if(eventBind.data.field){
-                                eventBind.data[eventBind.data.field] = value
-                                delete eventBind.data.field
+                            if(eventBind.data.eadmin_field){
+                                eventBind.data[eventBind.data.eadmin_field] = value
                             }
                             request({
                                 url:eventBind.url,

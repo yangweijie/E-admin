@@ -11,6 +11,9 @@ namespace Eadmin\traits;
 use Eadmin\form\Form;
 use Eadmin\form\traits\ComponentForm;
 use Eadmin\component\basic\Html;
+use Eadmin\grid\event\Updated;
+use Eadmin\grid\event\Updateing;
+use think\facade\Event;
 
 /**
  * 行内编辑
@@ -45,6 +48,7 @@ trait ColumnEditable
         ];
         $prop = $this->prop;
         $this->grid->updateing(function ($ids, $data) use($show,$prop) {
+            $event = [$ids, $data];
             $id = array_pop($ids);
             $pk = $this->grid->drive()->getPk();
             $field = 'eadmin_editable' . $prop.$id;
@@ -53,11 +57,13 @@ trait ColumnEditable
                 $data[$pk] = $id;
                 $result = $form->getDrive()->save($data);
                 if ($result !== false) {
+                    Event::until(Updated::class, $event);
                     $this->grid->model()->where($this->grid->drive()->getPk(),$id);
                     $this->grid->exec();
                     $data = $this->grid->parseData();
                     $row = array_pop($data);
                     $row['always_show'] = $show;
+
                     admin_success('操作完成', '数据保存成功')->data($row);
                 } else {
                     admin_error_message('数据保存失败');
@@ -74,7 +80,7 @@ trait ColumnEditable
         $field = 'eadmin_editable' . $this->prop.$data[$id];
         $params['eadmin_ids'] = [$data[$id]];
         $params['eadmin_editable_bind'] = $field;
-        $params['field'] = $this->prop;
+        $params['eadmin_field'] = $this->prop;
         $params['eadmin_editable'] = true;
         $type = $this->editable['type'];
         $component = self::$component[$type];

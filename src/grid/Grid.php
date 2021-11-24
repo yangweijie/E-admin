@@ -18,7 +18,9 @@ use Eadmin\component\layout\Content;
 use Eadmin\contract\GridInterface;
 use Eadmin\detail\Detail;
 use Eadmin\form\Form;
+use Eadmin\grid\event\Deleted;
 use Eadmin\grid\event\Deling;
+use Eadmin\grid\event\Updated;
 use Eadmin\grid\event\Updateing;
 use Eadmin\grid\excel\Csv;
 use Eadmin\grid\excel\Excel;
@@ -301,6 +303,13 @@ class Grid extends Component
             call_user_func_array($closure, $params);
         });
     }
+    //更新后回调
+    public function updated(\Closure $closure)
+    {
+        Event::listen(Updated::class, function ($params) use ($closure) {
+            call_user_func_array($closure, $params);
+        });
+    }
 
     //删除前回调
     public function deling(\Closure $closure)
@@ -310,7 +319,14 @@ class Grid extends Component
             $closure($id, $trueDelete);
         });
     }
-
+    //删除后回调
+    public function deleted(\Closure $closure)
+    {
+        Event::listen(Deleted::class, function ($id) use ($closure) {
+            $trueDelete = Request::delete('trueDelete');
+            $closure($id, $trueDelete);
+        });
+    }
     /**
      * 删除
      * @param int $id 删除的id
@@ -320,7 +336,9 @@ class Grid extends Component
     {
         $this->exec();
         Event::until(Deling::class, $id);
-        return $this->drive->destroy($id);
+        $result =  $this->drive->destroy($id);
+        Event::until(Deleted::class, $id);
+        return $result;
     }
 
     /**
@@ -331,9 +349,16 @@ class Grid extends Component
      */
     public function update($ids, $data)
     {
+
         $this->exec();
         Event::until(Updateing::class, [$ids, $data]);
-        return $this->drive->update($ids, $data);
+        $result = $this->drive->update($ids, $data);
+        Event::until(Updated::class, [$ids, $data]);
+        if ($result !== false) {
+            admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.save_success'));
+        } else {
+            admin_error_message(admin_trans('admin.save_fail'));
+        }
     }
 
     /**
