@@ -30,7 +30,9 @@ class MenuService
      */
     public function all($admin_visible = false)
     {
-        $data = Db::name('system_menu')
+       
+        $table = config( cookie('multi-app').'.database.menu_table');
+        $data = Db::name($table)
             ->where('status', 1)
             ->when($admin_visible, function ($q) {
                 $q->where('admin_visible', 1);
@@ -50,7 +52,8 @@ class MenuService
      * @param array $data
      */
     public function add(array $data){
-        SystemMenu::create($data);
+        $model = config(cookie('multi-app').'.database.menu_model');
+        $model::create($data);
     }
 
     /**
@@ -92,7 +95,8 @@ class MenuService
     public function listOptions($data = null)
     {
         if (is_null($data)) {
-            $data = Db::name('system_menu')->where('status', 1)->order('sort asc,id asc')->select();
+            $table = config(cookie('multi-app').'.database.menu_table');
+            $data = Db::name($table)->where('status', 1)->order('sort asc,id asc')->select();
         }
         $menusList = $this->getTreeLevel($data);
         foreach ($menusList as &$value) {

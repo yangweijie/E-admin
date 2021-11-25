@@ -21,6 +21,7 @@ return [
             'down' => '下移',
             'add' => '新增',
             'remove' => '移除',
+            'clear' => '清空',
         ],
         'queue_message'=>'任务已进入队列，正在排队中，请耐心等待',
         'grid' => [

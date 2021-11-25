@@ -55,7 +55,6 @@
               treeData:[],
               multiple:ctx.attrs.multiple || false
             })
-
             const value = ref(props.modelValue)
             const selectEl = ref()
             let loadFieldValue = props.loadField
@@ -74,6 +73,7 @@
                 changeHandel(val)
             })
             watch(()=>props.options,val=>{
+
                 if(props.tree){
                   state.treeData = treeData(val,props.treeProps.value,props.treeProps.pid,props.treeProps.children)
                 }

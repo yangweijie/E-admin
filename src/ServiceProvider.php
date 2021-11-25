@@ -196,6 +196,7 @@ class ServiceProvider extends Service
             'Eadmin\command\ClearDatabase',
             'Eadmin\command\Queue',
             'Eadmin\command\Crontab',
+            'Eadmin\command\App',
         ]);
 
         //定时任务

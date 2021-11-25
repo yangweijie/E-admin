@@ -4,7 +4,7 @@ return [
     'parent'=>'Parent',
     'auth_grant'=>'Function permissions',
     'menu_grant'=>'Menu permissions',
-    'menu_grant'=>'Data permissions',
+    'data_grant'=>'Data permissions',
     'select_user'=>'Choose a person',
     'select_group'=>'Select organization',
     'select_user_tip'=>'Have permission to view data containing the selected person',

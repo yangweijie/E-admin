@@ -119,22 +119,24 @@ class Select extends Field
             $selectGroup = OptionGroup::create()
                 ->attr('label', $option[$label])
                 ->attr('disabled', $disabled);
-            foreach ($option[$name] as $item) {
-                $disabled = false;
-                if (in_array($item[$id], $this->disabledData)) {
-                    $disabled = true;
+            if(isset($option[$name])){
+                foreach ($option[$name] as $item) {
+                    $disabled = false;
+                    if (in_array($item[$id], $this->disabledData)) {
+                        $disabled = true;
+                    }
+                    $selectGroup->content(
+                        SelectOption::create()
+                            ->attr('label', $item[$label])
+                            ->attr('disabled', $disabled)
+                            ->attr('value', $item[$id])
+                    );
+                    $options[] = [
+                        'id' => $item[$id],
+                        'label' => $item[$label],
+                        'disabled' => $disabled,
+                    ];
                 }
-                $selectGroup->content(
-                    SelectOption::create()
-                        ->attr('label', $item[$label])
-                        ->attr('disabled', $disabled)
-                        ->attr('value', $item[$id])
-                );
-                $options[] = [
-                    'id' => $item[$id],
-                    'label' => $item[$label],
-                    'disabled' => $disabled,
-                ];
             }
             $bindOptions = array_merge($bindOptions, $options);
             $this->content($selectGroup);
@@ -209,19 +211,23 @@ class Select extends Field
     {
         $this->disabledData = $disable;
         $options = [];
-        foreach ($data as $id => $label) {
-            if (in_array($id, $this->disabledData)) {
-                $disabled = true;
-            } else {
-                $disabled = false;
+        if(count($data) == count($data,1)){
+            foreach ($data as $id => $label) {
+                if (in_array($id, $this->disabledData)) {
+                    $disabled = true;
+                } else {
+                    $disabled = false;
+                }
+                $options[] = [
+                    'id' => $id,
+                    'label' => $label,
+                    'disabled' => $disabled,
+                    'slotDefault' => '',
+                ];
             }
-            $options[] = [
-                'id' => $id,
-                'label' => $label,
-                'disabled' => $disabled,
-            ];
+        }else{
+            $options = $data;
         }
-
         $this->bindValue($options, 'options', $this->optionBindField);
         $mapField = $this->optionBindField;
         if ($this->formItem) {
@@ -231,6 +237,7 @@ class Select extends Field
             }
         }
         $this->selectOption->map($options, $mapField)
+            ->mapAttr('slotDefault', 'slotDefault')
             ->mapAttr('label', 'label')
             ->mapAttr('key', 'id')
             ->mapAttr('value', 'id')

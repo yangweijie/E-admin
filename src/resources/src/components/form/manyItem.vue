@@ -1,7 +1,7 @@
 <template>
     <el-divider content-position='left' v-if="title && !table">{{title}}</el-divider>
     <el-form-item :label="title" v-if="table">
-        <a-table row-key="id" v-if="value.length > 0" :data-source="value" size="small"  :pagination="false" :custom-row="customRow" class="manyItemEadminTable">
+        <a-table row-key="id" v-if="value.length > 0" :data-source="value" size="small" :pagination="false" :custom-row="customRow" class="manyItemEadminTable">
             <a-table-column v-for="column in columns" :data-index="column.prop">
                 <template #title>
                     <render :data="column.title"></render>
@@ -21,6 +21,7 @@
             </a-table-column>
         </a-table>
         <el-button size="mini" type='primary' plain @click="add" v-if="!disabled && (limit == 0 || limit > value.length)">{{ trans('manyItem.add') }}</el-button>
+        <el-button size="mini" type='warning' @click="clear" v-if="!disabled && (limit == 0 || limit > value.length)">{{ trans('manyItem.clear') }}</el-button>
     </el-form-item>
     <div v-else>
         <div v-for="(item,index) in value">
@@ -30,6 +31,7 @@
                 <el-button size="mini" type='danger' v-show='value.length > 0' @click="remove(index)">{{ trans('manyItem.remove') }}</el-button>
                 <el-button size="mini" @click="handleUp(index)" v-show='value.length > 1 && index > 0'>{{ trans('manyItem.up') }}</el-button>
                 <el-button size="mini" v-show='value.length > 1 && index < value.length-1' @click="handleDown(index)">{{ trans('manyItem.down') }}</el-button>
+                <el-button size="mini" type='warning' v-if="value.length - 1 == index && (limit == 0 || limit > value.length)" @click="clear">{{ trans('manyItem.clear') }}</el-button>
             </el-form-item>
             <el-divider></el-divider>
         </div>
@@ -85,6 +87,10 @@
             function remove(index){
                 value.splice(index, 1)
             }
+            //清空
+            function clear(){
+                value.splice(0)
+            }
             function customRow(record,index) {
                 return {
                     onMouseenter: (event) => {
@@ -96,6 +102,7 @@
             };
             }
             return {
+                clear,
                 trans,
                 value,
                 add,
@@ -114,5 +121,8 @@
     border-left: 1px solid #ededed;
     border-right: 1px solid #ededed;
     clear: none;
+}
+.manyItemEadminTable .el-form-item{
+  margin-bottom: 0;
 }
 </style>

@@ -10,21 +10,16 @@ namespace app\admin\controller;
 
 
 use Eadmin\component\basic\Badge;
-use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Dialog;
 use Eadmin\component\basic\DropdownItem;
 use Eadmin\component\basic\Html;
-use Eadmin\component\basic\Tag;
-use Eadmin\component\grid\BatchAction;
-use Eadmin\component\layout\Content;
 use Eadmin\Controller;
 use Eadmin\form\Form;
 use Eadmin\grid\Actions;
 use Eadmin\grid\Filter;
 use Eadmin\grid\Grid;
-use Eadmin\model\AdminModel;
-use Eadmin\model\SystemAuth;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
+
+
 
 
 /**
@@ -43,7 +38,8 @@ class Admin extends Controller
      */
     public function index(): Grid
     {
-        return Grid::create(new AdminModel(), function (Grid $grid) {
+        $model = config('admin.database.user_model');
+        return Grid::create(new $model, function (Grid $grid) {
             $grid->title(admin_trans('admin.system_user'));
             $grid->userInfo('avatar', 'nickname', admin_trans('admin.fields.avatar'));
             $grid->column('username', admin_trans('admin.fields.username'))->display(function ($val, $data) {
@@ -115,7 +111,8 @@ class Admin extends Controller
      */
     public function updatePassword()
     {
-        return Form::create(new AdminModel(), function (Form $form) {
+        $model = config('admin.database.user_model');
+        return Form::create(new $model, function (Form $form) {
             $form->edit(\Eadmin\Admin::id());
             $form->password('old_password', admin_trans('admin.old_password'))->required();
             $form->password('new_password', admin_trans('admin.new_password'))->rule([
@@ -142,7 +139,8 @@ class Admin extends Controller
      */
     public function resetPassword($id)
     {
-        return Form::create(new AdminModel(), function (Form $form) use ($id) {
+        $model = config('admin.database.user_model');
+        return Form::create(new $model, function (Form $form) use ($id) {
             $form->edit($id);
             $form->password('new_password', admin_trans('admin.new_password'))->required()->rule([
                 'confirm' => admin_trans('admin.password_confim_validate'),
@@ -163,7 +161,8 @@ class Admin extends Controller
      */
     public function form(): Form
     {
-        return Form::create(new AdminModel(), function (Form $form) {
+        $model = config('admin.database.user_model');
+        return Form::create(new $model, function (Form $form) {
             $userInput = $form->text('username', admin_trans('admin.fields.username'))->rule([
                 'chsDash' => admin_trans('admin.username_validate'),
                 'unique:system_user' => admin_trans('admin.username_exist')
@@ -180,13 +179,14 @@ class Admin extends Controller
             }
             $form->mobile('phone', admin_trans('admin.fields.phone'))
                 ->rule([
-                    'unique:' . config('admin.system_user_table') => admin_trans('admin.phone_exist')
+                    'unique:' . config('admin.database.system_user_table') => admin_trans('admin.phone_exist')
                 ]);
             $form->text('mail', admin_trans('admin.fields.mail'))->rule([
                 'email' => admin_trans('admin.please_email'),
             ]);
             if ($form->getData('id') != config('admin.admin_auth_id')) {
-                $auths = SystemAuth::where('status', 1)->select()->toArray();
+                $authModel = config('admin.database.auth_model');
+                $auths = $authModel::where('status', 1)->select()->toArray();
                 $auths = \Eadmin\Admin::tree($auths);
                 $form->tree('roles','访问权限')
                     ->data($auths)
@@ -228,7 +228,8 @@ class Admin extends Controller
      */
     public function editInfo()
     {
-        return Form::create(new AdminModel(), function (Form $form) {
+        $model = config('admin.database.user_model');
+        return Form::create(new $model, function (Form $form) {
             $form->edit(\Eadmin\Admin::id());
             $form->text('username', admin_trans('admin.fields.username'))->rule([
                 'chsDash' => admin_trans('admin.username_validate')
@@ -240,7 +241,7 @@ class Admin extends Controller
             $form->text('phone', admin_trans('admin.fields.phone'))
                 ->rule([
                     'mobile' => admin_trans('admin.please_phone'),
-                    'unique:' . config('admin.system_user_table') => admin_trans('admin.phone_exist')
+                    'unique:' . config('admin.database.system_user_table') => admin_trans('admin.phone_exist')
                 ]);
             $form->text('mail', admin_trans('admin.fields.mail'))->rule([
                 'email' => admin_trans('admin.please_email'),

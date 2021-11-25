@@ -82,7 +82,8 @@ class NoticeService extends Service
      */
     public function pushAll($title, $content, $icon, $iconColor = '', $url = '', $type = 1)
     {
-        $userIds = AdminModel::column('id');
+        $model =  config(cookie('multi-app').'.database.user_model');
+        $userIds = $model::column('id');
         foreach ($userIds as $user_id) {
             if ($type == 1) {
                 $res = $this->pushIcon($user_id, $title, $content, $icon, $iconColor, $url);
@@ -120,7 +121,8 @@ class NoticeService extends Service
         } else {
             $pushData[] = $data;
         }
-        SystemNotice::create([
+        $model =  config(cookie('multi-app').'.database.notice_model');
+        $model::create([
             'user_id'    => $uid,
             'title'      => $title,
             'content'    => $content,

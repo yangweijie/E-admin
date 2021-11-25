@@ -262,7 +262,12 @@
                         }
                         let mapAttribute = {...attribute}
                         if(mapAttribute.slotDefault){
-                            children.default = ()=> mapAttribute.slotDefault
+                            if(mapAttribute.slotDefault instanceof Object){
+                              console.log(mapAttribute.slotDefault)
+                              children.default = ()=> renderComponent(toRaw(mapAttribute.slotDefault),{})
+                            }else{
+                              children.default = ()=> mapAttribute.slotDefault
+                            }
                         }
                         let mapChildren = {...children}
                         return _createVnode(data.name,name, mapAttribute, mapChildren,data.directive)

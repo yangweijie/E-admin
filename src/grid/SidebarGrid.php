@@ -228,11 +228,11 @@ class SidebarGrid extends Component
     public function jsonSerialize()
     {
         $this->sidebar->attr('remoteParams',$this->getCallMethod());
-        $this->grid->attr('SidebarGrid',$this->sidebar->attr('field'));
+
         //删除
         if(request()->has('eadmin_sidebar_delete')){
             $model = $this->model->find(request()->param('id'));
-           
+
             $model->delete();
             admin_success_message(admin_trans('admin.delete_complete'));
         }
@@ -253,6 +253,7 @@ class SidebarGrid extends Component
         if(is_null($this->grid)){
             return $this->sidebar;
         }else{
+            $this->grid->attr('SidebarGrid',$this->sidebar->attr('field'));
             $row = new Row();
             $row->gutter(10);
             $row->column($this->sidebar, $this->column[0] ?? 5);

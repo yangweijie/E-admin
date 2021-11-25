@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Eadmin\controller;
+namespace app\admin\controller;
 
 use Eadmin\Admin;
 use Eadmin\Controller;
@@ -24,7 +24,8 @@ class Notice extends Controller
     public function notification()
     {
         $data  = NoticeService::instance()->receive();
-        $count = SystemNotice::where('user_id', Admin::id())
+        $model = config('admin.database.notice_model');
+        $count = $model::where('user_id', Admin::id())
             ->where('is_read', 0)->count();
         $this->successCode([
             'list'  => $data,
@@ -39,7 +40,8 @@ class Notice extends Controller
      */
     public function system()
     {
-        $data = SystemNotice::where('user_id', Admin::id())
+        $model = config('admin.database.notice_model');
+        $data = $model::where('user_id', Admin::id())
             ->pages()->select();
         $this->successCode($data);
     }
@@ -51,8 +53,9 @@ class Notice extends Controller
      */
     public function reads()
     {
-        SystemNotice::where('id', $this->request->post('id'))->update(['is_read' => 1]);
-        $count = SystemNotice::where('user_id', Admin::id())
+        $model = config('admin.database.notice_model');
+        $model::where('id', $this->request->post('id'))->update(['is_read' => 1]);
+        $count = $model::where('user_id', Admin::id())
             ->where('is_read', 0)->count();
         $this->successCode($count);
     }
@@ -64,7 +67,8 @@ class Notice extends Controller
      */
     public function clear()
     {
-        SystemNotice::where('user_id', Admin::id())->delete();
+        $model = config('admin.database.notice_model');
+        $model::where('user_id', Admin::id())->delete();
         $this->successCode();
     }
 }

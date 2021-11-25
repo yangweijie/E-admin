@@ -19,13 +19,17 @@ class AdminModel extends BaseModel
 
     public function __construct(array $data = [])
     {
-        $this->table = config('admin.system_user_table');
+        $this->table = config('admin.database.user_table');
         parent::__construct($data);
     }
+    
+
     // 角色组
     public function roles()
     {
-        return $this->belongsToMany('system_auth', SystemUserAuth::class, 'auth_id', 'user_id');
+        $authModel = config('admin.database.auth_model');
+        $userAuthModel = config('admin.database.user_auth_model');
+        return $this->belongsToMany($authModel, $userAuthModel, 'auth_id', 'user_id');
     }
 
     // 密码 - 修改器
@@ -37,15 +41,19 @@ class AdminModel extends BaseModel
     // 获取权限
     public function permissions()
     {
-        $roleIds = SystemUserAuth::where('user_id', $this->id)->column('auth_id');
-        return SystemAuthNode::whereIn('auth_id', $roleIds)->select()->toArray();
+        $userAuthModel = config('admin.database.user_auth_model');
+        $roleIds = $userAuthModel::where('user_id', $this->id)->column('auth_id');
+        $authNodeModel = config('admin.database.auth_node_model');
+        return $authNodeModel::whereIn('auth_id', $roleIds)->select()->toArray();
     }
 
     // 获取菜单
     public function menus()
     {
-        $roleIds = SystemUserAuth::where('user_id', $this->id)->column('auth_id');
-        $menuIds = SystemAuthMenu::whereIn('auth_id', $roleIds)->column('menu_id');
+        $userAuthModel = config('admin.database.user_auth_model');
+        $roleIds = $userAuthModel::where('user_id', $this->id)->column('auth_id');
+        $authMenuModel = config('admin.database.auth_menu_model');
+        $menuIds = $authMenuModel::whereIn('auth_id', $roleIds)->column('menu_id');
         return Admin::menu()->menus($menuIds);
     }
 }

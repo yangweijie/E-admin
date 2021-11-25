@@ -36,7 +36,6 @@ class Env
      */
     public function get($name,$defualt=null)
     {
-        
         $value =  Arr::get($this->data, $name);
         if(is_null($value)){
             return $defualt;

@@ -14,7 +14,6 @@ use Eadmin\Controller;
 use Eadmin\form\Form;
 use Eadmin\grid\Actions;
 use Eadmin\grid\Grid;
-use Eadmin\model\AdminModel;
 use Eadmin\model\SystemAuth;
 use Eadmin\model\SystemAuthData;
 use Eadmin\model\SystemAuthMenu;
@@ -36,7 +35,8 @@ class Auth extends Controller
      */
     public function index(): Grid
     {
-        return Grid::create(new SystemAuth(), function (Grid $grid) {
+        $model = config('admin.database.auth_model');
+        return Grid::create(new $model, function (Grid $grid) {
             $grid->title(admin_trans('auth.title'));
             $grid->treeTable();
             $grid->column('name', admin_trans('auth.fields.name'));
@@ -70,8 +70,9 @@ class Auth extends Controller
      */
     public function form(): Form
     {
-        return Form::create(new SystemAuth(), function (Form $form) {
-            $options = SystemAuth::field('id,name,pid')->select()->toArray();
+        $model = config('admin.database.auth_model');
+        return Form::create(new $model, function (Form $form) use($model){
+            $options = $model::field('id,name,pid')->select()->toArray();
             $form->select('pid',admin_trans('auth.parent'))
                 ->treeOptions($options);
             $form->text('name', admin_trans('auth.fields.name'))->required();
@@ -86,7 +87,8 @@ class Auth extends Controller
      */
     public function dataAuth($id,$type){
         return Form::create([], function (Form $form) use ($id,$type) {
-            $data = SystemAuthData::where('auth_type',$type)
+            $authDataModel = config('admin.database.auth_data_model');
+            $data = $authDataModel::where('auth_type',$type)
                 ->where('auth_id',$id)
                 ->where('data_type',1)
                 ->column('data_id');
@@ -98,7 +100,7 @@ class Auth extends Controller
                 ->options(function ($ids){
                     return SystemAuth::whereIn('id',$ids)->column('name','id');
                 });
-            $data = SystemAuthData::where('auth_type',$type)
+            $data = $authDataModel::where('auth_type',$type)
                 ->where('auth_id',$id)
                 ->where('data_type',2)
                 ->column('data_id');
@@ -107,10 +109,11 @@ class Auth extends Controller
                 ->value($data)
                 ->multiple()
                 ->options(function ($ids){
-                    return AdminModel::whereIn('id',$ids)->column('nickname','id');
+                    $model = config('admin.database.user_model');
+                    return $model::whereIn('id',$ids)->column('nickname','id');
                 })->tip(admin_trans('auth.select_user_tip'));
-            $form->saving(function ($data) use($type) {
-                SystemAuthData::where('auth_type',$type)->where('auth_id', $data['id'])->delete();
+            $form->saving(function ($data) use($type,$authDataModel) {
+                $authDataModel::where('auth_type',$type)->where('auth_id', $data['id'])->delete();
                 $insertData = [];
                 foreach ($data['group_data'] as $data_id) {
                     $insertData[] = [
@@ -128,7 +131,7 @@ class Auth extends Controller
                         'data_id' => $data_id,
                     ];
                 }
-                (new SystemAuthData())->saveAll($insertData);
+                (new $authDataModel)->saveAll($insertData);
             });
         });
     }
@@ -140,18 +143,20 @@ class Auth extends Controller
      */
     public function menu($id)
     {
-        return Form::create(new SystemAuth(), function (Form $form) use ($id) {
+        $model = config('admin.database.auth_model');
+        return Form::create(new $model, function (Form $form) use ($id) {
             $form->edit($id);
             $form->labelPosition('top');
-            $menus = SystemAuthMenu::where('auth_id', request()->get('id'))->column('menu_id');
+            $authMenuModel = config('admin.database.auth_menu_model');
+            $menus = $authMenuModel::where('auth_id', request()->get('id'))->column('menu_id');
             $form->tree('menu_nodes')
                 ->data([['name' => admin_trans('auth.all'), 'id' => 0, 'children' => Admin::menu()->tree()]])
                 ->showCheckbox()
                 ->value($menus)
                 ->props(['children' => 'children', 'label' => 'name'])
                 ->defaultExpandAll();
-            $form->saving(function ($data) {
-                SystemAuthMenu::where('auth_id', $data['id'])->delete();
+            $form->saving(function ($data) use($authMenuModel){
+                $authMenuModel::where('auth_id', $data['id'])->delete();
                 if (!empty($data['menu_nodes']) && count($data['menu_nodes']) > 0) {
                     $menuData = [];
                     foreach ($data['menu_nodes'] as $menuId) {
@@ -160,7 +165,7 @@ class Auth extends Controller
                             'menu_id' => $menuId,
                         ];
                     }
-                    (new SystemAuthMenu())->saveAll($menuData);
+                    (new $authMenuModel)->saveAll($menuData);
                 }
             });
         });
@@ -173,18 +178,20 @@ class Auth extends Controller
      */
     public function authNode($id)
     {
-        return Form::create(new SystemAuth(), function (Form $form) use ($id) {
+        $model = config('admin.database.auth_model');
+        return Form::create(new $model, function (Form $form) use ($id) {
             $form->edit($id);
             $form->labelPosition('top');
-            $nodes = SystemAuthNode::where('auth_id', $id)->column('node_id');
+            $authNodeModel = config('admin.database.auth_node_model');
+            $nodes = $authNodeModel::where('auth_id', $id)->column('node_id');
             $form->tree('auth_nodes')
                 ->data(Admin::node()->tree())
                 ->showCheckbox()
                 ->horizontal()
                 ->value($nodes)
                 ->defaultExpandAll();
-            $form->saving(function ($data) {
-                SystemAuthNode::where('auth_id', $data['id'])->delete();
+            $form->saving(function ($data) use($authNodeModel){
+                $authNodeModel::where('auth_id', $data['id'])->delete();
                 if (!empty($data['auth_nodes']) && count($data['auth_nodes']) > 0) {
                     $authData = [];
                     $nodes = Admin::node()->all();
@@ -200,7 +207,7 @@ class Auth extends Controller
                         }
                     }
                     if (count($authData) > 0) {
-                        (new SystemAuthNode())->saveAll($authData);
+                        (new $authNodeModel)->saveAll($authData);
                     }
                 }
             });

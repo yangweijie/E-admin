@@ -13,5 +13,9 @@ use think\Model;
 
 class SystemMenu extends BaseModel
 {
-    
+    public function __construct(array $data = [])
+    {
+        $this->table = config('admin.database.menu_table');
+        parent::__construct($data);
+    }
 }

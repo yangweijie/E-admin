@@ -15,7 +15,6 @@ use think\facade\Cache;
 use think\facade\Db;
 use think\facade\Validate;
 use Eadmin\Controller;
-use Eadmin\model\AdminModel;
 use Eadmin\service\CaptchaService;
 use Eadmin\service\TokenService;
 use Eadmin\Admin;
@@ -37,9 +36,6 @@ class Login extends Controller
     {
         if($this->request->isPost()){
             $data = $this->request->post();
-            if(!empty($data['wx_code'])){
-                $this->wxQrcodeLogin($data['wx_code']);
-            }
             $validate = Validate::rule([
                 'username' => 'require',
                 'password' => 'require|min:5'
@@ -58,7 +54,8 @@ class Login extends Controller
                 if($verifyErrorNum >= 10){
                     $this->errorCode(3003);
                 }
-                $user = AdminModel::where('username', $username)->find();
+                $model = config('admin.database.user_model');
+                $user = $model::where('username', $username)->find();
                 if (empty($user) || !password_verify($password,$user['password'])) {
                     $this->app->cache->inc($usernameVerifyKey,1);
                     $this->app->cache->inc($verifyKey,1);
@@ -77,7 +74,11 @@ class Login extends Controller
                     $user->save();
                 }
                 $tokens = Admin::token()->encode($user);
-                event('UserLogin', $user);
+                $ip = app()->request->ip();
+                $user->login_ip = $ip;
+                $user->login_at = date('Y-m-d H:i:s');
+                $user->login_num = $user->login_num+1;
+                $user->save();
                 admin_success_message(admin_trans('admin.login_success'))->data($tokens);
             } else {
                 admin_error_message($validate->getError());
@@ -94,38 +95,7 @@ class Login extends Controller
            ]);
         }
     }
-    /**
-     * 微信二维码登录
-     */
-    protected function wxQrcodeLogin($code){
-        $config = [
-            'app_id'   => sysconf('wechat_open_appid'),
-            'secret'   => sysconf('wechat_open_secret'),
-        ];
-        $needBindWx = false;
-        try {
-            $app = Factory::officialAccount($config);
-            $oauth = $app->oauth;
-            $token = $oauth->getAccessToken($code);
-            $user = $oauth->user($token);
-            $openid =  $user->getId();
-            $user = AdminModel::where('openid', $openid)->find();
-            if($user){
-                event('UserLogin', $user);
-                $tokens = Admin::token()->encode($user);
-            }else{
-                $needBindWx = true;
-            }
-        }catch (\Exception $e){
-            \think\facade\Log::error("微信二维码登录错误:".$e->getMessage());
-            $this->successCode(40000,422);
-        }
-        if($needBindWx){
-            $this->successCode($openid,422);
-        }else{
-            admin_success_message(admin_trans('admin.login_success'))->data($tokens);
-        }
-    }
+   
     /**
      * 退出登陆
      * @auth false

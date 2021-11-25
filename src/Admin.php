@@ -395,8 +395,6 @@ class Admin
     public static function registerRoute()
     {
         app()->route->resource('eadmin', ResourceController::class)->ext('rest');
-        //菜单管理
-        app()->route->resource('menu', Menu::class);
         //日志调试
         app()->route->post('log/logData', Log::class . '@logData');
         app()->route->get('log/debug', Log::class . '@debug');
@@ -410,11 +408,7 @@ class Admin
         app()->route->post('plug/uninstall', Plug::class . '@uninstall');
         app()->route->post('plug/uploadGit', Plug::class . '@uploadGit');
         app()->route->get('plug', Plug::class . '@index');
-        //消息通知
-        app()->route->get('notice/notification', Notice::class . '@notification');
-        app()->route->post('notice/system', Notice::class . '@system');
-        app()->route->post('notice/reads', Notice::class . '@reads');
-        app()->route->delete('notice/clear', Notice::class . '@clear');
+       
         //数据库备份
         app()->route->get('backup/config', Backup::class . '@config');
         app()->route->post('backup/add', Backup::class . '@add');

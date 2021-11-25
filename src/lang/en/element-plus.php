@@ -21,6 +21,7 @@ return [
             'down'=> 'Move down',
             'add' => 'Add',
             'remove' => 'Remove',
+            'clear' => 'Clear',
         ],
         'queue_message'=>'The task has entered the queue and is being queued. Please wait patiently',
         'grid' => [

@@ -1,4 +1,5 @@
 // @ts-ignore
+import Cookies from 'js-cookie'
 import {reactive} from "vue";
 import request from '@/utils/axios'
 // @ts-ignore
@@ -50,6 +51,7 @@ const states = reactive({
     gridActivatedRefresh:true,
     gridFirst:true,
     lang:{},
+    app:Cookies.get('multi-app') || 'admin',
 });
 export const state = states
 //操作方法
@@ -193,7 +195,7 @@ const action = {
     refreshToken() {
         return new Promise((resolve, reject) => {
             request({
-                url: '/admin/admin/refreshToken'
+                url: '/' + states.app + '/admin/refreshToken'
             }).then((res: any) => {
                 if (res.data.token) {
                     localStorage.setItem('eadmin_token', res.data.token)
@@ -211,7 +213,7 @@ const action = {
     getInfo() {
         return new Promise((resolve, reject) => {
             request({
-                url: '/admin/admin/info'
+                url: '/' + states.app + '/admin/info'
             }).then((res: any) => {
                 const info = res.data.info
                 states.menus = res.data.menus
@@ -244,7 +246,7 @@ const action = {
     login(data: object) {
         return new Promise((resolve, reject) => {
             request({
-                url: '/admin/login',
+                url: '/' + states.app + '/login',
                 method: 'post',
                 data: data
             }).then((res: any) => {
@@ -261,7 +263,7 @@ const action = {
     logout() {
         return new Promise((resolve, reject) => {
             request({
-                url: '/admin/login/logout'
+                url: '/' + states.app + '/login/logout'
             }).then((res: any) => {
                 states.info.id = 0
                 states.mainComponent = []

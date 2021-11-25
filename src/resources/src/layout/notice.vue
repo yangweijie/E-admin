@@ -51,13 +51,15 @@
 </template>
 
 <script>
-    import {defineComponent, ref} from 'vue'
+    import {defineComponent, inject, ref} from 'vue'
     import request from '@/utils/axios'
     import {link,trans} from '@/utils'
     import { ElNotification } from 'element-plus'
+    import { store} from '@/store'
     export default defineComponent({
         name: "notice",
         setup() {
+            const state = inject(store)
             const list = ref([])
             const noticeCount = ref(0)
             let page = 1
@@ -67,7 +69,7 @@
             // 获取系统通知列表
             function noticeList() {
                 request({
-                    url: 'notice/system',
+                    url: '/' + state.app + '/notice/system',
                     method: 'post',
                     data: {
                         page: page,
@@ -81,7 +83,7 @@
             // 清空通知
             function noticeClear() {
                 request({
-                    url: 'notice/clear',
+                    url: '/' + state.app + '/notice/clear',
                     method: 'delete'
                 }).then(res => {
                     list.value = []
@@ -109,7 +111,7 @@
             // 读取通知
             function readNotice(id, url) {
                 request({
-                    url: 'admin/notice/reads',
+                    url: '/' + state.app + '/notice/reads',
                     method: 'post',
                     data: {
                         id: id
@@ -123,7 +125,7 @@
             }
 
             function receiveNotification() {
-                request('notice/notification').then(res => {
+                request('/' + state.app + '/notice/notification').then(res => {
                     if (res.data) {
                         noticeCount.value = res.data.count
                         if(res.data.list){

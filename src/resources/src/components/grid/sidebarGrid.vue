@@ -73,15 +73,16 @@
                 editUrl:'',
                 dataSource: props.dataSource,
             })
+
             if(!props.hideAll){
                 const all = {}
                 all[props.tree.attribute.nodeKey] = ''
                 all[props.tree.attribute.props.label] = '全部'
                 state.dataSource.unshift(all)
             }
-            if(props.default){
+            if(props.defaultValue){
                 let params = {}
-                params[props.field] = props.default
+                params[props.field] = props.defaultValue
                 ctx.emit('update:gridParams',params)
             }
             const addParams = computed(()=>{
@@ -94,7 +95,6 @@
             })
             function onNodeClick(row) {
                 state.current = row[props.tree.attribute.nodeKey]
-console.log(state.current)
                 let params = {}
                 params[props.field] = state.current
                 if(state.current){
@@ -132,7 +132,6 @@ console.log(state.current)
             const treeData = computed(()=>{
                 const data =  filterTree(state.dataSource)
                 ctx.emit('update:dataSource',data)
-                console.log(data)
                 return data
             })
             function getData() {
@@ -151,7 +150,6 @@ console.log(state.current)
                 }).then(res=>{
                     state.dataSource = data.concat(res.data)
                     if(state.dataSource.length > 0){
-                        console.log(state.dataSource[0])
                         onNodeClick(state.dataSource[0])
                     }
                 })

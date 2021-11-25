@@ -6,7 +6,7 @@
  * Time: 20:28
  */
 
-namespace Eadmin\controller;
+namespace app\admin\controller;
 
 
 use Eadmin\Admin;
@@ -44,7 +44,8 @@ class Menu extends Controller
      */
     public function index()
     {
-        return Grid::create(new SystemMenu(),function (Grid $grid){
+        $model = config('admin.database.menu_model');
+        return Grid::create(new $model,function (Grid $grid){
             $grid->treeTable();
             $grid->title(admin_trans('menu.title'));
             $grid->column('name', admin_trans('menu.fields.name'))->display(function ($val, $data) {
@@ -81,7 +82,8 @@ class Menu extends Controller
      */
     public function form($pid=0): Form
     {
-        return Form::create(new SystemMenu(),function (Form $form) use($pid){
+        $model = config('admin.database.menu_model');
+        return Form::create(new $model,function (Form $form) use($pid){
             $menus = Admin::menu()->listOptions();
             $form->select('pid', admin_trans('menu.fields.pid'))->default($pid)
                 ->options([0 => admin_trans('menu.fields.top')] + array_column($menus, 'label', 'id'))
