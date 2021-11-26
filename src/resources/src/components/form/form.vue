@@ -100,6 +100,7 @@
                 })
                 if(isReactive(ctx.attrs.model[field])){
                     watch(computed(()=>{
+                        console.log(JSON.stringify(ctx.attrs.model[field]))
                         return JSON.stringify(ctx.attrs.model[field])
                     }),(newValue,oldValue)=>{
                         debounceWatch([field,JSON.parse(newValue),JSON.parse(oldValue)],field)
@@ -148,15 +149,14 @@
                         let formData = res.data.form
                         for(let f in formData){
                             if(f == field && JSON.stringify(formData[f]) !== JSON.stringify(newValue)){
-                              console.log(f)
-                                if(isReactive(ctx.attrs.model[f])){
 
+                                if(isReactive(ctx.attrs.model[f])){
                                     Object.assign(ctx.attrs.model[f],formData[f])
                                 }else{
                                     ctx.attrs.model[f] = formData[f]
                                 }
                             }else if(f != field && ctx.attrs.model[f] != formData[f]){
-
+                                console.log(f)
                                 if(isReactive(ctx.attrs.model[f])){
                                     if(Array.isArray(ctx.attrs.model[f])){
                                         ctx.attrs.model[f] = []

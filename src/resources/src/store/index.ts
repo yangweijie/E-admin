@@ -51,7 +51,7 @@ const states = reactive({
     gridActivatedRefresh:true,
     gridFirst:true,
     lang:{},
-    app:Cookies.get('multi-app'),
+    app:Cookies.get('multi-app') || 'admin',
 });
 export const state = states
 //操作方法

@@ -362,6 +362,7 @@ class Admin
      */
     public static function getAppName()
     {
+        return 'admin';
         $name = app('http')->getName();
         if (!empty($name)) {
             return $name;

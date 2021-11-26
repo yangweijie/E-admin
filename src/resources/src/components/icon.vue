@@ -5,7 +5,7 @@
             trigger="click"
             >
         <template #reference>
-            <el-input v-model="value" clearable @input="filterIcons" @clear="filterIcons"><template #append><i :class="value"></i></template></el-input>
+            <el-input v-model="value" clearable @input="filterIcons" @clear="filterIcons"><template #append><span @click="visible=true" style="cursor: pointer"><i :class="value" v-if="value"></i><template v-else><i class="fa fa-hand-pointer-o"></i>请选择</template></span></template></el-input>
         </template>
         <el-scrollbar>
         <ul class="iconCollection">
