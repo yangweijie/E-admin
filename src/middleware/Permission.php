@@ -22,7 +22,8 @@ class Permission
 {
     public function handle(Request $request, \Closure $next)
     {
-        $moudel          = app('http')->getName();
+        $moudel  = app('http')->getName();
+        cookie('multi-app',$moudel);
         $eadmin_class    = $request->param('eadmin_class');
         $eadmin_function = $request->param('eadmin_function');
 
@@ -31,7 +32,7 @@ class Permission
             list($eadmin_class, $eadmin_function) = Admin::getDispatchCall($dispatch);
         }
         //验证权限
-        $authNodules = array_keys(config('admin.authModule'));
+        $authNodules = array_keys(config(Admin::getAppName().'.authModule'));
         if (in_array($moudel, $authNodules) && !Admin::check($eadmin_class, $eadmin_function, $request->method())) {
             return json(['code' => 44000, 'message' => admin_trans('admin.not_access_permission'),'method'=>$request->method()]);
         }

@@ -4,7 +4,7 @@ namespace app\admin\controller;
 
 use Eadmin\Controller;
 use Eadmin\form\drive\Config;
-use Eadmin\service\ConfigService;
+
 use think\facade\Cache;
 
 use Eadmin\form\Form;
@@ -29,7 +29,15 @@ class System extends Controller
      */
     public function config()
     {
-        return ConfigService::instance()->form();
+        $form = new Form(new Config());
+        $form->labelPosition('top');
+        $form->title('系统参数配置');
+        $form->image('system_web_logo', '网站LOGO')->size(80, 80);
+        $form->text('system_web_name', '网站名称');
+        $form->text('system_web_miitbeian', '网站备案号');
+        $form->text('system_web_copyright', '网站版权信息');
+        return $form;
+
     }
 
     /**

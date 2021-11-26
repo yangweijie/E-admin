@@ -5,7 +5,7 @@ import {ElMessage, ElNotification} from 'element-plus'
 import router from '@/router'
 import {action,state} from '@/store'
 import {refresh, link} from '@/utils'
-
+import Cookies from 'js-cookie'
 // create an axios instance
 const service = axios.create({
     // baseURL: window.global_config.VUE_APP_BASE_API, // url = base url + request url
@@ -20,7 +20,7 @@ service.interceptors.request.use(
         // let each request carry token
         // ['X-Token'] is a custom headers key
         // please modify it according to the actual situation
-        config.headers['Authorization'] = localStorage.getItem('eadmin_token')
+        config.headers['Authorization'] = localStorage.getItem(state.app + '_eadmin_token')
         return config
     },
     (error: any) => {
@@ -44,13 +44,13 @@ service.interceptors.response.use(
         */
        response: { data: any }) => {
         const res = response.data
-        const token_expire = localStorage.getItem('eadmin_token_expire')
+        const token_expire = localStorage.getItem(state.app + '_eadmin_token_expire')
         if(token_expire){
             const timeNow = Math.round((new Date()).getTime() / 1000)
             // @ts-ignore
             const refreshTime = token_expire - timeNow
             if (refreshTime > 0 && refreshTime < 1800) {
-                localStorage.removeItem('eadmin_token_expire')
+                localStorage.removeItem(state.app + '_eadmin_token_expire')
                 action.refreshToken()
             }
         }
@@ -58,15 +58,15 @@ service.interceptors.response.use(
         if (res.code !== 200) {
             // 登陆验证token判断
             if (res.code === 40000 || res.code === 40001 || res.code === 40002 || res.code === 40003) {
-                localStorage.removeItem('eadmin_token')
-                localStorage.removeItem('eadmin_token_expire')
+                localStorage.removeItem(state.app + '_eadmin_token')
+                localStorage.removeItem(state.app + '_eadmin_token_expire')
                 ElMessage({
                     message: res.message,
                     type: 'error',
                     duration: 1000,
                     onClose: function () {
-                        if (!localStorage.getItem('eadmin_token') && location.href.indexOf('/#/admin/login') === -1) {
-                            location.reload()
+                        if (location.href.indexOf('/#/'+state.app+'/login') === -1) {
+                            location.href = location.protocol + '//' +location.host + '/' + res.data.multi_app + '/' + location.hash
                         }
                     }
                 })

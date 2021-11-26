@@ -82,7 +82,7 @@ class NoticeService extends Service
      */
     public function pushAll($title, $content, $icon, $iconColor = '', $url = '', $type = 1)
     {
-        $model =  config(cookie('multi-app').'.database.user_model');
+        $model =  config(Admin::getAppName().'.database.user_model');
         $userIds = $model::column('id');
         foreach ($userIds as $user_id) {
             if ($type == 1) {
@@ -121,7 +121,7 @@ class NoticeService extends Service
         } else {
             $pushData[] = $data;
         }
-        $model =  config(cookie('multi-app').'.database.notice_model');
+        $model =  config(Admin::getAppName().'.database.notice_model');
         $model::create([
             'user_id'    => $uid,
             'title'      => $title,

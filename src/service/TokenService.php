@@ -8,6 +8,7 @@
 
 namespace Eadmin\service;
 
+use Eadmin\Admin;
 use Eadmin\traits\ApiJson;
 use think\db\Query;
 use think\facade\Cache;
@@ -44,10 +45,11 @@ class TokenService
      * @param string $type 配置类型
      */
     public function init($type){
+        $app = Admin::getAppName();
         if (empty($type)) {
-            $type = config('admin.token.default');
+            $type = config($app.'.token.default');
         }
-        $this->config = config('admin.token.' . $type);
+        $this->config = config($app.'.token.' . $type);
         $this->key = substr(md5($this->config['key']), 8, 16);
         $this->model = $this->config['model'];
         $this->unique = $this->config['unique'];
@@ -197,7 +199,7 @@ class TokenService
         }
         $data = $this->decode($token);
         if ($data === false) {
-            $this->errorCode(40001, '授权认证失败');
+            $this->errorCode(40001, '授权认证失败',['multi_app'=>Admin::getAppName()]);
         } elseif (Cache::has(md5($token)) && $this->unique) {
             $this->errorCode(40003, '账号已在其他地方登陆');
         } elseif ($data['expire'] < time()) {

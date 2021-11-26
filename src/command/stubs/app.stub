@@ -1,0 +1,57 @@
+<?php
+{%namespace%}
+return [
+    //权限模块
+    'authModule' => [
+        '{%name%}' => '系统模块',
+    ],
+    'token' => [
+        'default' => 'admin',
+        //配置列表
+        'admin' => [
+            //令牌key
+            'key' => 'QsoYEClMJsgOSWUBkSCq26yWkApqSuH1',
+            //令牌过期时间
+            'expire' => 86400,
+            //是否唯一登陆
+            'unique' => false,
+            //系统用户模型
+            'model' => AdminModel::class,
+            //验证字段
+            'auth_field' => [
+                'password'
+            ]
+        ],
+    ],
+    'database' => [
+        //用户表
+        'user_table' => 'system_user',
+        'user_model' => AdminModel::class,
+        //权限表
+        'auth_table' => 'system_auth',
+        'auth_model' => SystemAuth::class,
+        //权限关联表
+        'auth_node_table' => 'system_auth_node',
+        'auth_node_model' => SystemAuthNode::class,
+        //权限关联表
+        'user_auth_table' => 'system_user_auth',
+        'user_auth_model' => SystemUserAuth::class,
+        //菜单
+        'menu_table' => 'system_menu',
+        'menu_model' => SystemMenu::class,
+        //菜单权限关联表
+        'auth_menu_table' => 'system_auth_menu',
+        'auth_menu_model' => SystemAuthMenu::class,
+        //通知表
+        'notice_table' => 'system_notice',
+        'notice_model' => SystemNotice::class,
+        //数据权限表
+        'auth_data_table' => 'system_auth_data',
+        'auth_data_model' => SystemAuthData::class,
+        //文件
+        'file_table' => 'system_file',
+        'file_model' => SystemFile::class,
+        'file_cate_table' => 'system_file_cate',
+        'file_cate_model' => SystemFileCate::class,
+    ],
+];

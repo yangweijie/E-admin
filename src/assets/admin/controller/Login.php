@@ -84,13 +84,13 @@ class Login extends Controller
                 admin_error_message($validate->getError());
             }
         }else{
-           $where= ['web_logo','web_name','web_miitbeian','web_copyright'];
+           $where= ['system_web_logo','system_web_name','system_web_miitbeian','system_web_copyright'];
            $data = Db::name('SystemConfig')->whereIn('name',$where)->column('value','name');
            return Admin::view('/login')->attrs([
-               'webLogo'=>$data['web_logo'],
-               'webName'=>$data['web_name'],
-               'webMiitbeian'=>$data['web_miitbeian'],
-               'webCopyright'=>$data['web_copyright'],
+               'webLogo'=>$data['system_web_logo'],
+               'webName'=>$data['system_web_name'],
+               'webMiitbeian'=>$data['system_web_miitbeian'],
+               'webCopyright'=>$data['system_web_copyright'],
                'deBug'=>(bool) env('APP_DEBUG')
            ]);
         }

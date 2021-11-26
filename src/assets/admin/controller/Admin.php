@@ -204,14 +204,16 @@ class Admin extends Controller
      */
     public function info()
     {
+        \Eadmin\Admin::token()->auth();
         $data['menus'] = \Eadmin\Admin::menu()->tree(true);
         $data['info'] = \Eadmin\Admin::user();
-        $data['webLogo'] = sysconf('web_logo');
-        $data['webName'] = sysconf('web_name');
-        $data['topMenu'] = config('admin.topMenu', true);
-        $data['tagMenu'] = config('admin.tagMenu', true);
-        $data['theme'] = config('admin.theme.skin');
-        $data['lang'] = config('admin.lang');
+        $config = config('admin');
+        $data['webLogo'] = sysconf('system_web_logo');
+        $data['webName'] = sysconf('system_web_name');
+        $data['topMenu'] = $config['topMenu'];
+        $data['tagMenu'] = $config['tagMenu'];
+        $data['theme'] = $config['theme']['skin'];
+        $data['lang'] = $config['lang'];
         $data['lang']['cookie_var'] = config('lang.cookie_var');
         $data['lang']['element'] = admin_trans('element-plus.element');
         $data['dropdownMenu'] = [

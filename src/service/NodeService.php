@@ -206,7 +206,7 @@ class NodeService
                 $namespace = "Eadmin\\controller\\$controller";
                 $controllerFiles[] = [
                     'namespace' => $namespace,
-                    'module' => 'admin',
+                    'module' => Admin::getAppName(),
                     'file' => $file,
                 ];
             }
@@ -216,7 +216,7 @@ class NodeService
         foreach ($modules as $module) {
             $moduleName = basename($module);
             //权限模块
-            $authModuleName = config('admin.authModule');
+            $authModuleName = config(Admin::getAppName().'.authModule');
             if (isset($authModuleName[$moduleName])) {
                 $authModuleTitle = $authModuleName[$moduleName];
                 $this->treeArr[$moduleName] = [

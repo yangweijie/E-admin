@@ -21,6 +21,8 @@ class SystemUserSeeder extends Seeder
             'nickname' => 'admin',
             'password' => password_hash('admin', PASSWORD_DEFAULT),
         ];
-        $this->table('system_user')->insert($data)->save();
+        if ($this->hasTable('system_user')) {
+            $this->table('system_user')->insert($data)->save();
+        }
     }
 }

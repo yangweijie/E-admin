@@ -23,7 +23,7 @@ class FileSystem extends Controller
         $search = $this->request->get('search');
         $cate_id = $this->request->get('cate_id');
         $ext = $this->request->get('ext');
-        $model =  config(cookie('multi-app').'.database.file_model');
+        $model =  config(Admin::getAppName().'.database.file_model');
         $data = $model::where('admin_id', Admin::id())
             ->where('is_delete',0)
             ->when($cate_id, ['cate_id'=>$cate_id])
@@ -42,7 +42,7 @@ class FileSystem extends Controller
             ->select()->map(function ($item) {
                 $item['dir'] = false;
                 $item['size'] = FileService::instance()->getSize($item['file_size']);
-                $model =  config(cookie('multi-app').'.database.user_model');
+                $model =  config(Admin::getAppName().'.database.user_model');
                 $item['author'] = $model::where('id',$item['admin_id'])->value('nickname');
                 $item['update_time'] = $item['create_time'];
                 return $item;
@@ -56,7 +56,7 @@ class FileSystem extends Controller
         if($type == 1){
             $grid = null;
         }
-        $model = config(cookie('multi-app').'.database.file_cate_model');
+        $model = config(Admin::getAppName().'.database.file_cate_model');
         $sidebarGrid = SidebarGrid::create(new $model(), $grid,'id','label')
             ->treePid()
             ->form($this->cateForm())
@@ -77,7 +77,7 @@ class FileSystem extends Controller
     }
     public function cateForm()
     {
-        $model = config(cookie('multi-app').'.database.file_cate_model');
+        $model = config(Admin::getAppName().'.database.file_cate_model');
         $form = new Form(new $model);
         $options = Admin::menu()->listOptions(SystemFileCate::where('admin_id',Admin::id())->select()->toArray());
         $form->select('pid', admin_trans('filesystem.labels.cate'))
@@ -94,7 +94,7 @@ class FileSystem extends Controller
     }
     //移动分类
     public function moveCate($ids,$cate_id){
-        $model =  config(cookie('multi-app').'.database.file_model');
+        $model =  config(Admin::getAppName().'.database.file_model');
         $model::whereIn('id',$ids)->update(['cate_id'=>$cate_id]);
         admin_success(admin_trans('filesystem.success'), admin_trans('filesystem.moveFolderComplete'));
     }
@@ -124,7 +124,7 @@ class FileSystem extends Controller
 
     public function del($ids)
     {
-        $model =  config(cookie('multi-app').'.database.file_model');
+        $model =  config(Admin::getAppName().'.database.file_model');
         $model::whereIn('id',$ids)->update(['is_delete'=>1]);
         admin_success(admin_trans('filesystem.success'), admin_trans('deleleComplete'));
     }

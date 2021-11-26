@@ -2,7 +2,7 @@
 
 use think\migration\Seeder;
 
-class systemMenuSeeder extends Seeder
+class SystemMenuSeeder extends Seeder
 {
     /**
      * Run Method.
@@ -107,7 +107,7 @@ class systemMenuSeeder extends Seeder
                 array(
                     'id'     => 1015,
                     'pid'    => 4,
-                    'name'   => 'filesystem',
+                    'name'   => 'attachment',
                     'icon'   => 'el-icon-files',
                     'url'    => 'filesystem',
                     'sort'   => 0,
@@ -126,6 +126,8 @@ class systemMenuSeeder extends Seeder
                     'status' => 1,
                 ),
         );
-        $this->table('system_menu')->insert($data)->save();
+        if ($this->hasTable('system_menu')) {
+            $this->table('system_menu')->insert($data)->save();
+        }
     }
 }

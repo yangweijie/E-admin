@@ -14,6 +14,7 @@ use Eadmin\chart\echart\LineChart;
 use Eadmin\component\basic\Badge;
 use Eadmin\component\basic\Card;
 use Eadmin\component\basic\Html;
+use Eadmin\component\basic\QuickLink;
 use Eadmin\component\basic\Statistic;
 use Eadmin\component\basic\Tabs;
 use Eadmin\component\form\field\Select;
@@ -23,6 +24,12 @@ use Eadmin\constant\Style;
 use Eadmin\Controller;
 use Eadmin\grid\Filter;
 use Eadmin\grid\Grid;
+use mapleAccount\model\Account;
+use mapleGoods\common\Enum;
+use mapleGoods\model\Good;
+use mapleOrder\model\Order;
+use think\db\Query;
+use think\facade\Db;
 
 
 /**
@@ -42,210 +49,136 @@ class Index extends Controller
     {
         $content->title('概览');
 
-
         $content->row(function (Row $row) {
             $row->gutter(10);
-            $row->column(Statistic::create('统计', '1,128', 'el-icon-collection', '#884add', '#c08afa')->redirect('http://www.baidu.com'), 4);
-            $row->column(Statistic::create('新增用户', '500', 'el-icon-user-solid', '#fc4b67', '#ff8a92'), 4);
-            $row->column(Statistic::create('商品', '20', 'el-icon-goods', '#fbb016', '#ffc301'), 4);
-            $row->column(Statistic::create('订单', '99', 'el-icon-s-help', '#34c17c', '#8adfb6'), 4);
-            $row->column(Statistic::create('通知', '998', 'el-icon-message-solid', '#4789e7', '#c28af9'), 4);
-            $row->column(Statistic::create('待办', '2,128', 'el-icon-s-opportunity', '#ff431e', '#fba457'), 4);
-        });
-        $content->row(function (Row $row)  {
-            $row->gutter(10);
-            $row->column(new LineCard(), 6);
-            $row->column(new BarCard(), 6);
-            $row->column(new PieCard(), 6);
-            $row->column(new ProgressCard(), 6);
+            $money = 1000;
+            $row->column(Statistic::card('销售额', $money, 'el-icon-collection', '#884add'), 6);
+            $count = 2345;
+            $row->column(Statistic::card('用户', $count, 'el-icon-user-solid'), 6);
+            $count = 5588;
+            $row->column(Statistic::card('商品', $count, 'el-icon-goods', '#fbb016'), 6);
+            $count = 12545;
+            $row->column(Statistic::card('订单', $count, 'el-icon-s-order', '#34c17c'), 6);
+
         });
 
         $content->row(function (Row $row) {
             $row->gutter(10);
+            $row->column(
+                QuickLink::create('用户管理','el-icon-user-solid')
+                    ->redirect('/mapleGoods')
+                ,3);
+            $row->column(
+                QuickLink::create('商品管理','fa fa-shopping-cart','rgb(255, 156, 110)')
+                    ->redirect('/mapleGoods')
+                ,3);
+            $row->column(
+                QuickLink::create('订单管理','el-icon-s-order','rgb(179, 127, 235)')
+                    ->redirect('/mapleOrder')
+                ,3);
+            $row->column(
+                QuickLink::create('售后退款','fa fa-balance-scale','rgb(255, 214, 102)')
+                    ->redirect('/mapleOrder/mapleRefund')
+                ,3);
+            $row->column(
+                QuickLink::create('文章管理','fa fa-file-text-o','rgb(92, 219, 211)')
+                    ->redirect('/m3lonyArticle')
+                ,3);
+            $row->column(
+                QuickLink::create('优惠券','fa fa-money','rgb(255, 192, 105)')
+                    ->redirect('/rockysCoupon')
+                ,3);
+            $row->column(
+                QuickLink::create('短信记录','el-icon-message','rgb(255, 133, 192)')
+                    ->redirect('/admin/oplog/sms')
+                ,3);
+            $row->column(
+                QuickLink::create('系统配置','el-icon-s-tools','rgb(149, 222, 100)')
+                    ->redirect('/admin/system/config')
+                ,3);
+
+        });
 
 
-            $row->column(Card::create(Tabs::create()
-                ->pane('折线图',$this->lineEchart('line'))
-                ->pane('柱状图',$this->lineEchart('bar'))
-            ), 18);
+        $content->row(function (Row $row) {
+            $row->gutter(10);
+            $row->column($this->lineEchart('line'), 18);
             $row->column($this->rank(), 6);
         });
 
 
         $content->row(function (Row $row) {
             $row->gutter(10);
-            $row->column($this->pieEchart(), 12);
-            $row->column($this->radarEchart(), 12);
+            $row->column($this->userEchart(), 12);
+            $row->column($this->pieUserEchart(), 12);
+
         });
 
 
         return $content;
     }
 
-    public function line()
-    {
-        $echart = new LineChart('50px');
-        $echart->hideLegend();
-        $echart->xAxis(['', '', '', '', '', '', ''], [
-            'show' => false,
-        ]);
-        $echart->series('sdf', [28, 40, 36, 52, 38, 60, 55], [
-            'areaStyle' => [],
-            'showSymbol' => false,
-        ]);
-        $echart->setOptions([
-            'yAxis' => [
-                'splitLine' => ['show' => false],
-            ],
-            'grid' => [
-                'left' => '0',
-                'right' => '0',
-                'top' => '10%',
-                'bottom' => '0',
-            ],
-        ]);
-        return $echart;
-    }
 
+    //商品销量排行
     public function rank()
     {
-        $data = [
-            [
-                'id' => 1,
-                'name' => '阿里',
-            ],
-            [
-                'id' => 2,
-                'name' => '京东',
-            ],
-            [
-                'id' => 3,
-                'name' => '拼多多',
-            ],
-            [
-                'id' => 4,
-                'name' => '唯品会',
-            ],
-            [
-                'id' => 5,
-                'name' => '京东超时',
-            ],
-            [
-                'id' => 6,
-                'name' => '唯品会',
-            ],
-            [
-                'id' => 7,
-                'name' => '苹果',
-            ],
-            [
-                'id' => 8,
-                'name' => '未知',
-            ],
-            [
-                'id' => 8,
-                'name' => '未知',
-            ],
-            [
-                'id' => 8,
-                'name' => '未知',
-            ],
-            [
-                'id' => 8,
-                'name' => '未知',
-            ],
-            [
-                'id' => 8,
-                'name' => '未知',
-            ],
-        ];
-        $grid = new Grid($data);
-        $grid->column('id', '排名')->display(function ($val) {
-            $badge = Badge::create()->value($val);
-            if ($val == 1) {
+        $model = config('admin.database.user_model');
+        $grid = new Grid(new $model);
+
+        $grid->column('id', '销量排名')->display(function ($val) {
+            static $i=0;
+            $i++;
+            $badge = Badge::create()->value($i);
+            if ($i == 1) {
                 $badge->type('danger');
-            } elseif ($val == 2) {
+            } elseif ($i == 2) {
                 $badge->type('warning');
-            } elseif ($val == 3) {
+            } elseif ($i == 3) {
                 $badge->type('success');
-            } elseif ($val == 4) {
+            } elseif ($i == 4) {
                 $badge->type('primary');
             } else {
                 $badge->type('info');
             }
             return $badge;
-        });
-        $grid->column('name', '名称');
-        $grid->hidePage();
-        $grid->hideTools();
-        $grid->hideSelection();
-        $grid->hideAction();
+        })->width(100);
+        $grid->column('title', '商品')->tip();
+        $grid->column('sale_num', '销量')->align('center');
+        $grid->tableMode();
         return $grid;
     }
 
+
+
+
+
     /**
-     * 雷达图
+     * 用户饼图
      */
-    public function radarEchart()
+    public function pieUserEchart()
     {
-        $echart = new Echart('雷达图', 'radar');
+        $echart = new Echart('购买用户统计', 'pie');
         //不分组直接调用
-//        $echart->table('system_user','create_time');
-//        $echart->count('不分组系统用户数量',2);
-//        $echart->sum('系统用户id总和','id',50);
-//        $echart->sum('系统用户id1','id',50);
-//        $echart->sum('系统用户id2','id',50);
-//        $echart->sum('系统用户id3','id',100);
+        $echart->table(config('admin.database.user_table'), 'create_time');
+        $echart->count('未消费用户',function (Query $query){
 
-        //多模块分组
-        $echart->group('系统用户', function ($echart) {
-            $echart->table('system_user', 'create_time');
-            $echart->count('系统用户数量', 50);
-            $echart->sum('系统用户id总和', 'id', 50);
+        },function ($result){
+            if(env('APP_DEBUG')){
+                return rand(1,10000);
+            }else{
+                return $result;
+            }
         });
-        $echart->group('日志', function ($echart) {
-            $echart->table('system_user', 'create_time');
-            $echart->count('日志总数量', 50);
-            $echart->sum('日志id总和', 'id', 1000);
-        });
-        return $echart;
-    }
+        $echart->count('消费用户',function (Query $query){
 
-    /**
-     * 漏斗图
-     */
-    public function funnelchart()
-    {
-        $echart = new Echart('漏斗图', 'funnel');
-        $echart->table('system_user', 'create_time');
-        $echart->count('日志总数量');
-        $echart->sum('日志id总和', 'id');
-        $echart->avg('日志id平均', 'id');
-        return $echart;
-    }
-
-    /**
-     * 饼图
-     */
-    public function pieEchart()
-    {
-        $echart = new Echart('饼图', 'pie');
-        //不分组直接调用
-        $echart->table('system_user', 'create_time');
-        $echart->count('不分组系统用户数量');
-
-        //多模块分组
-        $echart->group('系统用户', function ($echart) {
-            $echart->table('system_user', 'create_time');
-            $echart->count('系统用户数量');
-            $echart->sum('系统用户id总和', 'id');
+        },function ($result){
+            if(env('APP_DEBUG')){
+                return rand(1,10000);
+            }else{
+                return $result;
+            }
         });
-        $echart->group('日志', function ($echart) {
-            $echart->table('system_user', 'create_time');
-            $echart->count('日志总数量');
-            $echart->sum('日志id总和', 'id');
-            $echart->avg('日志id平均', 'id');
-        });
+
         return $echart;
     }
 
@@ -254,45 +187,42 @@ class Index extends Controller
      */
     public function lineEchart($type)
     {
-        $echart = new Echart('', $type,'335px');
+        $echart = new Echart('订单', $type,'297px');
         $contentChart = new Content();
-        $contentChart->row(function (Row $row){
-            $row->gutter(10)->attr('style',['textAlign'=>'center']);
-            $row->column('<p>访问次数</p><p style="margin-top: 15px;font-size: 24px;color: #333;font-weight: 700">111</p>',6);
-            $row->column('<p>新增用户</p><p style="margin-top: 15px;font-size: 24px;color: #333;font-weight: 700">351</p>',6);
-            $row->column('<p>系统用户</p><p style="margin-top: 15px;font-size: 24px;color: #333;font-weight: 700">881</p>',6);
-        });
         $echart->header($contentChart);
-        $echart->table('system_user');
-        //筛选
-        $echart->filter(function (Filter $filter) {
-            $filter->eq('id', '系统用户');
+        $echart->table(config('admin.database.user_table'));
+        $echart->sum('订单金额', 'id',null,function ($result){
+            if(env('APP_DEBUG')){
+                return rand(1,10000);
+            }else{
+                return $result;
+            }
         });
-        $echart->count('系统用户', function ($query) {
-            $query->where('id', 1);
+        $echart->count('订单数',null,function ($result){
+            if(env('APP_DEBUG')){
+                return rand(1,10000);
+            }else{
+                return $result;
+            }
         });
-        $echart->sum('新增用户', 'id');
-        $echart->sum('访问次数', 'id');
         return $echart;
 
     }
 
     /**
-     * 柱状图
+     * 新增用户
      */
-    public function barEchart()
+    public function userEchart()
     {
-        $echart = new Echart('折线图', 'bar');
-        $echart->table('system_user');
-        //筛选
-//        $echart->filter(function (Filter $filter) {
-//            $filter->eq('id', 'id');
-//        });
-        $echart->count('系统用户', function ($query) {
-            $query->where('id', 1);
+        $echart = new Echart('新增用户', 'bar');
+        $echart->table(config('admin.database.user_table'));
+        $echart->count('人数',null,function ($result){
+            if(env('APP_DEBUG')){
+                return rand(1,10000);
+            }else{
+                return $result;
+            }
         });
-        $echart->sum('123', 'id');
-        $echart->sum('ff', 'id');
         return $echart;
     }
 }

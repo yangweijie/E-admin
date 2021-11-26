@@ -51,7 +51,7 @@ const states = reactive({
     gridActivatedRefresh:true,
     gridFirst:true,
     lang:{},
-    app:Cookies.get('multi-app') || 'admin',
+    app:Cookies.get('multi-app'),
 });
 export const state = states
 //操作方法
@@ -198,11 +198,11 @@ const action = {
                 url: '/' + states.app + '/admin/refreshToken'
             }).then((res: any) => {
                 if (res.data.token) {
-                    localStorage.setItem('eadmin_token', res.data.token)
-                    localStorage.setItem('eadmin_token_expire', Math.round((new Date()).getTime() / 1000) + res.data.expire)
+                    localStorage.setItem(states.app + '_eadmin_token', res.data.token)
+                    localStorage.setItem(states.app + '_eadmin_token_expire', Math.round((new Date()).getTime() / 1000) + res.data.expire)
                     resolve(res)
                 } else {
-                    localStorage.removeItem('eadmin_token')
+                    localStorage.removeItem(states.app + '_eadmin_token')
                     reject(res)
                 }
             }).catch((res: any) => {
@@ -250,8 +250,8 @@ const action = {
                 method: 'post',
                 data: data
             }).then((res: any) => {
-                localStorage.setItem('eadmin_token', res.data.token)
-                localStorage.setItem('eadmin_token_expire', Math.round((new Date()).getTime() / 1000) + res.data.expire)
+                localStorage.setItem(states.app + '_eadmin_token', res.data.token)
+                localStorage.setItem(states.app + '_eadmin_token_expire', Math.round((new Date()).getTime() / 1000) + res.data.expire)
                 states.menuModule = ''
                 states.mainComponent = []
                 resolve(res)
@@ -267,7 +267,7 @@ const action = {
             }).then((res: any) => {
                 states.info.id = 0
                 states.mainComponent = []
-                localStorage.removeItem('eadmin_token')
+                localStorage.removeItem(states.app + '_eadmin_token')
                 resolve(res)
             }).catch((res: any) => {
                 reject(res)

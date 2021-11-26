@@ -141,9 +141,9 @@ class Admin
     {
         $nodeId = md5($class . $function . strtolower($method));
         $permissions = self::permissions();
+
         foreach ($permissions as $permission) {
             if ($permission['id'] == $nodeId) {
-
                 if ($permission['is_login']) {
                     self::token()->auth();
                 }
@@ -164,7 +164,7 @@ class Admin
         if (!empty(self::$permissions)) {
             return self::$permissions;
         }
-        $permissionsKey = 'eadmin_permissions' . self::id();
+        $permissionsKey = 'eadmin_permissions' . Admin::getAppName() . self::id();
         $nodes = Cache::get($permissionsKey);
         if ($nodes) {
             self::$permissions = $nodes;
@@ -334,9 +334,9 @@ class Admin
      * @param bool $queue 多进程下默认并发执行,true排队执行
      * @return mixed
      */
-    public static function queue($title, $job, array $data, $delay = 0,$queue=false)
+    public static function queue($title, $job, array $data, $delay = 0, $queue = false)
     {
-        return (new QueueService())->queue($title, $job, $data, $delay,$queue);
+        return (new QueueService())->queue($title, $job, $data, $delay, $queue);
     }
 
     /**
@@ -354,6 +354,27 @@ class Admin
             }
         }
         return $vars;
+    }
+
+    /**
+     * 获取当前应用名称
+     * @return mixed
+     */
+    public static function getAppName()
+    {
+        $name = app('http')->getName();
+        $multi = cookie('multi-app') ?? 'admin';
+        if (!empty($name)) {
+            return $name;
+        }
+        $referer = app()->request->server('HTTP_REFERER');
+        if(!empty($referer)){
+            $pathinfo = pathinfo($referer);
+            if(isset($pathinfo['basename'])){
+                return $pathinfo['basename'];
+            }
+        }
+        return $multi;
     }
 
     /**
@@ -408,7 +429,7 @@ class Admin
         app()->route->post('plug/uninstall', Plug::class . '@uninstall');
         app()->route->post('plug/uploadGit', Plug::class . '@uploadGit');
         app()->route->get('plug', Plug::class . '@index');
-       
+
         //数据库备份
         app()->route->get('backup/config', Backup::class . '@config');
         app()->route->post('backup/add', Backup::class . '@add');
@@ -431,7 +452,6 @@ class Admin
         app()->route->any('crontab/clear', Crontab::class . '@clear');
         app()->route->any('crontab/exec', Crontab::class . '@exec');
         app()->route->get('crontab', Crontab::class . '@index');
-        //系统开发配置
-        app()->route->get('system_config', Config::class . '@index');
+      
     }
 }

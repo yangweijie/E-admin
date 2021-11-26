@@ -8,11 +8,7 @@
 
 namespace Eadmin\model;
 
-
-use app\model\User;
 use Eadmin\Admin;
-use think\facade\Db;
-use think\Model;
 
 class AdminModel extends BaseModel
 {

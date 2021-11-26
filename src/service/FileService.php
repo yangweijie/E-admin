@@ -175,7 +175,8 @@ class FileService extends Service
             $this->compressImage($filename);
             $url = $this->url($path);
             if(Admin::id() && request()->has('file_type')){
-                SystemFile::create([
+                $model =  config(Admin::getAppName().'.database.file_model');
+                $model::create([
                     'name' => $fileName,
                     'real_name' => request()->param('filename',$real_name),
                     'url' => $url,

@@ -3,6 +3,7 @@ import * as qiniu from "qiniu-js";
 import {uniqidMd5} from "./index";
 import {ElLoading} from "element-plus";
 import request from '@/utils/axios'
+import {state} from "../store";
 export default function upload() {
     return {
         config:{},
@@ -106,7 +107,7 @@ export default function upload() {
                     formData = new FormData()
                     formData.append('file', file, file.name)
                     formData.append('filename', filename)
-                    xhr.setRequestHeader('Authorization', localStorage.getItem('eadmin_token'))
+                    xhr.setRequestHeader('Authorization', localStorage.getItem(state.app + '_eadmin_token'))
                     xhr.send(formData)
                 }
             })
