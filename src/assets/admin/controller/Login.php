@@ -58,7 +58,9 @@ class Login extends Controller
                 if($verifyErrorNum >= 10){
                     $this->errorCode(3003);
                 }
-                $user = AdminModel::where('username', $username)->find();
+				$user = AdminModel::where('username', $username)
+					->whereNull('delete_time')
+					->find();
                 if (empty($user) || !password_verify($password,$user['password'])) {
                     $this->app->cache->inc($usernameVerifyKey,1);
                     $this->app->cache->inc($verifyKey,1);
