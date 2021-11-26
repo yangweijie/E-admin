@@ -32,8 +32,10 @@ class Permission
             list($eadmin_class, $eadmin_function) = Admin::getDispatchCall($dispatch);
         }
         //验证权限
-        $authNodules = array_keys(config(Admin::getAppName().'.authModule'));
+        $authNodules = config(Admin::getAppName().'.authModule')??[];
+        $authNodules = array_keys($authNodules);
         if (in_array($moudel, $authNodules) && !Admin::check($eadmin_class, $eadmin_function, $request->method())) {
+          
             return json(['code' => 44000, 'message' => admin_trans('admin.not_access_permission'),'method'=>$request->method()]);
         }
         return $next($request);

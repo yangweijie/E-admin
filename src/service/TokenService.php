@@ -45,8 +45,11 @@ class TokenService
      * @param string $type 配置类型
      */
     public function init($type){
+
         $app = Admin::getAppName();
-        if (empty($type)) {
+        $type = config($app.'.token.default');
+        if(empty($type)){
+            $app = 'admin';
             $type = config($app.'.token.default');
         }
         $this->config = config($app.'.token.' . $type);

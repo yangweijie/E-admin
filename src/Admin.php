@@ -363,7 +363,6 @@ class Admin
     public static function getAppName()
     {
         $name = app('http')->getName();
-        $multi = cookie('multi-app') ?? 'admin';
         if (!empty($name)) {
             return $name;
         }
@@ -374,7 +373,7 @@ class Admin
                 return $pathinfo['basename'];
             }
         }
-        return $multi;
+        return 'admin';
     }
 
     /**
@@ -452,6 +451,6 @@ class Admin
         app()->route->any('crontab/clear', Crontab::class . '@clear');
         app()->route->any('crontab/exec', Crontab::class . '@exec');
         app()->route->get('crontab', Crontab::class . '@index');
-      
+
     }
 }

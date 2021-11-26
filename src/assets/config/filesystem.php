@@ -1,5 +1,5 @@
 <?php
-
+$app = \Eadmin\Admin::getAppName();
 return [
     // 默认磁盘
     'default' => env('filesystem.driver', 'local'),
@@ -13,9 +13,9 @@ return [
             // 磁盘类型
             'type'       => 'local',
             // 磁盘路径
-            'root'       => app()->getRootPath() . 'public/upload',
+            'root'       => app()->getRootPath() . 'public/upload/'.$app,
             // 磁盘路径对应的外部URL路径
-            'url'        => '/upload',
+            'url'        => '/upload/'.$app,
             // 可见性
             'visibility' => 'public',
         ],
@@ -24,8 +24,8 @@ return [
             'type'=>'qiniu',
             'accessKey'=>'',
             'secretKey'=>'',
-            'bucket'=>'togy',
-            'domain'=>'https://imgs.my8m.com'
+            'bucket'=>'',
+            'domain'=>''
         ],
 
         //阿里云
