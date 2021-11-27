@@ -91,22 +91,23 @@
             }, 300)
             //watch监听变化
             const watchData = []
-
+            const model = ctx.attrs.model
             props.watch.forEach(field=>{
+                const watchValue = eval('model.'+field)
                 watchData.push({
                     field:field,
-                    newValue:ctx.attrs.model[field],
-                    oldValue:ctx.attrs.model[field],
+                    newValue:watchValue,
+                    oldValue:watchValue,
                 })
-                if(isReactive(ctx.attrs.model[field])){
+
+                if(isReactive(watchValue)){
                     watch(computed(()=>{
-                        console.log(JSON.stringify(ctx.attrs.model[field]))
-                        return JSON.stringify(ctx.attrs.model[field])
+                        return JSON.stringify(eval('model.'+field))
                     }),(newValue,oldValue)=>{
                         debounceWatch([field,JSON.parse(newValue),JSON.parse(oldValue)],field)
                     },{deep:true})
                 }else{
-                    watch(()=>ctx.attrs.model[field],(newValue,oldValue)=>{
+                    watch(()=>eval('model.'+field),(newValue,oldValue)=>{
                         debounceWatch([field,newValue,oldValue],field)
                     })
                 }
@@ -156,7 +157,7 @@
                                     ctx.attrs.model[f] = formData[f]
                                 }
                             }else if(f != field && ctx.attrs.model[f] != formData[f]){
-                                console.log(f)
+
                                 if(isReactive(ctx.attrs.model[f])){
                                     if(Array.isArray(ctx.attrs.model[f])){
                                         ctx.attrs.model[f] = []

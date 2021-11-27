@@ -82,6 +82,7 @@ class ServiceProvider extends Service
     protected function language(){
 
         $dirs = $this->finderIn(__DIR__,['lang']);
+
         $ranges = $this->finderIn($dirs);
         $dirs = $this->finderIn($this->app->getBasePath());
         $dirs = $this->finderIn($dirs,['lang']);
@@ -162,11 +163,16 @@ class ServiceProvider extends Service
     protected function crontab(){
         try{
             Schedule::call('数据库备份和定时清理excel目录',function () {
+                $where = ['databackup_on','database_number','database_day'];
+                $config = Db::name('SystemConfig')
+                    ->whereIn('name',$where)
+                    ->cache(300)
+                    ->column('value','name');
                 //数据库备份
-                if(sysconf('databackup_on') == 1){
+                if($config['databackup_on'] == 1){
                     BackupData::instance()->backup();
                     $list = BackupData::instance()->getBackUpList();
-                    if(count($list) > sysconf('database_number')){
+                    if(count($list) > $config['database_number']){
                         $backData = array_pop($list);
                         BackupData::instance()->delete($backData['id']);
                     }
@@ -174,7 +180,7 @@ class ServiceProvider extends Service
                 //定时清理excel目录
                 $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
                 $fileSystem->remove(app()->getRootPath().'public/upload/excel');
-            })->everyDay(sysconf('database_day'));
+            })->everyDay($config['database_day']);
             Schedule::call('清理上传已删除文件',function () {
                 FileService::instance()->clear();
             })->everyMinute();

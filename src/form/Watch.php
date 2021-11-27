@@ -9,6 +9,7 @@
 namespace Eadmin\form;
 
 use ArrayAccess;
+use think\helper\Arr;
 
 class Watch implements ArrayAccess
 {
@@ -91,7 +92,7 @@ class Watch implements ArrayAccess
 	 */
 	public function set($field, $value)
 	{
-		$this->data[$field] = $value;
+        Arr::set($this->data,$field,$value);
 	}
 
 	public function __get($name)

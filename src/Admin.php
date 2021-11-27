@@ -275,10 +275,8 @@ class Admin
             if (Str::endsWith($url, '.rest')) {
                 return null;
             }
-            if (strpos($url, '/') !== false) {
-                if ($url instanceof Url) {
-                    $url->suffix(false);
-                }
+            if ($url instanceof Url) {
+                $url->suffix(false);
                 $parse = parse_url($url);
                 $path = $parse['path'] ?? '';
                 $pathinfo = array_filter(explode('/', $path));

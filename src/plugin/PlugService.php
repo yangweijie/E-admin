@@ -127,7 +127,7 @@ class PlugService
             }
         }
         if (count($this->plugPaths) > 0 && !Cache::has('plugverify' . date('Y-m-d'))) {
-            $this->verify();
+           // $this->verify();
         }
     }
 

@@ -248,19 +248,17 @@ if (!function_exists('plug_url')) {
         $class = $class['class'];
         $arr = explode('/',$url);
         if (count($arr) == 3){
-            $url = "plugin/{$arr[0]}/{$arr[1]}/$arr[2]";
-            return $url;
-        }
-        if(\think\helper\Str::startsWith($class,'plugin')){
+            $url = "/plugin/{$arr[0]}/{$arr[1]}/$arr[2]";
+        }elseif(\think\helper\Str::startsWith($class,'plugin')){
             $classArr = explode('\\',$class);
             $plugName = $classArr[1];
             if(count($arr) == 1){
-                $url = "plugin/$plugName/{$classArr[3]}/{$arr[0]}";
+                $url = "/plugin/$plugName/{$classArr[3]}/{$arr[0]}";
             }elseif (count($arr) == 2){
-                $url = "plugin/$plugName/{$arr[0]}/$arr[1]";
+                $url = "/plugin/$plugName/{$arr[0]}/$arr[1]";
             }
         }
-        return $url;
+        return url($url,$vars);
     }
 }
 

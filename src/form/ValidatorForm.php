@@ -150,6 +150,7 @@ class ValidatorForm
             $validate = Validate::rule($this->updateRules['rule'])->message($this->updateRules['msg']);
             $rules    = $this->updateRules['rule'];
         }
+       
         foreach ($data as $field => $arr) {
             if (is_array($arr) && count($arr) != count($arr, 1)) {
                 $validateFields = [];

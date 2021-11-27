@@ -263,7 +263,6 @@
                         let mapAttribute = {...attribute}
                         if(mapAttribute.slotDefault){
                             if(mapAttribute.slotDefault instanceof Object){
-                              console.log(mapAttribute.slotDefault)
                               children.default = ()=> renderComponent(toRaw(mapAttribute.slotDefault),{})
                             }else{
                               children.default = ()=> mapAttribute.slotDefault

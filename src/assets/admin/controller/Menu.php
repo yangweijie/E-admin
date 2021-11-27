@@ -14,6 +14,7 @@ use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Dropdown;
 use Eadmin\component\basic\DropdownItem;
 use Eadmin\component\basic\Html;
+use Eadmin\component\basic\Link;
 use Eadmin\component\basic\Tip;
 use Eadmin\component\layout\Content;
 use Eadmin\component\layout\Row;
@@ -52,7 +53,10 @@ class Menu extends Controller
                 return "<i class='{$data['icon']}'></i> " . $val;
             });
             $grid->column('url',  admin_trans('menu.fields.url'))->display(function ($val) {
-                return ' ' . $val;
+                if(empty($val) || $val == '#'){
+                    return $val;
+                }
+                return Link::create($val)->href("#/$val");
             });
             $grid->column('status', admin_trans('menu.fields.status'))->switch();
             $grid->column('admin_visible', admin_trans('menu.fields.super_status'))->switch(admin_trans('menu.options.admin_visible'));
