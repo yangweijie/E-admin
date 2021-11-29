@@ -169,7 +169,7 @@
                               value = dateFormat(value,data.attribute.valueFormat)
                             }
                             if(eventBind.data.eadmin_field){
-                                eventBind.data[eventBind.data.eadmin_field] = value
+                              setObjectValue(eventBind.data,eventBind.data.eadmin_field,value)
                             }
                             request({
                                 url:eventBind.url,

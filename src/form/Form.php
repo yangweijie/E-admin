@@ -47,6 +47,7 @@ use Eadmin\traits\Exec;
 use Eadmin\traits\FormModel;
 use think\facade\Event;
 use think\facade\Request;
+use think\helper\Arr;
 use think\helper\Str;
 use think\Model;
 
@@ -366,7 +367,7 @@ class Form extends Component
             $defaultValue = $component->getDefault();
             $componentValue = $component->getValue();
             //设置default缺省值
-            if (empty($value) && $value !== '0' && $value !== 0 && !is_null($defaultValue)) {
+            if (empty($value) && $value !== false && $value !== '0' && $value !== 0 && !is_null($defaultValue)) {
                 $value = $this->getPickerValue($component, $field, $defaultValue);
             }
 
@@ -403,6 +404,7 @@ class Form extends Component
             } elseif (method_exists($component,'bindMapField') && $attr == 'modelValue' && is_array($value)) {
                 $this->setData($field, end($value));
             } else {
+
                 $this->setData($field, $value ?? '');
             }
             if (is_null($data)) {
@@ -811,28 +813,22 @@ class Form extends Component
      */
     public function setData(string $field, $value)
     {
-
         //数字类型转换处理
         if (is_array($value) && count($value) == count($value, 1)) {
             foreach ($value as &$v) {
-                if (!is_array($v) && preg_match('/^\d{1,11}$/', $v)) {
+                if (!is_array($v) && is_numeric($value) && preg_match('/^\d{1,11}$/', $v)) {
                     $v = intval($v);
                 } elseif (is_numeric($v) && strpos($v, '.') !== false) {
                     $v = floatval($v);
                 }
             }
-        } elseif (!is_array($value) && preg_match('/^\d{1,11}$/', $value)) {
+
+        } elseif (!is_array($value) && is_numeric($value) && preg_match('/^\d{1,11}$/', $value)) {
             $value = intval($value);
         } elseif (is_numeric($value) && strpos($value, '.') !== false) {
             $value = floatval($value);
         }
-
-        if (strpos($field, '.')) {
-            [$relation, $field] = explode('.', $field);
-            $this->data[$relation][$field] = $value;
-        } else {
-            $this->data[$field] = $value;
-        }
+        Arr::set($this->data,$field,$value);
     }
 
     public function getData($field = null)

@@ -14,6 +14,8 @@ use Eadmin\component\basic\Html;
 use Eadmin\grid\event\Updated;
 use Eadmin\grid\event\Updateing;
 use think\facade\Event;
+use think\helper\Arr;
+use think\helper\Str;
 
 /**
  * 行内编辑
@@ -51,10 +53,11 @@ trait ColumnEditable
             $event = [$ids, $data];
             $id = array_pop($ids);
             $pk = $this->grid->drive()->getPk();
-            $field = 'eadmin_editable' . $prop.$id;
+            $field = 'eadmin_editable' . str_replace('.','_',$this->prop).$id;
             if (isset($data['eadmin_editable']) && $field == $data['eadmin_editable_bind']) {
                 $form = new Form($this->grid->drive()->model());
                 $data[$pk] = $id;
+
                 $result = $form->getDrive()->save($data);
                 if ($result !== false) {
                     Event::until(Updated::class, $event);
@@ -77,14 +80,15 @@ trait ColumnEditable
     {
         $params = $this->grid->getCallMethod();
         $id = $this->grid->drive()->getPk();
-        $field = 'eadmin_editable' . $this->prop.$data[$id];
+        $field = 'eadmin_editable' . str_replace('.','_',$this->prop).$data[$id];
         $params['eadmin_ids'] = [$data[$id]];
         $params['eadmin_editable_bind'] = $field;
         $params['eadmin_field'] = $this->prop;
         $params['eadmin_editable'] = true;
+        Arr::set($params,$this->prop,Arr::get($data,$this->prop));
         $type = $this->editable['type'];
         $component = self::$component[$type];
-        $component = $component::create(null, $data[$this->prop])
+        $component = $component::create(null, Arr::get($data,$this->prop))
             ->size('small')
             ->type($type)->changeAjax('/eadmin/batch.rest', $params, 'put');
         $component->bind($field, (int)$this->editable['show']);

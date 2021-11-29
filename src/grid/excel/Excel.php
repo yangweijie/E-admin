@@ -30,7 +30,7 @@ class Excel extends AbstractExporter
 
     protected $sheet;
 
-    protected $callback = null;
+
 
     protected $mapCallback = null;
     //数据开始列
@@ -80,13 +80,7 @@ class Excel extends AbstractExporter
         }
     }
 
-    /**
-     * @param \Closure $closure
-     */
-    public function callback(\Closure $closure)
-    {
-        $this->callback = $closure;
-    }
+
 
     /**
      * 设置数据遍历开始行列

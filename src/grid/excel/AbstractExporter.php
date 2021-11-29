@@ -22,6 +22,14 @@ abstract class AbstractExporter
 
     protected $except = [];
 
+    protected $callback = null;
+    /**
+     * @param \Closure $closure
+     */
+    public function callback(\Closure $closure)
+    {
+        $this->callback = $closure;
+    }
     /**
      * 设置表头列
      * @param array $columns

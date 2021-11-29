@@ -21,6 +21,12 @@ use think\facade\Filesystem;
 class Csv extends AbstractExporter
 {
     protected $rowIndex = 0;
+    public function __construct()
+    {
+        if (is_callable($this->callback)) {
+            call_user_func($this->callback, $this);
+        }
+    }
     protected function writeRowData($fp){
         $this->filterColumns();
         //设置标题

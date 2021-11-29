@@ -227,7 +227,7 @@
             hideExportAll: Boolean,
             queueExport: {
               type:[Boolean,Number],
-              default:-1
+              default:false
             },
             quickSearch: Boolean,
             hideDeleteSelection: Boolean,
@@ -701,7 +701,7 @@
                         eadmin_ids:selectIds.value
                 }
                 requestParams = Object.assign(globalRequestParams(),requestParams)
-                if(props.queueExport === true || (props.queueExport == -1 && type == 'all')){
+                if(props.queueExport === true){
                   excel.progress = 0
                   excel.file = ''
                   request({

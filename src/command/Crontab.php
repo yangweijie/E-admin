@@ -23,6 +23,7 @@ use think\facade\Event;
 class Crontab extends Command
 {
     protected $exec_time = null;
+    protected $process = [];
     protected function configure()
     {
         // 指令配置
@@ -44,15 +45,23 @@ class Crontab extends Command
                     ];
                     if($crontab['schedule']->isMinuteTask()){
                         if($this->exec_time == date('i')){
-                           
+
                            continue;
                         }
                         $this->exec_time = date('i');
                     }
                     $process = new Process($cmd,app()->getRootPath());
+                    $this->process = $process;
                     $process->start();
+
                 }
                 sleep(1);
+                foreach ($this->process as $key=>$process){
+                    if(!$process->isRunning()){
+                        $process->stop();
+                        unset($this->process[$key]);
+                    }
+                }
             }
         }else{
             $key = $input->getOption('key');

@@ -365,9 +365,10 @@ class Grid extends Component
      * 开启导出
      * @param string $fileName 导出文件名
      */
-    public function export($fileName = '')
+    public function export($fileName = '',$format='csv')
     {
         $this->attr('export', true);
+        $this->attr('exportType', $format);
         $this->attr('Authorization', rawurlencode(Admin::token()->get()));
         $this->exportFileName = empty($fileName) ? date('YmdHis') : $fileName;
     }
@@ -627,12 +628,15 @@ class Grid extends Component
                 $columnTitle[$field] = $label;
             }
         }
-        if (is_callable($this->exportFileName)) {
+        if($this->attr('exportType') == 'csv'){
+            $excel = new Csv();
+        }else{
             $excel = new Excel();
-            $excel->file(date('YmdHis'));
+        }
+        $excel->file(date('YmdHis'));
+        if (is_callable($this->exportFileName)) {
             $excel->callback($this->exportFileName);
         } else {
-            $excel = new Csv();
             $excel->file($this->exportFileName);
         }
         $excel->columns($columnTitle);
