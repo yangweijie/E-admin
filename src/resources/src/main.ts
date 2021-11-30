@@ -6,6 +6,7 @@ import './styles/index.scss'
 import app from  './app'
 import './component'
 import './directive'
+import {loadScript} from './utils/index'
 import zhLocale from 'element-plus/lib/locale/lang/zh-cn'
 import request from '@/utils/axios'
 import { Switch ,Table ,Dropdown,Menu,Steps,Result,List,Popover,Spin} from "ant-design-vue";
@@ -30,6 +31,7 @@ app.use(Switch)
 app.use(ElementPlus,{size: 'medium',locale :zhLocale})
 app.use(router)
 app.provide(store, state)
+app.config.globalProperties.$script = loadScript
 app.config.globalProperties.$request = request
 app.config.globalProperties.$action = action
 app.mount('#app')

@@ -85,7 +85,7 @@
             initClearValue()
             changeHandel(value.value)
             function initClearValue() {
-                if(!ctx.attrs.multiple && !findTree(props.options,value.value,'id')){
+                if(!ctx.attrs.allowCreate  && !ctx.attrs.multiple && !findTree(props.options,value.value,'id')){
                     value.value = ''
                 }
             }

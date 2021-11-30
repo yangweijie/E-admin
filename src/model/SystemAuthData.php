@@ -2,6 +2,7 @@
 
 namespace Eadmin\model;
 
+
 class SystemAuthData extends BaseModel
 {
     public function __construct(array $data = [])

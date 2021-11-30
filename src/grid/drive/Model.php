@@ -55,14 +55,13 @@ class Model implements GridInterface
         $this->db          = $this->model->db();
         $this->tableFields = $this->model->getTableFields();
         $this->pkField     = $this->model->getPk();
-        if (in_array($this->softDeleteField, $this->tableFields)) {
+        if (in_array($this->softDeleteField, $this->tableFields) && property_exists($model, 'withTrashed')) {
             $this->isSotfDelete = true;
             if (request()->has('eadmin_deleted')) {
-                $this->db->removeWhereField($this->softDeleteField);
-                $this->db->where($this->softDeleteField,'<>',0);
-            } else {
-                $this->db->where($this->softDeleteField,0);
+                $this->db = $this->model->onlyTrashed();
             }
+        }else{
+            $this->db = $this->db->removeOption('soft_delete',$this->softDeleteField);
         }
     }
 
@@ -264,7 +263,7 @@ class Model implements GridInterface
             $res = Db::execute("update {$this->model->getTable()} inner join {$sortSql} a on a.{$pk}={$this->model->getTable()}.{$pk} set {$this->sortField}=a.rownum");
             admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.sort_success'));
         } else {
-            return $this->model->removeWhereField($this->softDeleteField)->strict(false)->whereIn($pk, $ids)->update($data);
+            return $this->model->withTrashed()->strict(false)->whereIn($pk, $ids)->update($data);
         }
     }
 
@@ -289,10 +288,11 @@ class Model implements GridInterface
             $this->db->removeWhereField($this->softDeleteField);
             if ($ids === true) {
                 if ($this->isSotfDelete && !$trueDelete) {
-                    $res = $this->db->where('1=1')->update([$this->softDeleteField => date('Y-m-d H:i:s')]);
+                    $res = $this->db->where('1=1')->update([$this->softDeleteField => time()]);
                 } else {
-                    if (in_array($this->softDeleteField, $this->tableFields)) {
-                        $deleteData = $this->db->field($this->model()->getPk())->whereNotNull($this->softDeleteField)->select();
+                    if (in_array($this->softDeleteField, $this->tableFields) &&  property_exists($this->model, 'withTrashed')) {
+                        $this->db = $this->model->onlyTrashed();
+                        $deleteData = $this->db->field($this->model()->getPk())->select();
                     } else {
                         $deleteData = $this->db->field($this->model()->getPk())->select();
                     }
@@ -300,9 +300,12 @@ class Model implements GridInterface
                 }
             } else {
                 if ($this->isSotfDelete && !$trueDelete) {
-                    $res = Db::name($this->model->getTable())->whereIn($this->model->getPk(), $ids)->update([$this->softDeleteField => date('Y-m-d H:i:s')]);
+                    $res = Db::name($this->model->getTable())->whereIn($this->model->getPk(), $ids)->update([$this->softDeleteField => time()]);
                 } else {
-                    $deleteData = $this->model->field($this->model()->getPk())->removeOption('where')->whereIn($this->model->getPk(), $ids)->select();
+                    $deleteData = $this->model->field($this->model()->getPk())
+                        ->removeOption('soft_delete')
+                        ->removeOption('where')
+                        ->whereIn($this->model->getPk(), $ids)->select();
                     $this->deleteRelationData($deleteData);
                 }
             }
@@ -341,7 +344,7 @@ class Model implements GridInterface
                     } elseif ($this->model->$relation() instanceof HasOne) {
                         foreach ($deleteData as $data) {
                             if (!is_null($data->$relation)) {
-                                $data->$relation->delete();
+                                $data->$relation->force()->delete();
                             }
                         }
                     }
@@ -350,6 +353,7 @@ class Model implements GridInterface
         }
         //模型全局查询影响，这里用db删除
         $deleteIds = $deleteData->column($this->model->getPk());
+
         Db::name($this->model->getTable())->delete($deleteIds);
     }
 

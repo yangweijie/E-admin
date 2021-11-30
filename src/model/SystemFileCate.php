@@ -2,6 +2,8 @@
 
 namespace Eadmin\model;
 
+
+
 class SystemFileCate extends BaseModel
 {
     public function __construct(array $data = [])

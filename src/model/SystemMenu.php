@@ -9,6 +9,7 @@
 namespace Eadmin\model;
 
 
+
 use think\Model;
 
 class SystemMenu extends BaseModel

@@ -116,3 +116,6 @@ body *::-webkit-scrollbar-thumb:hover {
 .eadmin-select-tree .el-tree-node__content{
   height: 34px;
 }
+.ant-dropdown{
+  z-index: 10500;
+}

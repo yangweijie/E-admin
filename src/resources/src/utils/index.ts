@@ -6,7 +6,7 @@ import { store,action} from '@/store'
 import { t,use } from 'element-plus/lib/locale'
 // @ts-ignore
 import md5 from 'js-md5'
-import {inject} from "vue";
+import {onBeforeUnmount} from "vue";
 export function treeData(source, id, parentId, children){
     let cloneData = JSON.parse(JSON.stringify(source))
     return cloneData.filter(father=>{
@@ -296,6 +296,7 @@ export function randomCoding(length){
     return idvalue;
 }
 export function empty(value) {
+    console.log(value)
     if(!value && value !== 0){
         return true
     }
@@ -308,4 +309,31 @@ export function offsetTop(el) {
         return offsetTop(el.parentElement) + el.offsetTop
     }
     return el.offsetTop
+}
+export function isNumber(value) {
+    if (parseFloat(value).toString() == "NaN") {
+        return false;
+    } else {
+        return true;
+    }
+}
+export function loadScript(src){
+    return new Promise((resolve, reject) =>{
+        const Doms = document.querySelectorAll('[data-key=s'+md5(src)+']')
+        if(Doms.length > 0){
+            Doms.forEach(item=>{
+            item.remove()
+          })
+        }
+        let script = document.createElement('script')
+        script.src = src
+        script.setAttribute('data-key', 's'+md5(src))
+        document.getElementsByTagName('head')[0].appendChild(script)
+        script.onload = (e)=> {
+            resolve(e)
+        }
+        script.onerror = (e)=>{
+            reject(e)
+        }
+    })
 }

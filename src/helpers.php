@@ -239,7 +239,7 @@ if (!function_exists('plug')) {
 if (!function_exists('plug_url')) {
     /**
      * 插件控制器生成url
-     * @return string
+     * @return \think\app\Url
      */
     function plug_url($url,$vars=[])
     {

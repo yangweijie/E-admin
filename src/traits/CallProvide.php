@@ -49,6 +49,7 @@ trait CallProvide
     public function exec(){
 
         if(!is_null($this->execClosure) && $this->exec){
+        
             call_user_func($this->execClosure,$this);
         }
         return $this;

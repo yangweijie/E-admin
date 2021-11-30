@@ -1,7 +1,7 @@
 <script>
     import {defineComponent, toRaw, h,reactive, resolveComponent,isProxy,resolveDirective,withDirectives,getCurrentInstance,onBeforeUnmount} from 'vue'
     import {splitCode} from '@/utils/splitCode'
-    import {setObjectValue,findArrKey} from '@/utils'
+    import {setObjectValue,findArrKey,isNumber} from '@/utils'
     import dayjs from 'dayjs'
     import request from '@/utils/axios'
     export default defineComponent({
@@ -421,17 +421,34 @@
                             val = eval('modelValue.' + where.field)
                         }
                         if(Array.isArray(val)){
+
                             if(scope && scope.row){
                                 if(where.op == 'notIn'){
-                                    evals.push('(scope.row.' + where.field+".indexOf('"+where.condition+"') == -1 && scope.row."+ where.field+".indexOf("+where.condition+") == -1)")
+                                    if(isNumber(where.condition)){
+                                      evals.push('(scope.row.' + where.field+".indexOf('"+where.condition+"') == -1 && scope.row."+ where.field+".indexOf("+where.condition+") == -1)")
+                                    }else{
+                                      evals.push('(scope.row.' + where.field+".indexOf('"+where.condition+"') == -1)")
+                                    }
                                 }else{
-                                    evals.push('(scope.row.' + where.field+".indexOf('"+where.condition+"') >= 0 || scope.row."+ where.field+".indexOf("+where.condition+") >= 0)")
+                                    if(isNumber(where.condition)){
+                                      evals.push('(scope.row.' + where.field+".indexOf('"+where.condition+"') >= 0 || scope.row."+ where.field+".indexOf("+where.condition+") >= 0)")
+                                    }else{
+                                      evals.push('(scope.row.' + where.field+".indexOf('"+where.condition+"') >= 0)")
+                                    }
                                 }
                             }else{
                                 if(where.op == 'notIn'){
-                                    evals.push('(modelValue.' + where.field+".indexOf('"+where.condition+"') == -1 && modelValue."+ where.field+".indexOf("+where.condition+") == -1)")
+                                    if(isNumber(where.condition)) {
+                                      evals.push('(modelValue.' + where.field + ".indexOf('" + where.condition + "') == -1 && modelValue." + where.field + ".indexOf(" + where.condition + ") == -1)")
+                                    }else{
+                                      evals.push('(modelValue.' + where.field + ".indexOf('" + where.condition + "') == -1)")
+                                    }
                                 }else{
-                                    evals.push('(modelValue.' + where.field+".indexOf('"+where.condition+"') >= 0 || modelValue."+ where.field+".indexOf("+where.condition+") >= 0)")
+                                    if(isNumber(where.condition)) {
+                                      evals.push('(modelValue.' + where.field + ".indexOf('" + where.condition + "') >= 0 || modelValue." + where.field + ".indexOf(" + where.condition + ") >= 0)")
+                                    }else{
+                                      evals.push('(modelValue.' + where.field + ".indexOf('" + where.condition + "') >= 0)")
+                                    }
                                 }
                             }
 

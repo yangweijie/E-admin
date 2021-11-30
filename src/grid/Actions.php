@@ -150,7 +150,7 @@ class Actions extends Html
                 $confirm = Confirm::create($text)->message(admin_trans('admin.confim_recover'))
                     ->url($url)
                     ->type('warning')
-                    ->params($params + ['delete_time' => null, 'eadmin_ids' => [$this->id]])
+                    ->params($params + ['delete_time' => 0, 'eadmin_ids' => [$this->id]])
                     ->method('put');
                 $this->dropdown->item($confirm);
                 $params['trueDelete'] = true;
@@ -221,7 +221,7 @@ class Actions extends Html
                     Button::create(admin_trans('admin.recover_data'))
                         ->size('small')
                         ->icon('el-icon-s-help')
-                        ->save($params + ['delete_time' => null, 'eadmin_ids' => [$this->id]], "/eadmin/batch.rest", admin_trans('admin.confim_recover'))->method('put')
+                        ->save($params + ['delete_time' => 0, 'eadmin_ids' => [$this->id]], "/eadmin/batch.rest", admin_trans('admin.confim_recover'))->method('put')
                 );
                 $params['trueDelete'] = true;
                 $text = admin_trans('admin.true_delete');

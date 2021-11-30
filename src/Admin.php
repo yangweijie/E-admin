@@ -289,6 +289,7 @@ class Admin
                     array_shift($pathinfo);
                 }
                 $url = implode('/', $pathinfo);
+
                 $dispatch = Route::getDomains()['-']->check(request(), $url);
                 if ($dispatch === false) {
                     $dispatch = Route::url($url);
@@ -297,6 +298,7 @@ class Admin
         } catch (\Throwable $exception) {
 
         }
+
         return $dispatch;
     }
 
@@ -383,6 +385,7 @@ class Admin
     public static function dispatch($url)
     {
         $dispatch = Admin::getDispatch($url);
+       
         $vars = self::parseUrlQuery($url);
         $data = $url;
         if ($dispatch) {

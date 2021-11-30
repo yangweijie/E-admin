@@ -47,7 +47,7 @@ class Backup extends Controller
                     Button::create(admin_trans('backup.reduction'))
                         ->typePrimary()
                         ->sizeSmall()
-                        ->save(['id' => $data['id']], 'backup/reduction', admin_trans('backup.confirm_reduction'))
+                        ->save(['id' => $data['id']], url('/backup/reduction'), admin_trans('backup.confirm_reduction'))
                 );
             });
             $grid->deling(function ($ids) {
@@ -56,7 +56,7 @@ class Backup extends Controller
                 }
             });
             $grid->hideDeleteButton();
-            $grid->tools('backup/config');
+            $grid->tools(url('/backup/config'));
         });
     }
 
@@ -76,7 +76,7 @@ class Backup extends Controller
             $form->number('database_day', ' '.admin_trans('backup.every_database'))->min(1)->append('<span style="padding-left: 12px">'.admin_trans('backup.day_auto').'</span>')->required();
             $form->actions(function (FormAction $action) {
                 $action->submitButton()->sizeMini();
-                $action->addRightAction(Button::create(admin_trans('backup.backup_database'))->typeWarning()->sizeMini()->save([], 'backup/add'));
+                $action->addRightAction(Button::create(admin_trans('backup.backup_database'))->typeWarning()->sizeMini()->save([],  url('/backup/add')));
                 $action->hideResetButton();
             });
         });

@@ -639,7 +639,7 @@
                 ElMessageBox.confirm(trans('grid.confirmRecoverySelected'),trans('grid.continue'),{type: 'warning'}).then(()=>{
                     request({
                         url: props.loadDataUrl.replace('.rest','/batch.rest'),
-                        data: Object.assign({eadmin_ids: selectIds.value},props.params,{delete_time:null}),
+                        data: Object.assign({eadmin_ids: selectIds.value},props.params,{delete_time:0}),
                         method:'put',
                     }).then(res=>{
                         loading.value = true

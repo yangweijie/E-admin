@@ -311,7 +311,7 @@ trait Validator
 	 * @param string $text 文案，必须带上[字段]
 	 * @return $this
 	 */
-	public function numRule($text = '[字段]不是纯数字')
+	public function numberRule($text = '[字段]不是纯数字')
 	{
 		$this->formItem->rules(['number' => str_replace('[字段]', $this->formItem->attr('label'), $text)]);
 		return $this;

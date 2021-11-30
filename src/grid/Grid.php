@@ -145,7 +145,7 @@ class Grid extends Component
 
     public static function create($data, \Closure $closure)
     {
-        $self = new self($data);
+        $self = new static($data);
         $self->parseCallMethod(true, 2);
         $self->setExec($closure);
         return $self;
@@ -450,14 +450,14 @@ class Grid extends Component
 
     public function tools($tools)
     {
-        if (is_string($tools)) {
-            $this->tools[] = Html::create()->content($tools);
-        } elseif (is_array($tools)) {
+       if (is_array($tools)) {
             foreach ($tools as $tool) {
                 $this->tools($tool);
             }
         } elseif ($tools instanceof Component) {
             $this->tools[] = $tools;
+        }else{
+            $this->tools[] = Html::create()->content($tools);
         }
         return $this;
     }
