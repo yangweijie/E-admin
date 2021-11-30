@@ -66,6 +66,7 @@ x: number | true, y: number
  * @method $this showHeader(bool $bool = true) 是否显示表头
  * @method $this loadDataUrl(string $value) 设置加载数据url
  * @method $this params(array $value) 加载数据附加参数
+ * @method $this selectionType(string $value) 多选checkbox 单选radio
  * @property Filter $filter
  */
 class Grid extends Component
