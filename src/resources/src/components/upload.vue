@@ -274,14 +274,17 @@ export default defineComponent({
     } else if (typeof props.modelValue === 'object' && props.modelValue instanceof Array) {
       state.files = props.modelValue
     }
+    if(!props.modelValue && props.multiple){
+      ctx.emit('update:modelValue', [])
+    }
     watchUploadBtn()
     watch(()=>state.files,val=>{
       watchUploadBtn()
       if(instance.parent && instance.parent.provides && instance.parent.provides.elFormItem){
-        instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val.join(',')])
+        instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val])
       }
       state.inputValue = val.join(',')
-      ctx.emit('update:modelValue', state.inputValue)
+      ctx.emit('update:modelValue', val)
     },{deep:true})
     watch(()=>props.modelValue,val=>{
       if (typeof val === 'string') {
@@ -672,7 +675,7 @@ export default defineComponent({
     function submit() {
       state.dialogVisible = false
       if(props.multiple){
-        state.files.push(state.selection)
+        state.files = state.files.concat(state.selection)
       }else{
         state.files = state.selection
       }

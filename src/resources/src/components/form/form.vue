@@ -112,11 +112,13 @@
                     })
                 }
             })
-            watchData.push({
-              field:'batch_init_watch',
-              newValue:initWatch,
-              oldValue:'',
-            })
+            if(initWatch.length > 0){
+              watchData.push({
+                field:'batch_init_watch',
+                newValue:initWatch,
+                oldValue:'',
+              })
+            }
             watchListen()
             //监听watch变化数据队列执行
             async function watchListen(){

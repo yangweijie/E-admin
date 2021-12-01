@@ -126,6 +126,6 @@ class FileSystem extends Controller
     {
         $model =  config(Admin::getAppName().'.database.file_model');
         $model::whereIn('id',$ids)->update(['is_delete'=>1]);
-        admin_success(admin_trans('filesystem.success'), admin_trans('deleleComplete'));
+        admin_success(admin_trans('filesystem.success'), admin_trans('filesystem.deleleComplete'));
     }
 }
