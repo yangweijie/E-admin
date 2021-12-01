@@ -91,15 +91,15 @@
             }, 300)
             //watch监听变化
             const watchData = []
+            const initWatch = []
             const model = ctx.attrs.model
             props.watch.forEach(field=>{
                 const watchValue = eval('model.'+field)
-                watchData.push({
-                    field:field,
-                    newValue:watchValue,
-                    oldValue:watchValue,
+                initWatch.push({
+                  field:field,
+                  newValue:watchValue,
+                  oldValue:watchValue,
                 })
-
                 if(isReactive(watchValue)){
                     watch(computed(()=>{
                         return JSON.stringify(eval('model.'+field))
@@ -111,6 +111,11 @@
                         debounceWatch([field,newValue,oldValue],field)
                     })
                 }
+            })
+            watchData.push({
+              field:'batch_init_watch',
+              newValue:initWatch,
+              oldValue:'',
             })
             watchListen()
             //监听watch变化数据队列执行

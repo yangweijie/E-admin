@@ -51,7 +51,7 @@ class Crontab extends Command
                         $this->exec_time = date('i');
                     }
                     $process = new Process($cmd,app()->getRootPath());
-                    $this->process = $process;
+                    $this->process[] = $process;
                     $process->start();
 
                 }

@@ -16,10 +16,10 @@ const routes = [
         path: '/'+state.app+'/login',
         component: Login,
     },
-    {
-        path: '/generate',
-        component: Generate,
-    },
+    // {
+    //     path: '/generate',
+    //     component: Generate,
+    // },
     {
         path: '/im',
         component: Im,

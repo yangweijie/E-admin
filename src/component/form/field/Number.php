@@ -18,7 +18,7 @@ use Eadmin\component\form\Field;
  * @method $this size(string $size) 计数器尺寸 large / medium / small / mini
  * @method $this controls(bool $value = true) 是否使用控制按钮
  * @method $this controlsPosition(string $position) 控制按钮位置 right
- * @method $this placeholder(string $text) 输入框默认 placeholder right
+ * @method $this placeholder(string $text) 输入框默认 placeholder 
  * @package Eadmin\component\form\field
  */
 class Number extends Field

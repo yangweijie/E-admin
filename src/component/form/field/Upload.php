@@ -132,7 +132,7 @@ class Upload extends Field
     public function jsonSerialize()
     {
         if (is_null($this->attr('finder'))) {
-            $finder = Admin::dispatch('/filesystem?type=1');
+            $finder = Admin::dispatch(url('/filesystem',['type'=>1]));
             $uploadButton = clone $this;
             $uploadButton->finder(false)
                 ->attr('foreverShow', true)

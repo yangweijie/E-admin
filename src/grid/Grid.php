@@ -184,6 +184,13 @@ class Grid extends Component
     }
 
     /**
+     * 设置高度
+     * @param int $height 高度
+     */
+    public function height($height){
+        $this->scroll(['x' => 'max-content','y'=>$height]);
+    }
+    /**
      * 表格模式
      */
     public function tableMode()
