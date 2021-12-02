@@ -60,7 +60,7 @@ class PlugService
     {
         $this->app = app();
         $this->client = new Client([
-            'base_uri' => 'http://exadmin.test/api/Plugin/',
+            'base_uri' => 'https://www.ex-admin.com/api/Plugin/',
             'verify' => false,
             'timeout' => 10
         ]);
