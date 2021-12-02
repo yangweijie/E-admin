@@ -51,7 +51,6 @@ class PlugService
     protected $client;
     protected $total = 0;
     protected $loginToken = '';
-
     public function __construct()
     {
         $this->initialize();;
@@ -61,7 +60,7 @@ class PlugService
     {
         $this->app = app();
         $this->client = new Client([
-            'base_uri' => 'https://www.ex-admin.com/api/Plugin/',
+            'base_uri' => 'http://exadmin.test/api/Plugin/',
             'verify' => false,
             'timeout' => 10
         ]);
@@ -115,8 +114,13 @@ class PlugService
      */
     public function register()
     {
+        if (count($this->plugPaths) > 0 && !Cache::has('plugverify' . date('Y-m-d'))) {
+            $this->verify();
+        }
         $loader = Composer::loader();
+        $unauthorized = Cache::get('plugverify'.date('Y-m-d')) ?? [];
         foreach ($this->plugPaths as $name => $plugPaths) {
+            if(in_array($name,$unauthorized)) continue;
             $arr = $this->info($name);
             $arr['plug_path'] = $plugPaths;
             $psr4 = Arr::get($arr, 'namespace');
@@ -133,9 +137,6 @@ class PlugService
                 }
             }
         }
-        if (count($this->plugPaths) > 0 && !Cache::has('plugverify' . date('Y-m-d'))) {
-           // $this->verify();
-        }
     }
 
     private function verify()
@@ -147,6 +148,12 @@ class PlugService
                 'info' => $serviceProvider->getInfo(),
             ];
         }
+        $response = $this->client->post('verify', [
+            'form_params' => [
+                'domain' => request()->host(),
+                'plugs' => $data,
+            ]
+        ]);
         try {
             $response = $this->client->post('verify', [
                 'form_params' => [
@@ -155,11 +162,14 @@ class PlugService
                 ]
             ]);
             if ($response->getStatusCode() == 200) {
-                Cache::set('plugverify' . date('Y-m-d'), 1, 60 * 60 * 24);
+                $content = $response->getBody()->getContents();
+                $content = json_decode($content, true);
+                Cache::set('plugverify' . date('Y-m-d'), $content['data'], 60 * 60 * 24);
             }
         } catch (\Exception $exception) {
-
+           
         }
+
     }
 
     public function authorize($info)
