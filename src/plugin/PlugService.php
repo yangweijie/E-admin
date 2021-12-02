@@ -76,6 +76,13 @@ class PlugService
     }
 
     /**
+     * 登录token
+     * @return mixed
+     */
+    public function token(){
+        return Cache::get($this->loginToken);
+    }
+    /**
      * 是否登录
      * @return bool
      */
@@ -159,7 +166,7 @@ class PlugService
     {
         $response = $this->client->post('authorize', [
             'headers' => [
-                'Authorization' => Cache::get($this->loginToken)
+                'Authorization' => self::token()
             ],
             'form_params' => [
                 'info' => $info,
@@ -444,7 +451,7 @@ class PlugService
                 'version' => $version,
             ],
             'headers' => [
-                'Authorization' => Cache::get($this->loginToken)
+                'Authorization' => self::token()
             ],
             'save_to' => $plugZip
         ]);
