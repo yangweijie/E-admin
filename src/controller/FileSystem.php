@@ -121,6 +121,6 @@ class FileSystem extends Controller
     public function del($ids)
     {
         SystemFile::whereIn('id',$ids)->update(['is_delete'=>1]);
-        admin_success(admin_trans('filesystem.success'), admin_trans('deleleComplete'));
+        admin_success(admin_trans('filesystem.success'), admin_trans('filesystem.deleleComplete'));
     }
 }
