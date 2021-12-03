@@ -162,12 +162,12 @@ class ServiceProvider extends Service
     }
     protected function crontab(){
         try{
-            Schedule::call('数据库备份和定时清理excel目录',function () {
-                $where = ['databackup_on','database_number','database_day'];
-                $config = Db::name('SystemConfig')
-                    ->whereIn('name',$where)
-                    ->cache(300)
-                    ->column('value','name');
+            $where = ['databackup_on','database_number','database_day'];
+            $config = Db::name('SystemConfig')
+                ->whereIn('name',$where)
+                ->cache(300)
+                ->column('value','name');
+            Schedule::call('数据库备份和定时清理excel目录',function () use($config) {
                 //数据库备份
                 if($config['databackup_on'] == 1){
                     BackupData::instance()->backup();
@@ -185,7 +185,7 @@ class ServiceProvider extends Service
                 FileService::instance()->clear();
             })->everyMinute();
         }catch (\Exception $exception){
-
+          
         }
     }
     public function boot()

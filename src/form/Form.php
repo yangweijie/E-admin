@@ -693,6 +693,10 @@ class Form extends Component
             $manyItem->content($item);
         }
         $manyItem->attr('columns', $columns);
+        $ifField = str_replace('.', '_', $relation);
+        $ifField = $this->bindAttr('model') . $ifField . 'Show';
+        $this->bind($ifField, 1);
+        $manyItem->where($ifField, 1);
         $this->push($manyItem);
         return $manyItem;
     }

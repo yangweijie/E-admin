@@ -64,7 +64,9 @@
         setup(props,ctx){
             const value = reactive(props.modelValue)
             const hoverIndex = ref(-1)
+
             watch(value,(val)=>{
+
                 ctx.emit('update:modelValue',val)
             })
             // 上移

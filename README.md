@@ -5,8 +5,8 @@
 <p align=""><code>Ex-admin</code>是一个基于<a href="https://www.laravel-admin.org/" target="_blank">Element Plus</a>开发而成后台系统构建工具，无需关注页面模板JavaScript，只用php代码即可快速构建出一个功能完善的后台系统。。</p>
 
 
-- [中文文档](http://rocky-git.gitee.io/e-admin-sites/#/zh-CN/component/installation)
-- [Demo / 在线演示](https://eadmin.togy.com.cn)
+- [中文文档](https://www.ex-admin.com/index/docs)
+- [Demo / 在线演示](https://demo.ex-admin.com)
 - [github](https://github.com/rocky-git/E-admin)
 - [gitee(码云)](https://gitee.com/rocky-git/eadmin)
 
@@ -74,7 +74,7 @@ php think eadmin:install
 强制重新安装：
 
 ```
-php think admin:install -f
+php think eadmin:install -f
 ```
 
 phpstudy的apache环境需要配置验证token，默认关闭

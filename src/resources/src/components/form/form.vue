@@ -16,7 +16,7 @@
 </template>
 
 <script>
-    import {defineComponent, inject,nextTick,ref,watch,computed,isReactive} from 'vue'
+    import {defineComponent, inject,nextTick,ref,watch,computed,isReactive,toRaw} from 'vue'
     import manyItem from "./manyItem.vue"
     import { store } from '@/store'
     import { useHttp } from '@/hooks'
@@ -165,20 +165,26 @@
                                 }
                             }else if(f != field && ctx.attrs.model[f] != formData[f]){
 
-                                if(isReactive(ctx.attrs.model[f])){
-                                    if(Array.isArray(ctx.attrs.model[f])){
-                                        ctx.attrs.model[f] = []
-                                    }else{
-                                      for(field in formData[f]){
-                                        if(Array.isArray(formData[f][field])){
-                                          Object.assign(ctx.attrs.model[f][field],formData[f][field])
-                                        }
-                                      }
-                                    }
-                                    Object.assign(ctx.attrs.model[f],formData[f])
+                              if(isReactive(ctx.attrs.model[f])){
+                                if(Array.isArray(ctx.attrs.model[f])){
+                                  ctx.attrs.model[f] = []
                                 }else{
-                                    ctx.attrs.model[f] = formData[f]
+                                  for(field in formData[f]){
+                                    if(Array.isArray(formData[f][field])){
+                                        let length = ctx.attrs.model[f][field].length
+                                        for (let i=0;i<length;i++){
+                                          ctx.attrs.model[f][field].pop()
+                                        }
+                                        formData[f][field].forEach(item=>{
+                                          ctx.attrs.model[f][field].push(item)
+                                        })
+                                    }
+                                  }
                                 }
+                              }else{
+                                ctx.attrs.model[f] = formData[f]
+                              }
+                              Object.assign(ctx.attrs.model[f],formData[f])
                             }
                         }
                         resolve(res)

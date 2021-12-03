@@ -103,6 +103,18 @@ abstract class Field extends Component
     }
 
     /**
+     * 追加item到后面
+     * @param \Closure $closure 闭包 Form参数
+     * @return $this
+     */
+    public function pushItem(\Closure $closure){
+        $formItems = $this->formItem->form()->collectFields($closure);
+        foreach ($formItems as $formItem){
+            $this->formItem->form()->push($formItem);
+        }
+        return $this;
+    }
+    /**
      * @return FormItem
      */
     public function getFormItem(){

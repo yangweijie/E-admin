@@ -174,27 +174,29 @@ class FileService extends Service
             $extension = pathinfo($filename)['extension'];
             $this->compressImage($filename);
             $url = $this->url($path);
-            if(Admin::id() && request()->has('file_type')){
-                $model =  config(Admin::getAppName().'.database.file_model');
-                $model::create([
-                    'name' => $fileName,
-                    'real_name' => request()->param('filename',$real_name),
-                    'url' => $url,
-                    'path' => $path,
-                    'cate_id' => request()->param('cate_id', 0),
-                    'ext' => $extension,
-					'file_size' => request()->param('totalSize', 0),
-					'file_type' => request()->param('file_type', ''),
-                    'uptype' => $this->upType,
-                    'admin_id' => Admin::id(),
-                ]);
-            }
+            $this->saveData($fileName,$real_name,$url,$path,$extension);
             return $url;
         } else {
             return false;
         }
     }
-
+    private function saveData($fileName,$real_name,$url,$path,$extension){
+        if(Admin::id() && request()->has('file_type')){
+            $model =  config(Admin::getAppName().'.database.file_model');
+            $model::create([
+                'name' => $fileName,
+                'real_name' => request()->param('filename',$real_name),
+                'url' => $url,
+                'path' => $path,
+                'cate_id' => request()->param('cate_id', 0),
+                'ext' => $extension,
+                'file_size' => request()->param('totalSize', 0),
+                'file_type' => request()->param('file_type', ''),
+                'uptype' => $this->upType,
+                'admin_id' => Admin::id(),
+            ]);
+        }
+    }
     /**
      * 获取目录下文件数量
      * @param string $chunkSaveDir
@@ -304,7 +306,9 @@ class FileService extends Service
         rmdir($chunkSaveDir);
         if ($res) {
             $this->compressImage($put_filename);
-            return $this->url($saveName);
+            $url =  $this->url($saveName);
+            $this->saveData($filename,$filename,$url,$saveName,$extend);
+            return $url;
         } else {
             return false;
         }
@@ -349,12 +353,18 @@ class FileService extends Service
      */
     public function clear()
     {
-        SystemFile::where('is_delete', 1)->chunk(100, function ($files) {
+        $model =  config(Admin::getAppName().'.database.file_model');
+        $model::where('is_delete', 1)->chunk(100, function ($files) {
             foreach ($files as $file) {
                 try {
-                    $res = Filesystem::disk($file['uptype'])->delete($file['path']);
-                    if ($res) {
+                    $filePath = config('filesystem.disks.'.$file['uptype'].'.root').DIRECTORY_SEPARATOR.Admin::getAppName().DIRECTORY_SEPARATOR.$file['path'];
+                    if(is_file($filePath) && unlink($filePath)){
                         $file->delete();
+                    }else{
+                        $res = Filesystem::disk($file['uptype'])->delete($file['path']);
+                        if ($res) {
+                            $file->delete();
+                        }
                     }
                 }catch (\Exception $exception){
 
