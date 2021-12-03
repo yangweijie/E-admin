@@ -1,8 +1,8 @@
 <div align="center">
-    <img src="http://rocky-git.gitee.io/e-admin-sites/static/logo.50c3504.png" height="80"> 
+    <img src="https://www.ex-admin.com/cms/logo.jpg" height="80"> 
 </div>
 <br>
-<p align=""><code>E-admin</code>是一个基于<a href="https://www.laravel-admin.org/" target="_blank">Element Plus</a>开发而成后台系统构建工具，无需关注页面模板JavaScript，只用php代码即可快速构建出一个功能完善的后台系统。。</p>
+<p align=""><code>Ex-admin</code>是一个基于<a href="https://www.laravel-admin.org/" target="_blank">Element Plus</a>开发而成后台系统构建工具，无需关注页面模板JavaScript，只用php代码即可快速构建出一个功能完善的后台系统。。</p>
 
 
 - [中文文档](http://rocky-git.gitee.io/e-admin-sites/#/zh-CN/component/installation)
@@ -10,9 +10,6 @@
 - [github](https://github.com/rocky-git/E-admin)
 - [gitee(码云)](https://gitee.com/rocky-git/eadmin)
 
-
-
-![](http://rocky-git.gitee.io/e-admin-sites/static/theme-index-bg1.fed340c.png)
 
 
 
@@ -113,4 +110,4 @@ phpstudy的apache环境需要配置验证token，默认关闭
 
 ### License
 ------------
-`e-admin` is licensed under [The MIT License (MIT)](LICENSE).
+`e-admin` is licensed under [The Apache-2.0 License (Apache-2.0)](LICENSE).

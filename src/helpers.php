@@ -226,6 +226,7 @@ if (!function_exists('color_mix')) {
         return rgbToHex("rgb($r,$g,$b)");
     }
 }
+
 if (!function_exists('plug')) {
     /**
      * 插件管理

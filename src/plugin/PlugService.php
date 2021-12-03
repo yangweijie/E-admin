@@ -167,11 +167,25 @@ class PlugService
                 Cache::set('plugverify' . date('Y-m-d'), $content['data'], 60 * 60 * 24);
             }
         } catch (\Exception $exception) {
-           
+
         }
 
     }
 
+    /**
+     * 获取插件logo
+     * @param $name
+     * @return null
+     */
+    public function getLogin($name){
+        $file = $this->plugPathBase . DIRECTORY_SEPARATOR . $name.DIRECTORY_SEPARATOR.'logo.png';
+      
+        if(is_file($file)){
+            $content =  file_get_contents($file);
+            return 'data:image/png;base64,' . base64_encode($content);
+        }
+        return null;
+    }
     public function authorize($info)
     {
         $response = $this->client->post('authorize', [
@@ -268,9 +282,13 @@ class PlugService
             ]);
             $content = $response->getBody()->getContents();
             $content = json_decode($content, true);
+
             $this->plugs = $content['data']['data'];
             $this->total = $content['data']['total'];
-            $names = array_column($this->installed(), 'name');
+
+            if(count($this->plugs) > 0){
+                $names = array_column($this->installed(), 'name');
+            }
             foreach ($this->plugs as &$plug) {
                 $plug['install'] = false;
                 if (in_array($plug['name'], $names)) {
@@ -298,11 +316,14 @@ class PlugService
     {
         $plugs = [];
         $names = [];
+
         foreach ($this->plugPaths as $name => $plug) {
             $info = $this->info($name);
             $names[] = $info['name'];
         }
+
         $onlinePlugs = $this->all('', 0, 1, 1000, $names);
+
         $names = array_column($onlinePlugs, 'name');
         foreach ($this->plugPaths as $name => $plug) {
             $info = $this->info($name);

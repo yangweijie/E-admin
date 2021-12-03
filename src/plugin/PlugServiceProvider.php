@@ -156,7 +156,7 @@ PHP;
             foreach ($menus as $menu) {
                 SystemMenu::where('mark', $this->getName())
                     ->where('name', $menu['name'])
-                    ->update(['status' => $menu['status']]);
+                    ->update(['status' => $menu['status'] ?? 1]);
             }
         }
     }

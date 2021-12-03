@@ -8,12 +8,14 @@ use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Card;
 use Eadmin\component\basic\Dropdown;
 use Eadmin\component\basic\Html;
+use Eadmin\component\basic\Image;
 use Eadmin\component\basic\Space;
 use Eadmin\component\basic\Tabs;
 use Eadmin\component\basic\Tag;
 use Eadmin\component\basic\TimeLine;
 use Eadmin\component\form\FormAction;
 use Eadmin\component\layout\Content;
+use Eadmin\constant\Style;
 use Eadmin\Controller;
 use Eadmin\form\drive\Config;
 use Eadmin\grid\Actions;
@@ -71,11 +73,17 @@ class Plug extends Controller
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');
         $grid->column('title', '名称')->display(function ($val, $data) {
+
             return Html::div()->content([
-                Html::div()->content(Tag::create($data['title'])->size('mini')->effect('dark')),
-                Html::div()->content($data['name']),
-                Html::div()->content($data['description']),
-            ]);
+                Image::create()
+                    ->style(['width'=>'60px','height'=>'60px','marginRight'=>'10px',"borderRadius" => '5px'])
+                    ->src(Admin::plug()->getLogin($data['name'])),
+                Html::div()->content([
+                    Html::div()->content(Tag::create($data['title'])->size('mini')->effect('dark')),
+                    Html::div()->content($data['name']),
+                    Html::div()->content($data['description'])
+                ])
+            ])->style(Style::FLEX_CENTER);
         });
 
         $grid->column('version', '版本');
