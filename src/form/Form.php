@@ -632,6 +632,7 @@ class Form extends Component
      * @param mixed $relation 关联方法|字段
      * @param string $title 标题
      * @param \Closure $closure
+     * @return FormMany
      */
     public function hasMany($relation, $title, \Closure $closure)
     {
@@ -679,7 +680,7 @@ class Form extends Component
             $this->data = [];
         }
 
-        $manyItem->value($manyData);
+        $manyItem->default($manyData);
         $this->itemComponent = $originItemComponent;
         foreach ($formItems as $item) {
             $formItem = clone $item;

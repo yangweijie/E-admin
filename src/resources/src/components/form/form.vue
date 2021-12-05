@@ -181,10 +181,10 @@
                                     }
                                   }
                                 }
+                                Object.assign(ctx.attrs.model[f],formData[f])
                               }else{
                                 ctx.attrs.model[f] = formData[f]
                               }
-                              Object.assign(ctx.attrs.model[f],formData[f])
                             }
                         }
                         resolve(res)
