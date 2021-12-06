@@ -249,9 +249,7 @@
                 state.hoverIndex = -1
             }
             function batch(index,field,value) {
-                if(value){
-                    state.dialogs[index].dialog = false
-                }
+                state.dialogs[index].dialog = false
                 state.tableData = state.tableData.map(item=>{
                     item[field] = value
                     return item

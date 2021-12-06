@@ -2,9 +2,21 @@
     <el-divider content-position='left' v-if="title && !table">{{title}}</el-divider>
     <el-form-item :label="title" v-if="table">
         <a-table row-key="id" v-if="value.length > 0" :data-source="value" size="small" :pagination="false" :custom-row="customRow" class="manyItemEadminTable">
-            <a-table-column v-for="column in columns" :data-index="column.prop">
+            <a-table-column v-for="(column,index) in columns" :data-index="column.prop">
                 <template #title>
                     <render :data="column.title"></render>
+                    <i class="el-icon-edit-outline" style="cursor: pointer" v-if="column.component.content.default[0].name != 'EadminDisplay' && !column.component.content.default[0].attribute.disabled" @click="openBatch(index)"></i>
+                    <el-dialog
+                        :title="trans('spec.batch')"
+                        v-model="dialogs[index].dialog"
+                        width="30%">
+                      <render :data="column.component.content.default[0]" v-model="dialogs[index].value"></render>
+                      <template #footer>
+                        <el-button size="small" @click="dialogs[index] = false">{{trans('spec.cancel')}}</el-button>
+                        <el-button size="small" type="primary" @click="()=>{batch(index,column.prop,dialogs[index].value)}">
+                          {{ trans('spec.save') }}</el-button>
+                      </template>
+                    </el-dialog>
                 </template>
                 <template #default="{ record , index}">
                     <render :slot-props="{ row:record ,$index:index ,propField:field,validator:$attrs.validator}" :data="column.component"></render>
@@ -20,11 +32,13 @@
                  </template>
             </a-table-column>
         </a-table>
-        <el-button size="mini" type='primary' plain @click="add" v-if="!disabled && (limit == 0 || limit > value.length)">{{ trans('manyItem.add') }}</el-button>
-        <el-button size="mini" type='warning' @click="clear" v-if="!disabled && (limit == 0 || limit > value.length)">{{ trans('manyItem.clear') }}</el-button>
+        <div style="margin-top: 5px">
+          <el-button size="mini" type='primary' plain @click="add" v-if="!disabled && (limit == 0 || limit > value.length)">{{ trans('manyItem.add') }}</el-button>
+          <el-button size="mini" type='warning' @click="clear" v-if="!disabled && (limit == 0 || limit > value.length)">{{ trans('manyItem.clear') }}</el-button>
+        </div>
     </el-form-item>
-    <div v-else>
-        <div v-for="(item,index) in value">
+    <div class="hasMany" v-else>
+        <template v-for="(item,index) in value">
             <slot :row="item" :$index="index" :prop-field="field" :validator="$attrs.validator"></slot>
             <el-form-item v-if="!disabled">
                 <el-button size="mini" v-if="value.length - 1 == index && (limit == 0 || limit > value.length)" type='primary' plain @click="add">{{ trans('manyItem.add') }}</el-button>
@@ -33,8 +47,8 @@
                 <el-button size="mini" v-show='value.length > 1 && index < value.length-1' @click="handleDown(index)">{{ trans('manyItem.down') }}</el-button>
                 <el-button size="mini" type='warning' v-if="value.length - 1 == index && (limit == 0 || limit > value.length)" @click="clear">{{ trans('manyItem.clear') }}</el-button>
             </el-form-item>
-            <el-divider></el-divider>
-        </div>
+            <el-divider style="margin:10px 0"></el-divider>
+        </template>
         <el-form-item v-if="value.length == 0 && !disabled">
             <el-button size="mini" type='primary' plain @click="add">{{ trans('manyItem.add') }}</el-button>
         </el-form-item>
@@ -64,7 +78,13 @@
         setup(props,ctx){
             const value = reactive(props.modelValue)
             const hoverIndex = ref(-1)
-
+            const dialogs = ref([])
+            props.columns.forEach(item=>{
+              dialogs.value.push({
+                  dialog:false,
+                  value:'',
+              })
+            })
             watch(value,(val)=>{
 
                 ctx.emit('update:modelValue',val)
@@ -93,6 +113,17 @@
             function clear(){
                 value.splice(0)
             }
+            function batch(index,field,val) {
+              dialogs.value[index].dialog = false
+              value.forEach((item,index)=>{
+                value[index][field] = val
+              })
+
+            }
+            function openBatch(index){
+
+                dialogs.value[index].dialog = true
+            }
             function customRow(record,index) {
                 return {
                     onMouseenter: (event) => {
@@ -101,9 +132,11 @@
                     onMouseleave: (event) => {
                         hoverIndex.value = -1
                     }
-            };
+                };
             }
             return {
+                openBatch,
+                batch,
                 clear,
                 trans,
                 value,
@@ -113,6 +146,7 @@
                 handleDown,
                 customRow,
                 hoverIndex,
+                dialogs,
             }
         }
     })
@@ -125,6 +159,9 @@
     clear: none;
 }
 .manyItemEadminTable .el-form-item{
+  margin-bottom: 0;
+}
+.hasMany .el-col .el-form-item{
   margin-bottom: 0;
 }
 </style>

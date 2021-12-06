@@ -362,7 +362,6 @@ class Admin
      */
     public static function getAppName()
     {
-        return 'admin';
         $name = app('http')->getName();
         if (!empty($name)) {
             return $name;
@@ -385,7 +384,7 @@ class Admin
     public static function dispatch($url)
     {
         $dispatch = Admin::getDispatch($url);
-       
+
         $vars = self::parseUrlQuery($url);
         $data = $url;
         if ($dispatch) {

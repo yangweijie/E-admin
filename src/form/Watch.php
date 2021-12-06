@@ -88,7 +88,7 @@ class Watch implements ArrayAccess
 	/**
 	 * 设置值
 	 * @param string $field 字段
-	 * @param string $value 值
+	 * @param mixed $value 值
 	 */
 	public function set($field, $value)
 	{

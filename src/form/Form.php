@@ -171,14 +171,16 @@ class Form extends Component
      * 保存成功关闭弹窗
      * @param bool $value false不关闭
      */
-    public function saveCloseDialog(bool $value = true){
-        $this->attr('saveCloseDialog',$value);
-        if($value){
+    public function saveCloseDialog(bool $value = true)
+    {
+        $this->attr('saveCloseDialog', $value);
+        if ($value) {
             $this->event('gridRefresh');
-        }else{
+        } else {
             $this->removeEvent('gridRefresh');
         }
     }
+
     /**
      * 居中对齐
      * @param int $width 宽度
@@ -392,7 +394,7 @@ class Form extends Component
                 $value = empty($value) ? null : $value;
                 $this->setData($field, $value);
             } elseif (
-                ($component instanceof Cascader || method_exists($component,'bindMapField')) &&
+                ($component instanceof Cascader || method_exists($component, 'bindMapField')) &&
                 $attr != 'modelValue' &&
                 is_array($value) &&
                 (!empty($component->getDefault()) || !empty($component->getValue()))
@@ -401,7 +403,7 @@ class Form extends Component
                 $this->setData($field, $val);
                 $component->default($value);
                 $component->value($value);
-            } elseif (method_exists($component,'bindMapField') && $attr == 'modelValue' && is_array($value)) {
+            } elseif (method_exists($component, 'bindMapField') && $attr == 'modelValue' && is_array($value)) {
                 $this->setData($field, end($value));
             } else {
 
@@ -682,15 +684,19 @@ class Form extends Component
 
         $manyItem->default($manyData);
         $this->itemComponent = $originItemComponent;
+        $columns = [];
         foreach ($formItems as $item) {
-            $formItem = clone $item;
-            $columns[] = [
-                'title' => Html::create($formItem->content['label']),
-                'dataIndex' => $formItem->attr('prop'),
-                'prop' => $formItem->attr('prop'),
-                'component' => $formItem
-            ];
-            $formItem->removeAttr('label');
+            if ($item instanceof FormItem) {
+                $formItem = clone $item;
+                $columns[] = [
+                    'title' => Html::create($formItem->content['label']),
+                    'dataIndex' => $formItem->attr('prop'),
+                    'prop' => $formItem->attr('prop'),
+                    'component' => $formItem
+                ];
+                $formItem->removeAttr('label');
+
+            }
             $manyItem->content($item);
         }
         $manyItem->attr('columns', $columns);
@@ -760,7 +766,7 @@ class Form extends Component
             $component->bindFields($arguments);
             $prop = $component->bindAttr('modelValue');
             $this->except([$prop]);
-        } elseif (method_exists($component,'bindMapField')) {
+        } elseif (method_exists($component, 'bindMapField')) {
             $field = array_pop($arguments);
             $component = $class::create($field);
             $component->bindMapField($arguments);
@@ -833,7 +839,7 @@ class Form extends Component
         } elseif (is_numeric($value) && strpos($value, '.') !== false) {
             $value = floatval($value);
         }
-        Arr::set($this->data,$field,$value);
+        Arr::set($this->data, $field, $value);
     }
 
     public function getData($field = null)
@@ -970,7 +976,7 @@ class Form extends Component
                         }
                     }
                 }
-            }elseif ($item instanceof Row) {
+            } elseif ($item instanceof Row) {
                 foreach ($item->content['default'] as $col) {
                     foreach ($col->content['default'] as $content) {
                         if ($content instanceof FormMany) {

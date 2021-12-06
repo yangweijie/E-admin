@@ -69,12 +69,13 @@ class FormItem extends Field
             $name = $this->form->tab->getContentCount();
             $this->form->validator()->setTabField($name,$prop);
         }
+        $validataField = $prop.'|'.$this->attr('label');
         if ($mode == 1) {
-            $this->form->validator()->createRule($prop, $rule);
+            $this->form->validator()->createRule($validataField, $rule);
         } elseif ($mode == 2) {
-            $this->form->validator()->updateRule($prop, $rule);
+            $this->form->validator()->updateRule($validataField, $rule);
         } else {
-            $this->form->validator()->rule($prop, $rule);
+            $this->form->validator()->rule($validataField, $rule);
         }
     }
 

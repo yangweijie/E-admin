@@ -187,6 +187,7 @@
                               }
                             }
                         }
+                        console.log(ctx.attrs.model)
                         resolve(res)
                     }).catch((res)=>{
                         resolve(res)

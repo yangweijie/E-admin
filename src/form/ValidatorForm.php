@@ -21,20 +21,25 @@ class ValidatorForm
     //创建验证规则
     protected $createRules = [
         'rule' => [],
-        'msg'  => [],
+        'msg' => [],
     ];
     //更新验证规则
     protected $updateRules = [
         'rule' => [],
-        'msg'  => [],
+        'msg' => [],
     ];
     protected $tabFields = [];
-    public function setTabField($name,$field){
-        $this->tabFields[] = ['name'=>$name,'field'=>$field];
+
+    public function setTabField($name, $field)
+    {
+        $this->tabFields[] = ['name' => $name, 'field' => $field];
     }
-    public function getTabField(){
+
+    public function getTabField()
+    {
         return $this->tabFields;
     }
+
     /**
      * 表单新增更新验证规则
      * @Author: rocky
@@ -88,11 +93,11 @@ class ValidatorForm
         switch ($type) {
             case 1:
                 $this->createRules['rule'] = array_merge_recursive($this->createRules['rule'], $rule);
-                $this->createRules['msg']  = array_merge_recursive($this->createRules['msg'], $msg);
+                $this->createRules['msg'] = array_merge_recursive($this->createRules['msg'], $msg);
                 break;
             case 2:
                 $this->updateRules['rule'] = array_merge_recursive($this->updateRules['rule'], $rule);
-                $this->updateRules['msg']  = array_merge_recursive($this->updateRules['msg'], $msg);
+                $this->updateRules['msg'] = array_merge_recursive($this->updateRules['msg'], $msg);
                 break;
         }
 
@@ -108,7 +113,7 @@ class ValidatorForm
     public function parseRule($field, $rules, $type)
     {
         $ruleMsg = [];
-        $rule    = [];
+        $rule = [];
         foreach ($rules as $key => $value) {
             if (strpos($key, ':') !== false) {
                 $msgKey = $field . '.' . substr($key, 0, strpos($key, ':'));
@@ -116,23 +121,31 @@ class ValidatorForm
                 $msgKey = $field . '.' . $key;
 
             }
-            $ruleMsg[$msgKey] = $value;
-            $rule[]           = $key;
+            if (is_numeric($key)) {
+                $rule[] = $value;
+            } else {
+                $rule[] = $key;
+                list($validateField,$label) = explode('|',$msgKey);
+                $ruleMsg[$validateField] = $value;
+            }
         }
         $resRule = [
             $field => $rule
         ];
         $this->setRules($resRule, $ruleMsg, $type);
     }
-    protected function getTabIndex($fields){
+
+    protected function getTabIndex($fields)
+    {
         $fields = array_keys($fields);
-        foreach ($this->tabFields as $row){
-            if(in_array($row['field'], $fields)){
+        foreach ($this->tabFields as $row) {
+            if (in_array($row['field'], $fields)) {
                 return $row['name'];
             }
         }
         return null;
     }
+
     /**
      * 验证表单规则
      * @param array $data
@@ -144,27 +157,27 @@ class ValidatorForm
         if ($type == 1) {
             //新增
             $validate = Validate::rule($this->createRules['rule'])->message($this->createRules['msg']);
-            $rules    = $this->createRules['rule'];
+            $rules = $this->createRules['rule'];
         } else {
             //更新
             $validate = Validate::rule($this->updateRules['rule'])->message($this->updateRules['msg']);
-            $rules    = $this->updateRules['rule'];
+            $rules = $this->updateRules['rule'];
         }
-       
+
         foreach ($data as $field => $arr) {
             if (is_array($arr) && count($arr) != count($arr, 1)) {
                 $validateFields = [];
-                $removeFields   = [];
-                $manyValidate   = clone $validate;
+                $removeFields = [];
+                $manyValidate = clone $validate;
                 $current = current($arr);
                 //循环验证规则
                 foreach ($rules as $key => $rule) {
                     //查找带.的验证规则
                     if (strstr($key, $field . '.')) {
-                        list($relation,$f) = explode('.',$key);
+                        list($relation, $f) = explode('.', $key);
                         //查找二维数组中存在的验证字段进行单独验证，并移除原先存在的验证规则
-                        if(is_array($current) && array_key_exists($f,$current)){
-                            $validateFields[]   = $key;
+                        if (is_array($current) && array_key_exists($f, $current)) {
+                            $validateFields[] = $key;
                             $removeFields[$key] = true;
                         }
                     }
@@ -173,14 +186,14 @@ class ValidatorForm
                     //二维数组中的验证字段进行单独验证
                     foreach ($arr as $index => $value) {
                         $validateData[$field] = $value;
-                        $result               = $manyValidate->only($validateFields)->batch(true)->check($validateData);;
+                        $result = $manyValidate->only($validateFields)->batch(true)->check($validateData);;
                         if (!$result) {
                             throw new HttpResponseException(json([
-                                'code'    => 422,
+                                'code' => 422,
                                 'message' => '表单验证失败',
-                                'data'    => $manyValidate->getError(),
-                                'index'   => (string)$index,
-                                'tabIndex'=>$this->getTabIndex($manyValidate->getError())
+                                'data' => $manyValidate->getError(),
+                                'index' => (string)$index,
+                                'tabIndex' => $this->getTabIndex($manyValidate->getError())
                             ]));
                         }
                     }
@@ -189,21 +202,21 @@ class ValidatorForm
                 $validate->remove($removeFields);
             }
         }
-        Event::until(Validating::class,$data);
+        Event::until(Validating::class, $data);
         $result = $validate->batch(true)->check($data);
-        if(Request::has('eadmin_validate') && $result){
+        if (Request::has('eadmin_validate') && $result) {
             throw new HttpResponseException(json([
-                'code'    => 412,
+                'code' => 412,
                 'message' => '验证通过',
-                'data'    => []
+                'data' => []
             ]));
         }
         if (!$result) {
             throw new HttpResponseException(json([
-                'code'    => 422,
+                'code' => 422,
                 'message' => '表单验证失败',
-                'data'    => $validate->getError(),
-                'tabIndex'=>$this->getTabIndex($validate->getError())
+                'data' => $validate->getError(),
+                'tabIndex' => $this->getTabIndex($validate->getError())
             ]));
         }
     }
