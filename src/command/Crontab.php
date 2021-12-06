@@ -10,6 +10,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
+use Eadmin\facade\Schedule;
 use Symfony\Component\Filesystem\Filesystem;
 use think\facade\Event;
 
