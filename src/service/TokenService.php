@@ -198,15 +198,15 @@ class TokenService
             $token = self::$token ? self::$token : Request::header('Authorization') ?? urldecode(Request::param('Authorization'));
         }
         if (empty($token)) {
-            $this->errorCode(40000, '请先登陆再访问');
+            $this->errorCode(40000, admin_trans('token.login_auth'),['multi_app'=>Admin::getAppName()]);
         }
         $data = $this->decode($token);
         if ($data === false) {
-            $this->errorCode(40001, '授权认证失败',['multi_app'=>Admin::getAppName()]);
+            $this->errorCode(40001, admin_trans('token.login_auth_error'),['multi_app'=>Admin::getAppName()]);
         } elseif (Cache::has(md5($token)) && $this->unique) {
-            $this->errorCode(40003, '账号已在其他地方登陆');
+            $this->errorCode(40003, admin_trans('token.login_other'),['multi_app'=>Admin::getAppName()]);
         } elseif ($data['expire'] < time()) {
-            $this->errorCode(40002, '认证身份过期，请重新登陆');
+            $this->errorCode(40002, admin_trans('token.login_expire'),['multi_app'=>Admin::getAppName()]);
         }
         $model = new $this->model;
         $pk = $model->getPk();
@@ -215,14 +215,14 @@ class TokenService
             if ($this->user()) {
                 foreach ($this->authFields as $field) {
                     if (isset($data[$field]) && $data[$field] != $this->user()[$field]) {
-                        $this->errorCode(40002, '认证身份过期，请重新登陆');
+                        $this->errorCode(40002, admin_trans('token.login_expire'),['multi_app'=>Admin::getAppName()]);
                     }
                 }
             } else {
-                $this->errorCode(40002, '认证身份过期，请重新登陆');
+                $this->errorCode(40002, admin_trans('token.login_expire'),['multi_app'=>Admin::getAppName()]);
             }
         } else {
-            $this->errorCode(40001, '授权认证失败');
+            $this->errorCode(40001, admin_trans('token.login_auth_error'),['multi_app'=>Admin::getAppName()]);
         }
         return true;
     }
