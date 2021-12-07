@@ -1,97 +1,85 @@
 <template>
     <div class="container">
-        <div class="login-layout">
-          <div class="left">
-              <div class="logo-container">
-                <img :src="webLogo" class="logo" v-if="webLogo" />
-                {{webName}}
+      <div class="container-center">
+        <div class="login-container">
+          <div class="ad"></div>
+          <el-form ref="loginForm" :model="loginForm" :rules="loginRules" auto-complete="on" class="login-form"
+                   label-position="left">
+            <div>
+              <div class="title-container">
+                <h3 class="title">
+                  <el-avatar :size="100" fit="fill" :src="webLogo" v-if="webLogo" />
+                  <br>
+                  <span v-if="webName">{{webName}}</span>
+                </h3>
               </div>
-             <div class="left-container">
-               <img src="{:request()->domain()}/eadmin/login-box-bg.9027741f.svg" class="ad">
-               <div class="text-block">
-                 开箱即用的中后台管理系统
-               </div>
-             </div>
-          </div>
-          <div class="right">
-            <div class="login-container">
-              <el-form ref="loginForm" :model="loginForm" :rules="loginRules" auto-complete="on" class="login-form"
-                       label-position="left">
-
-                  <div class="title-container">
-                    <h3 class="title">
-                      <span>登录</span>
-                    </h3>
-                  </div>
-                  <el-form-item prop="username" :style="inputFocusIndex == 'username' ? inputFocusCss : ''">
+              <el-form-item prop="username" :style="inputFocusIndex == 'username' ? inputFocusCss : ''">
                 <span class="svg-container">
                   <i class="el-icon-user"/>
                 </span>
-                    <el-input
-                        ref="username"
-                        v-model="loginForm.username"
-                        placeholder="请输入账号"
-                        name="username"
-                        type="text"
-                        tabindex="1"
-                        auto-complete="on"
-                        @focus="inputFocus('username')"
-                        @blur="inputFocusIndex = ''"
-                    />
-                  </el-form-item>
-                  <el-form-item prop="password" :style="inputFocusIndex == 'password' ? inputFocusCss : ''">
+                <el-input
+                    ref="username"
+                    v-model="loginForm.username"
+                    placeholder="请输入账号"
+                    name="username"
+                    type="text"
+                    tabindex="1"
+                    auto-complete="on"
+                    @focus="inputFocus('username')"
+                    @blur="inputFocusIndex = ''"
+                />
+              </el-form-item>
+              <el-form-item prop="password" :style="inputFocusIndex == 'password' ? inputFocusCss : ''">
           <span class="svg-container">
             <i class="el-icon-lock"/>
           </span>
-                    <el-input
-                        :key="passwordType"
-                        ref="password"
-                        v-model="loginForm.password"
-                        :type="passwordType"
-                        placeholder="请输入密码"
-                        name="password"
-                        tabindex="2"
-                        auto-complete="on"
-                        @focus="inputFocus('password')"
-                        @blur="inputFocusIndex = ''"
-                        @keyup.enter.native="handleLogin"
-                    />
-                    <span class="show-pwd" @click="showPwd">
+                <el-input
+                    :key="passwordType"
+                    ref="password"
+                    v-model="loginForm.password"
+                    :type="passwordType"
+                    placeholder="请输入密码"
+                    name="password"
+                    tabindex="2"
+                    auto-complete="on"
+                    @focus="inputFocus('password')"
+                    @blur="inputFocusIndex = ''"
+                    @keyup.enter.native="handleLogin"
+                />
+                <span class="show-pwd" @click="showPwd">
             <i :class="passwordType === 'password' ? 'el-icon-key' : 'el-icon-view'"/>
           </span>
-                  </el-form-item>
-                  <div v-if="verifyMode == 2" style="display: flex;justify-content: space-between;">
-                    <el-form-item prop="verify" :style="inputFocusIndex == 'verify' ? inputFocusCss : 'width:190px'">
+              </el-form-item>
+              <div v-if="verifyMode == 2" style="display: flex;justify-content: space-between;">
+                <el-form-item prop="verify" :style="inputFocusIndex == 'verify' ? inputFocusCss : 'width:190px'">
             <span class="svg-container">
               <i class="el-icon-circle-check"/>
             </span>
-                      <el-input
-                          ref="verify"
-                          v-model="loginForm.verify"
-                          placeholder="请输入验证码"
-                          name="verify"
-                          type="text"
-                          tabindex="3"
-                          auto-complete="on"
-                          style="width: 150px"
-                          maxlength="4"
-                          @focus="inputFocus('verify')"
-                          @blur="inputFocusIndex = ''"
-                          @keyup.enter.native="handleLogin"
-                      />
-                    </el-form-item>
-                    <el-image :src="verifyImage" style="height: 52px;cursor: pointer;border-radius: 5px"
-                              @click="getVerify"/>
-                  </div>
-                  <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;height: 50px"
-                             @click.native.prevent="handleLogin">{{loginBtnText}}
-                  </el-button>
-              </el-form>
-
+                  <el-input
+                      ref="verify"
+                      v-model="loginForm.verify"
+                      placeholder="请输入验证码"
+                      name="verify"
+                      type="text"
+                      tabindex="3"
+                      auto-complete="on"
+                      style="width: 150px"
+                      maxlength="4"
+                      @keyup.enter.native="handleLogin"
+                  />
+                </el-form-item>
+                <el-image :src="verifyImage" style="height: 52px;cursor: pointer;border-radius: 5px"
+                          @click="getVerify"/>
+              </div>
+              <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;height: 50px"
+                         @click.native.prevent="handleLogin">{{loginBtnText}}
+              </el-button>
             </div>
-            <div class="icp"><a href="http://beian.miit.gov.cn" target="_blank">{{webMiitbeian}}</a> | {{webCopyright}}</div>
-          </div>
+          </el-form>
         </div>
+        <div class="icp"><a href="http://beian.miit.gov.cn" target="_blank">{{webMiitbeian}}</a> | {{webCopyright}}</div>
+      </div>
+
     </div>
 </template>
 <script>
@@ -198,10 +186,7 @@
             height: 47px;
         }
     }
-    .logo{
-      width: 48px;
-      height: 48px;
-    }
+
     /* reset element-ui css */
     .login-container .el-input {
         display: inline-block;
@@ -219,28 +204,20 @@
         height: 47px;
         caret-color: #999;
     }
-    .login-layout .left{
-      position:relative;
-      width: 50%;
-      height: 100%;
-      margin-left: 150px;
-    }
-    .login-layout .left .ad{
-      width: 45%;
-    }
-    .login-layout .right{
-      position:relative;
-      width: 50%;
-      height: 100%;
+    .login-container .ad{
+      width: 480px;
+      height: 500px;
+      background: url("{:request()->domain()}/eadmin/login-ad.png") 50%;
+      overflow: hidden;
     }
     .login-container .el-form-item {
-        border: 1px solid #eeeeee;
+        border-bottom: 1px solid #eeeeee;
+        /*background: #f5f7fa;*/
+        /*border-radius: 5px;*/
         color: #454545;
     }
     .icp {
-        position: absolute;
-        bottom:10px;
-
+        text-align: center;
         width: 100%;
         color: #000;
         opacity: .5;
@@ -261,62 +238,36 @@
         background-position-x: -1920px;
       }
     }
-    .container{
-      position: relative;
-      width: 100%;
-      height: 100%;
-      min-height: 100%;
-      overflow: hidden;
-      background-color: #FFFFFF;
-    }
-    .container:before {
-        position: absolute;
-        top: 0;
-        left: 0;
+    .container {
+        min-height: 100%;
         width: 100%;
-        height: 100%;
-        margin-left: -48%;
-        background-image: url("{:request()->domain()}/eadmin/login-bg.b9f5c736.svg");
-        background-position: 100%;
-        background-repeat: no-repeat;
-        background-size: auto 100%;
-        content: "";
+        background: url("{:request()->domain()}/eadmin/loginbg.png") no-repeat;
+        background-color: #fff;
+        overflow: hidden;
+        align-items: center;
+        flex-direction: column;
+        -webkit-animation: bg-run 50s linear infinite;
+        animation: bg-run 50s linear infinite;
     }
-    .text-block{
-      margin-top: 30px;
-      font-size: 32px;
-      color:#FFFFFF;
-    }
-    .logo-container{
-      font-size: 24px;
-      color: #fff;
-      font-weight: 700;
-      position: relative;
-      top: 50px;
-      margin-left:20px;
-    }
-    .login-layout {
-      height: 100%;
-      display: flex;
-      position: relative;
-    }
-    .left-container{
+    .container-center{
+      width: 900px;
+      height: 500px;
+      max-width: 100%;
+      left:calc(50% - 450px);
+      top:calc(50% - 250px);
       position: absolute;
-      top:calc(50% - 100px);
-      left: 0;
-      right: 0;
-      bottom: 0;
+
     }
     .login-container {
-      width: 400px;
-      position: absolute;
-      top:calc(50% - 250px);
-      left:0;
-      right: 0;
-      bottom: 0;
+      background: #FFFFFF;
+      border-radius: 5px;
+      display: flex;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px 0 rgb(59 124 255 / 20%);
     }
     .login-container .login-form {
-
+      padding: 30px 35px 0;
+      flex: 1;
     }
 
     .login-container .tips {
@@ -330,9 +281,15 @@
         vertical-align: middle;
         display: inline-block;
     }
+
+    .login-container .title-container {
+        /*margin-top: 100px;*/
+    }
+
     .login-container .title-container .title {
         font-size: 26px;
-
+        /*color: #eee;*/
+        text-align: center;
         font-weight: bold;
     }
 
