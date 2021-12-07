@@ -232,8 +232,7 @@ class SidebarGrid extends Component
         //删除
         if(request()->has('eadmin_sidebar_delete')){
             $model = $this->model->find(request()->param('id'));
-
-            $model->delete();
+            $model->force(true)->delete();
             admin_success_message(admin_trans('admin.delete_complete'));
         }
         $data = $this->db->select()->toArray();
