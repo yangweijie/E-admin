@@ -148,12 +148,6 @@ class PlugService
                 'info' => $serviceProvider->getInfo(),
             ];
         }
-        $response = $this->client->post('verify', [
-            'form_params' => [
-                'domain' => request()->host(),
-                'plugs' => $data,
-            ]
-        ]);
         try {
             $response = $this->client->post('verify', [
                 'form_params' => [
@@ -179,7 +173,7 @@ class PlugService
      */
     public function getLogin($name){
         $file = $this->plugPathBase . DIRECTORY_SEPARATOR . $name.DIRECTORY_SEPARATOR.'logo.png';
-      
+
         if(is_file($file)){
             $content =  file_get_contents($file);
             return 'data:image/png;base64,' . base64_encode($content);
@@ -362,6 +356,7 @@ class PlugService
         $content = $response->getBody()->getContents();
         $res = json_decode($content, true);
         if ($res['code'] == 200) {
+            halt($res['data']['token']);
             Cache::set($this->loginToken, $res['data']['token'], 60 * 60 * 24);
             return true;
         } else {

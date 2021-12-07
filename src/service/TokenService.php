@@ -47,12 +47,14 @@ class TokenService
     public function init($type){
 
         $app = Admin::getAppName();
-        $type = config($app.'.token.default');
         if(empty($type)){
             $app = 'admin';
             $type = config($app.'.token.default');
         }
         $this->config = config($app.'.token.' . $type);
+        if(empty($this->config)){
+            $this->config = config('admin.token.' . $type);
+        }
         $this->key = substr(md5($this->config['key']), 8, 16);
         $this->model = $this->config['model'];
         $this->unique = $this->config['unique'];

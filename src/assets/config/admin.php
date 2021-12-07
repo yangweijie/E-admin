@@ -50,7 +50,7 @@ return [
             'model' => \app\model\User::class,
             //验证字段
             'auth_field' => [
-                'password123'
+                'password'
             ],
             //是否调试
             'debug' => env('AUTH.DEBUG', false),

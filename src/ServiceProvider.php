@@ -57,12 +57,12 @@ class ServiceProvider extends Service
         Admin::plug()->register();
         //视图路由
         Admin::registerRoute();
-
+        //加载语言
+        $this->language();
         //权限中间件
         $this->app->middleware->route(\Eadmin\middleware\Permission::class);
         $this->app->middleware->route(LoadLangPack::class);
-        //加载语言
-        $this->language();
+
     }
     protected function finderIn($path,$name = [],$type='directories'){
 
@@ -185,7 +185,7 @@ class ServiceProvider extends Service
                 FileService::instance()->clear();
             })->everyMinute();
         }catch (\Exception $exception){
-          
+
         }
     }
     public function boot()
