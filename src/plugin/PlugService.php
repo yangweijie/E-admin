@@ -359,7 +359,6 @@ class PlugService
         $content = $response->getBody()->getContents();
         $res = json_decode($content, true);
         if ($res['code'] == 200) {
-            halt($res['data']['token']);
             Cache::set($this->loginToken, $res['data']['token'], 60 * 60 * 24);
             return true;
         } else {
