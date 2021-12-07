@@ -206,8 +206,7 @@ PHP;
         if (!empty($menus)) {
             foreach ($menus as $key => $menu) {
                 if (isset($menu['pid'])) {
-                    $menu['pid'] = SystemMenu::where('mark', $this->getName())
-                        ->where('name', $menu['pid'])->value('id');
+                    $menu['pid'] = SystemMenu::where('name', $menu['pid'])->value('id');
                 }
                 if (!isset($menu['sort'])) {
                     $menu['sort'] = SystemMenu::max('sort') + 1;
