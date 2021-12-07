@@ -611,7 +611,6 @@ PHP;
         $filesystem->remove($path);
         Db::name('system_menu')->where('mark', $name)->delete();
         Db::name('system_config')->where('mark', $name)->delete();
-        Db::name('system_config_cate')->where('mark', $name)->delete();
         return true;
     }
 }
