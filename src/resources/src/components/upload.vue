@@ -284,7 +284,11 @@ export default defineComponent({
         instance.parent.provides.elFormItem.formItemMitt?.emit('el.form.change', [val])
       }
       state.inputValue = val.join(',')
-      ctx.emit('update:modelValue', val)
+      if(props.multiple){
+        ctx.emit('update:modelValue', val)
+      }else{
+        ctx.emit('update:modelValue', state.inputValue)
+      }
     },{deep:true})
     watch(()=>props.modelValue,val=>{
       if (typeof val === 'string') {

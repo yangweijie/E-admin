@@ -593,8 +593,10 @@ PHP;
         $except[] = $name;
         foreach ($plugs as $plug) {
             if (in_array($plug,$except)) continue;
-            $info = $this->info($plug);
-            $requires = array_merge($requires, array_keys($info['plugin']));
+            if($this->isInstall($plug)){
+                $info = $this->info($plug);
+                $requires = array_merge($requires, array_keys($info['plugin']));
+            }
         }
         $info = $this->info($name);
         $requires = array_diff(array_keys($info['plugin']), $requires);
