@@ -201,6 +201,9 @@ class PlugService
     protected function valid($info)
     {
         $response = $this->client->post('valid', [
+            'headers' => [
+                'Authorization' => self::token()
+            ],
             'form_params' => [
                 'info' => $info,
             ]
@@ -598,19 +601,21 @@ PHP;
                 $requires = array_merge($requires, array_keys($info['plugin']));
             }
         }
-        $info = $this->info($name);
-        $requires = array_diff(array_keys($info['plugin']), $requires);
+        if($this->isInstall($name)){
+            $info = $this->info($name);
+            $requires = array_diff(array_keys($info['plugin']), $requires);
 
-        //卸载依赖插件
-        foreach ($requires as $require) {
-            $this->uninstall($require,$except);
+            //卸载依赖插件
+            foreach ($requires as $require) {
+                $this->uninstall($require,$except);
+            }
+            $path = $this->plugPathBase . '/' . $name;
+            $this->dataMigrate('rollback', $path);
+            $filesystem = new \Symfony\Component\Filesystem\Filesystem;
+            $filesystem->remove($path);
+            Db::name('system_menu')->where('mark', $name)->delete();
+            Db::name('system_config')->where('mark', $name)->delete();
         }
-        $path = $this->plugPathBase . '/' . $name;
-        $this->dataMigrate('rollback', $path);
-        $filesystem = new \Symfony\Component\Filesystem\Filesystem;
-        $filesystem->remove($path);
-        Db::name('system_menu')->where('mark', $name)->delete();
-        Db::name('system_config')->where('mark', $name)->delete();
         return true;
     }
 }
