@@ -4,7 +4,6 @@
           <div class="left">
               <div class="logo-container">
                 <img :src="webLogo" class="logo" v-if="webLogo" />
-                {{webName}}
               </div>
              <div class="left-container">
                <img src="{:request()->domain()}/eadmin/login-box-bg.9027741f.svg" class="ad">
@@ -199,8 +198,7 @@
         }
     }
     .logo{
-      width: 48px;
-      height: 48px;
+     
     }
     /* reset element-ui css */
     .login-container .el-input {
