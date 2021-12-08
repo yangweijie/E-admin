@@ -102,7 +102,7 @@ return [
         'default' => 'amap',
         //高德地图key
         'amap' => [
-            'api_key' => '7b89e0e32dc5eb583c067edb5491c4d3'
+            'api_key' => ''
         ],
     ],
     //开关顶部菜单

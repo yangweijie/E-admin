@@ -165,7 +165,7 @@ class Admin extends Controller
         return Form::create(new $model, function (Form $form) {
             $userInput = $form->text('username', admin_trans('admin.fields.username'))->rule([
                 'chsDash' => admin_trans('admin.username_validate'),
-                'unique:system_user' => admin_trans('admin.username_exist')
+                'unique:' . config('admin.database.user_model') => admin_trans('admin.username_exist')
             ])->required();
             if ($form->isEdit()) {
                 $userInput->disabled();
@@ -179,7 +179,7 @@ class Admin extends Controller
             }
             $form->mobile('phone', admin_trans('admin.fields.phone'))
                 ->rule([
-                    'unique:' . config('admin.database.system_user_table') => admin_trans('admin.phone_exist')
+                    'unique:'  . config('admin.database.user_model') => admin_trans('admin.phone_exist')
                 ]);
             $form->text('mail', admin_trans('admin.fields.mail'))->rule([
                 'email' => admin_trans('admin.please_email'),
@@ -243,7 +243,7 @@ class Admin extends Controller
             $form->text('phone', admin_trans('admin.fields.phone'))
                 ->rule([
                     'mobile' => admin_trans('admin.please_phone'),
-                    'unique:' . config('admin.database.system_user_table') => admin_trans('admin.phone_exist')
+                    'unique:' . config('admin.database.user_model') => admin_trans('admin.phone_exist')
                 ]);
             $form->text('mail', admin_trans('admin.fields.mail'))->rule([
                 'email' => admin_trans('admin.please_email'),
