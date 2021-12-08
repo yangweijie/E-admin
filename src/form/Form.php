@@ -365,6 +365,7 @@ class Form extends Component
         }
 
         foreach ($component->bindAttribute as $attr => $field) {
+
             $value = $this->drive->getData($field, $data);
             $defaultValue = $component->getDefault();
             $componentValue = $component->getValue();
@@ -678,11 +679,15 @@ class Form extends Component
                 $pk = $data->getPk();
                 $this->data[$pk] = $data[$pk];
             }
+
             $manyData[] = $this->data;
             $this->data = [];
         }
-
-        $manyItem->default($manyData);
+        if(empty($datas)){
+            $manyItem->default($manyData);
+        }else{
+            $manyItem->value($manyData);
+        }
         $this->itemComponent = $originItemComponent;
         $columns = [];
         foreach ($formItems as $item) {

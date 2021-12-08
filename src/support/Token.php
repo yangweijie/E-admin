@@ -17,7 +17,7 @@ use think\Model;
  * @method bool set($token) static 设置token
  * @method bool get() static 获取token
  * @method bool logout($token) static 退出token
- * @method bool clear($token) static 清除token
+ * @method bool clear() static 清除token
  * @method Model user($lock=false) static 获取用户模型
  */
 class Token extends Facade
