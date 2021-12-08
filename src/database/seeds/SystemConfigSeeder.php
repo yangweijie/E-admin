@@ -23,7 +23,7 @@ class SystemConfigSeeder extends Seeder
             1 =>
                 array(
                     'name' => 'system_web_logo',
-                    'value' => 'https://www.ex-admin.com/cms/logo.jpg',
+                    'value' => 'https://www.ex-admin.com/cms/logo.png',
                 ),
             2 =>
                 array(
