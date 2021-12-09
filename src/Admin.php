@@ -199,7 +199,7 @@ class Admin
 
     public static function token()
     {
-        return new TokenService();
+        return new TokenService('admin');
     }
 
     /**
