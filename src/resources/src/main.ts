@@ -35,3 +35,4 @@ app.config.globalProperties.$script = loadScript
 app.config.globalProperties.$request = request
 app.config.globalProperties.$action = action
 app.mount('#app')
+window['action'] = action

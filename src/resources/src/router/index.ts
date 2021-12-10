@@ -13,7 +13,7 @@ import {nextTick} from "q";
 let asyncCmponent:any
 const routes = [
     {
-        path: '/'+state.app+'/login',
+        path: '/login',
         component: Login,
     },
     // {
@@ -40,8 +40,9 @@ router.beforeEach( async(to:RouteLocationNormalized, from:RouteLocationNormalize
     if(to.path == '/generate'){
         return next()
     }
-    if(!localStorage.getItem(state.app + '_eadmin_token') && to.path !== '/' + state.app +'/login'){
-        return next('/' + state.app + '/login?redirect='+to.fullPath)
+    action.multiAppInit()
+    if(!localStorage.getItem(state.app + '_eadmin_token') && to.path !== '/login'){
+        return next('/login?redirect='+to.fullPath)
     }
     if(!state.info.id && localStorage.getItem(state.app + '_eadmin_token')){
         await action.getInfo()
@@ -74,7 +75,9 @@ router.afterEach((to:RouteLocationNormalized)=>{
 })
 function loadComponent(url:string){
     delete app._context.components[url]
-
+    if(url.indexOf('/login') === 0){
+        url = url.replace('/login','/'+state.app + '/login')
+    }
     return new Promise((resolve, reject) =>{
         request({
             url:url

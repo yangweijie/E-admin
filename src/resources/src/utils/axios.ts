@@ -21,6 +21,7 @@ service.interceptors.request.use(
         // ['X-Token'] is a custom headers key
         // please modify it according to the actual situation
         config.headers['Authorization'] = localStorage.getItem(state.app + '_eadmin_token')
+        config.headers['multi-app'] = state.app
         return config
     },
     (error: any) => {
@@ -42,7 +43,8 @@ service.interceptors.response.use(
         * Here is just an example
         * You can also judge the status by HTTP Status Code
         */
-       response: { data: any }) => {
+       response: { data: any ,headers: any }) => {
+        action.setMultiApp(response.headers['multi-app'])
         const res = response.data
         const token_expire = localStorage.getItem(state.app + '_eadmin_token_expire')
         if(token_expire){
@@ -65,7 +67,7 @@ service.interceptors.response.use(
                     type: 'error',
                     duration: 1000,
                     onClose: function () {
-                        if (location.href.indexOf('/#/'+state.app+'/login') === -1) {
+                        if (location.href.indexOf('/#/login') === -1) {
                             location.href = location.protocol + '//' +location.host + '/' + res.data.multi_app + '/' + location.hash
                         }
                     }

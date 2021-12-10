@@ -180,7 +180,7 @@
             //退出登录
             function logout() {
                 action.logout().then(res=>{
-                    router.push(`/${state.app}/login?redirect=${route.fullPath}`)
+                    router.push(`/login?redirect=${route.fullPath}`)
                 })
             }
             //刷新

@@ -51,11 +51,22 @@ const states = reactive({
     gridActivatedRefresh:true,
     gridFirst:true,
     lang:{},
-    app:Cookies.get('multi-app') || 'admin',
+    app:'',
 });
 export const state = states
 //操作方法
 const action = {
+    multiAppInit(){
+        if(!state.app){
+            this.setMultiApp(window['multiApp'])
+        }
+    },
+    setMultiApp(name){
+        if(name == "{$multiApp|default='admin'}"){
+            name = 'admin'
+        }
+        state.app = name
+    },
     //切换主题
     changeTheme(theme){
         if(state.theme == 'light'){
@@ -262,6 +273,7 @@ const action = {
     },
     logout() {
         return new Promise((resolve, reject) => {
+            console.log(state.app)
             request({
                 url: '/' + states.app + '/login/logout'
             }).then((res: any) => {
