@@ -61,6 +61,8 @@ class ServiceProvider extends Service
         $this->language();
         //权限中间件
         $this->app->middleware->route(\Eadmin\middleware\Permission::class);
+
+        $this->app->middleware->route(\Eadmin\middleware\MultiApp::class);
         $this->app->middleware->route(LoadLangPack::class);
 
     }
