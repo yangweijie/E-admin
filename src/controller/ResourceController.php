@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace Eadmin\controller;
 
+use Eadmin\Admin;
 use Eadmin\Controller;
 use think\Request;
 
@@ -108,7 +109,7 @@ class ResourceController extends Controller
         $class = explode('\\',$class);
         $controller = end($class);
         $app = request()->param('eadmin_app','');
-        app('http')->name($app);
+        app('http')->name(Admin::getAppName());
         app()->setNamespace("app\\".$app);
         $this->request->setController($controller);
         $actionName = $reflect->getName();

@@ -254,6 +254,13 @@ const action = {
             })
         })
     },
+    getVerify(){
+        return new Promise((resolve, reject) => {
+            request(states.app + '/system/verify').then(res => {
+                resolve(res)
+            })
+        })
+    },
     login(data: object) {
         return new Promise((resolve, reject) => {
             request({

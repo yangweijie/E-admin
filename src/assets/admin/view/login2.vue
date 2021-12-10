@@ -139,7 +139,7 @@ export default {
   },
   methods: {
     getVerify() {
-      this.$request('admin/system/verify').then(res => {
+      this.$action.getVerify().then(res => {
         this.verifyImage = res.data.image
         this.loginForm.hash = res.data.hash
         this.verifyMode = res.data.mode

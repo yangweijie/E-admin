@@ -282,8 +282,8 @@ class Admin
                 $pathinfo = array_filter(explode('/', $path));
                 $name = current($pathinfo);
                 if (empty(app('http')->getName())) {
-                    app('http')->name('admin');
-                    app()->setNamespace("app\\admin");
+                    app('http')->name(Admin::getAppName());
+                    app()->setNamespace("app\\".Admin::getAppName());
                 }
                 if ($name == app('http')->getName()) {
                     array_shift($pathinfo);
@@ -364,16 +364,20 @@ class Admin
     {
         $name = app('http')->getName();
         if (!empty($name)) {
+            $map = config('app.app_map', []);
+            $mapName = array_search($name,$map);
+            if ($mapName !== false) {
+                $config = config($name);
+                \think\facade\Config::set($config,$mapName);
+                return $mapName;
+            }
             return $name;
         }
-        $referer = app()->request->server('HTTP_REFERER');
-        if(!empty($referer)){
-            $pathinfo = pathinfo($referer);
-            if(isset($pathinfo['basename'])){
-                return $pathinfo['basename'];
-            }
+        $name = app()->request->header('multi-app');
+        if(!empty($name)){
+            return $name;
         }
-        return 'admin';
+        return $name;
     }
 
     /**

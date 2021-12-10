@@ -144,11 +144,11 @@
         },
         methods: {
             getVerify() {
-                this.$request('admin/system/verify').then(res => {
-                    this.verifyImage = res.data.image
-                    this.loginForm.hash = res.data.hash
-                    this.verifyMode = res.data.mode
-                })
+              this.$action.getVerify().then(res => {
+                this.verifyImage = res.data.image
+                this.loginForm.hash = res.data.hash
+                this.verifyMode = res.data.mode
+              })
             },
             inputFocus(mark) {
                 this.inputFocusIndex = mark
