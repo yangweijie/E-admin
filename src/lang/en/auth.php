@@ -14,6 +14,7 @@ return [
         'name'=>'name',
         'desc'=>'description',
         'status'=>'status',
+        'sort' => 'sort',
     ],
     'options'=>[
         'databackup_on'=>[

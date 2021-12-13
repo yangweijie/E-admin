@@ -39,7 +39,18 @@ class Transfer extends Field
      */
     public function options($data)
     {
-        $this->attr('data', $data);
+        if(count($data) == count($data,1)){
+            foreach ($data as $id => $label) {
+                $options[] = [
+                    'id' => $id,
+                    'label' => $label,
+                    'disabled' => false,
+                ];
+            }
+        }else{
+            $options = $data;
+        }
+        $this->attr('data', $options);
         return $this;
     }
 }

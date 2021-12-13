@@ -44,7 +44,9 @@ service.interceptors.response.use(
         * You can also judge the status by HTTP Status Code
         */
        response: { data: any ,headers: any }) => {
-        action.setMultiApp(response.headers['multi-app'])
+        if(response.headers['multi-app']){
+            action.setMultiApp(response.headers['multi-app'])
+        }
         const res = response.data
         const token_expire = localStorage.getItem(state.app + '_eadmin_token_expire')
         if(token_expire){

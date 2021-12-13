@@ -373,7 +373,7 @@ class Admin
             }
             return $name;
         }
-        $name = app()->request->header('multi-app');
+        $name = app()->request->header('multi-app','admin');
         if(!empty($name)){
             return $name;
         }

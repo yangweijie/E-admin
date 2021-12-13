@@ -73,10 +73,12 @@ class Auth extends Controller
         $model = config('admin.database.auth_model');
         return Form::create(new $model, function (Form $form) use($model){
             $options = $model::field('id,name,pid')->select()->toArray();
+            $form->hidden('admin_id')->default(Admin::id());
             $form->select('pid',admin_trans('auth.parent'))
                 ->treeOptions($options);
             $form->text('name', admin_trans('auth.fields.name'))->required();
             $form->textarea('desc', admin_trans('auth.fields.desc'))->rows(4)->required();
+            $form->number('sort', admin_trans('auth.fields.sort'))->default($model::max('sort')+1);
         });
     }
     /**

@@ -104,6 +104,13 @@ class NodeService
      */
     protected function parse($files)
     {
+        $nodeIds = [];
+        if(config('admin.admin_auth_id') != Admin::id()){
+            $userAuthModel = config(Admin::getAppName().'.database.user_auth_model');
+            $auth_ids = $userAuthModel::where('user_id', Admin::id())->column('auth_id');
+            $authNodeModel = config(Admin::getAppName().'.database.auth_node_model');
+            $nodeIds = $authNodeModel::whereIn('auth_id', $auth_ids)->column('node_id');
+        }
         $data = [];
         $rules = app()->route->getRuleList();
         foreach ($files as $key => $item) {
@@ -112,6 +119,7 @@ class NodeService
             if (!empty($item['module'])) {
                 $moduleName = $item['module'];
             }
+
             $namespace = $item['namespace'];
             $plug = $item['plug'] ?? false;
             $class = new \ReflectionClass($namespace);
@@ -124,6 +132,7 @@ class NodeService
                     $title = $controller;
                 }
             }
+
             $this->treeArr[$moduleName]['children'][$key] = [
                 'label' => $title,
                 'id' => md5($namespace),
@@ -138,6 +147,7 @@ class NodeService
                     $reflectionNamedType = $method->getReturnType();
                     if ($res !== false) {
                         list($title, $auth, $login,$authPlug) = $res;
+                        $id = md5($namespace . $action . 'get');
                         $nodeData = [
                             'label' => $title,
                             'class' => $namespace,
@@ -145,7 +155,7 @@ class NodeService
                             'is_auth' => $auth,
                             'is_login' => $login,
                             'method' => 'get',
-                            'id' => md5($namespace . $action . 'get'),
+                            'id' => $id,
                         ];
                         if ($auth && $authPlug) {
                             if ($reflectionNamedType && $reflectionNamedType->getName() == 'Eadmin\form\Form') {
@@ -153,22 +163,31 @@ class NodeService
                                 $nodeData['label'] = $label . '添加';
                                 $nodeData['method'] = 'post';
                                 $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                $data[] = $nodeData;
-                                $methodNode[] = $nodeData;
+                                if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id()) {
+                                    $data[] = $nodeData;
+                                    $methodNode[] = $nodeData;
+                                }
+
                                 $nodeData['label'] = $label . '修改';
                                 $nodeData['method'] = 'put';
                                 $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                $data[] = $nodeData;
-                                $methodNode[] = $nodeData;
+                                if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id()) {
+                                    $data[] = $nodeData;
+                                    $methodNode[] = $nodeData;
+                                }
                             } else {
-                                $data[] = $nodeData;
-                                $methodNode[] = $nodeData;
+                                if(in_array($id,$nodeIds) || config('admin.admin_auth_id') == Admin::id()){
+                                    $data[] = $nodeData;
+                                    $methodNode[] = $nodeData;
+                                }
                                 if ($reflectionNamedType && $reflectionNamedType->getName() == 'Eadmin\grid\Grid') {
                                     $nodeData['label'] = '删除';
                                     $nodeData['method'] = 'delete';
                                     $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                    $data[] = $nodeData;
-                                    $methodNode[] = $nodeData;
+                                    if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id()) {
+                                        $data[] = $nodeData;
+                                        $methodNode[] = $nodeData;
+                                    }
                                 }
                             }
                         }

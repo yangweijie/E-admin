@@ -95,7 +95,7 @@ class Menu extends Controller
             $form->text('name', admin_trans('menu.fields.name'))->required();
             $form->text('url', admin_trans('menu.fields.url'));
             $form->icon('icon', admin_trans('menu.fields.icon'));
-            $form->number('sort', admin_trans('menu.fields.sort'))->default(SystemMenu::where('pid',$pid)->max('sort')+1);
+            $form->number('sort', admin_trans('menu.fields.sort'))->default($model::where('pid',$pid)->max('sort')+1);
         });
     }
 }

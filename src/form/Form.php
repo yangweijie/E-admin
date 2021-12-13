@@ -765,7 +765,7 @@ class Form extends Component
                 $component->showPassword();
             }
         }
-        if ($name == 'cascader') {
+        if (method_exists($component, 'bindFields')) {
             $component = $class::create();
             $component->attr('bindFields', $arguments);
             $component->bindFields($arguments);

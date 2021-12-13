@@ -40,6 +40,7 @@ class Admin extends Controller
     {
         $model = config('admin.database.user_model');
         return Grid::create(new $model, function (Grid $grid) {
+            $grid->model()->when(config('admin.admin_auth_id') != \Eadmin\Admin::id(),[['id','<>',config('admin.admin_auth_id')]]);
             $grid->title(admin_trans('admin.system_user'));
             $grid->userInfo('avatar', 'nickname', admin_trans('admin.fields.avatar'));
             $grid->column('username', admin_trans('admin.fields.username'))->display(function ($val, $data) {

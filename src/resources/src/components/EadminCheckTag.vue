@@ -1,16 +1,17 @@
 <template>
-    <el-check-tag style="margin-right: 8px;"
-                  v-for="option in options" :key="option"
-                  :checked="isSelect(option.value)"
-                  @change="checked => handleChange(option.value, checked)"
-    >
+    <div ref="checkTag">
+      <el-check-tag style="margin-right: 8px;"
+                    v-for="option in options" :key="option"
+                    :checked="isSelect(option.value)"
+                    @change="checked => handleChange(option.value, checked)"
+      >
         {{ option.label }}
-    </el-check-tag>
+      </el-check-tag>
+    </div>
 </template>
 
 <script>
     import {defineComponent, ref, watch} from "vue";
-
     export default defineComponent({
         name: "EadminCheckTag",
         props: {
@@ -22,9 +23,11 @@
         emits: ['update:modelValue'],
         setup(props,ctx){
             const value = ref(props.modelValue)
+            const checkTag = ref()
             if(props.multiple && !Array.isArray(value.value)){
                 value.value = []
             }
+
             watch(() => props.modelValue, val => {
 
                 value.value = val
@@ -32,6 +35,7 @@
             watch(value, value => {
                 ctx.emit('update:modelValue', value)
             },{deep:true})
+
             //标签是否选择
             function isSelect(selectValue){
                 if(props.multiple){
@@ -73,6 +77,7 @@
                 }
             }
             return {
+                checkTag,
                 isSelect,
                 handleChange
             }

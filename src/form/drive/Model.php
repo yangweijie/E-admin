@@ -91,7 +91,7 @@ class Model implements FormInterface
                                 $deleteIds = array_diff($deleteIds, $realtionUpdateIds);
                             }
                             if (count($deleteIds) > 0) {
-                                $result = $this->model->$field()->whereIn($this->pkField, $deleteIds)->delete();
+                                $result = $this->model->$field()->whereIn($this->pkField, $deleteIds)->removeOption('soft_delete')->delete();
                             }
                         }
                         $foreignKey = $this->model->$field()->getForeignKey();

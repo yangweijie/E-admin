@@ -30,6 +30,7 @@ class CreateSystemAuth extends Migrator
     {
         $table = $this->table('system_auth', ['engine' => 'InnoDB', 'collation' => 'utf8mb4_unicode_ci'])->setComment('系统-权限');
         $table->addColumn(Column::integer('pid')->setDefault(0)->setComment('上级id'));
+        $table->addColumn(Column::integer('admin_id')->setDefault(0)->setComment('创建人id'));
         $table->addColumn(Column::string('name', 20)->setDefault('')->setComment('权限角色名称'));
         $table->addColumn(Column::boolean('status')->setDefault(1)->setComment('权限角色状态'));
         $table->addColumn(Column::bigInteger('sort')->setDefault(0)->setComment('排序'));

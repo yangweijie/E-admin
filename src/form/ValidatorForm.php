@@ -100,8 +100,6 @@ class ValidatorForm
                 $this->updateRules['msg'] = array_merge_recursive($this->updateRules['msg'], $msg);
                 break;
         }
-
-
     }
 
     /**
@@ -125,7 +123,7 @@ class ValidatorForm
                 $rule[] = $value;
             } else {
                 $rule[] = $key;
-                list($validateField,$label) = explode('|',$msgKey);
+                list($validateField, $label) = explode('|', $msgKey);
                 $ruleMsg[$validateField] = $value;
             }
         }
@@ -156,14 +154,22 @@ class ValidatorForm
 
         if ($type == 1) {
             //新增
-            $validate = Validate::rule($this->createRules['rule'])->message($this->createRules['msg']);
             $rules = $this->createRules['rule'];
+            $msgs = $this->createRules['msg'];
         } else {
             //更新
-            $validate = Validate::rule($this->updateRules['rule'])->message($this->updateRules['msg']);
             $rules = $this->updateRules['rule'];
+            $msgs = $this->createRules['msg'];
         }
-
+        foreach ($rules as &$rule) {
+            $rule = array_unique($rule);
+        }
+        foreach ($msgs as &$msg) {
+            if (is_array($msg)) {
+                $msg = array_unique($msg);
+            }
+        }
+        $validate = Validate::rule($rules)->message($msgs);
         foreach ($data as $field => $arr) {
             if (is_array($arr) && count($arr) != count($arr, 1)) {
                 $validateFields = [];

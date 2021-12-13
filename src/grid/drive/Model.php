@@ -263,9 +263,11 @@ class Model implements GridInterface
             $res = Db::execute("update {$this->model->getTable()} inner join {$sortSql} a on a.{$pk}={$this->model->getTable()}.{$pk} set {$this->sortField}=a.rownum");
             admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.sort_success'));
         } else {
-            return $this->model->when(property_exists($this->model, 'withTrashed'),function ($query){
-                $query->withTrashed();
-            })->strict(false)->whereIn($pk, $ids)->update($data);
+            if(property_exists($this->model, 'withTrashed')){
+                $this->model->withTrashed()->strict(false)->whereIn($pk, $ids)->update($data);
+            }else{
+                $this->model->strict(false)->whereIn($pk, $ids)->update($data);
+            }
         }
     }
 

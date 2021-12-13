@@ -236,11 +236,11 @@ class SidebarGrid extends Component
             admin_success_message(admin_trans('admin.delete_complete'));
         }
         $data = $this->db->select()->toArray();
+
         if ($this->treePid) {
             $data = Admin::tree($data, $this->treeId, $this->treePid);
-        }else{
-            $this->sidebar->attr('dataSource',$data);
         }
+        $this->sidebar->attr('source',$data);
         //加载数据
         if(request()->has('eadmin_sidebar_data')){
 

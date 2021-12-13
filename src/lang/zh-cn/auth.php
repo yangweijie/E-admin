@@ -14,6 +14,7 @@ return [
         'name'=>'名称',
         'desc'=>'描述',
         'status'=>'状态',
+        'sort'=>'排序',
     ],
     'options'=>[
         'databackup_on'=>[

@@ -58,7 +58,7 @@
                 type: String,
                 default:'group_id',
             },
-            dataSource :{
+            source :{
               type: Array,
               default:[],
             },
@@ -71,9 +71,8 @@
                 current:props.defaultValue,
                 keyword:'',
                 editUrl:'',
-                dataSource: props.dataSource,
+                dataSource: JSON.parse(JSON.stringify(props.source)),
             })
-
             if(!props.hideAll){
                 const all = {}
                 all[props.tree.attribute.nodeKey] = ''
@@ -131,7 +130,7 @@
             }
             const treeData = computed(()=>{
                 const data =  filterTree(state.dataSource)
-                ctx.emit('update:dataSource',data)
+                ctx.emit('update:source',data)
                 return data
             })
             function getData() {
