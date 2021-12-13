@@ -87,7 +87,7 @@ class Menu extends Controller
     public function form($pid=0): Form
     {
         $model = config('admin.database.menu_model');
-        return Form::create(new $model,function (Form $form) use($pid){
+        return Form::create(new $model,function (Form $form) use($pid,$model){
             $menus = Admin::menu()->listOptions();
             $form->select('pid', admin_trans('menu.fields.pid'))->default($pid)
                 ->options([0 => admin_trans('menu.fields.top')] + array_column($menus, 'label', 'id'))
