@@ -192,6 +192,7 @@ class Admin extends Controller
                 $form->tree('roles','访问权限')
                     ->data($auths)
                     ->showCheckbox()
+                    ->checkStrictly()
                     ->defaultExpandAll()
                     ->props(['children' => 'children', 'label' => 'name']);
             }

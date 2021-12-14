@@ -21,6 +21,7 @@ use Eadmin\component\form\Field;
  * @method $this expandOnClickNode(bool $bool = true) 是否在点击节点的时候展开或者收缩节点， 默认值为 true，如果为 false，则只有点箭头图标的时候才会展开或者收缩节点
  * @method $this highlightCurrent(bool $bool = true) 是否高亮当前选中节点
  * @method $this showCheckbox(bool $bool = true) 节点是否可被选择
+ * @method $this checkStrictly(bool $bool = true) 在显示复选框的情况下，是否严格的遵循父子不互相关联的做法，默认为 false
  * @method $this horizontal(bool $bool = true) 横向
  */
 class Tree extends Field
