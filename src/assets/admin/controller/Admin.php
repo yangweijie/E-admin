@@ -62,7 +62,8 @@ class Admin extends Controller
                 $dropdown = $action->dropdown();
                 if ($data['id'] == config('admin.admin_auth_id') || $data['id'] == \Eadmin\Admin::id()) {
                     $action->hideDel();
-                }else{
+                }
+                if ($data['id'] != config('admin.admin_auth_id')){
                     $dropdown
                         ->prepend(admin_trans('auth.data_grant'),'fa fa-database')
                         ->dialog()

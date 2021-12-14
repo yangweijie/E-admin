@@ -1,6 +1,8 @@
 <?php
 {%namespace%}
 return [
+    //超级管理员id
+    'admin_auth_id' => 1,
     //权限模块
     'authModule' => [
         '{%name%}' => '系统模块',

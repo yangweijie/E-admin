@@ -61,7 +61,7 @@ class Model implements GridInterface
                 $this->db = $this->model->onlyTrashed();
             }
         }else{
-            $this->db = $this->db->removeOption('soft_delete',$this->softDeleteField);
+            $this->db = $this->db->removeOption('soft_delete');
         }
     }
 
@@ -289,7 +289,7 @@ class Model implements GridInterface
         $res        = true;
         Db::startTrans();
         try {
-            $this->db->removeWhereField($this->softDeleteField);
+            $this->db->removeOption('soft_delete');
             if ($ids === true) {
                 if ($this->isSotfDelete && !$trueDelete) {
                     $res = $this->db->where('1=1')->update([$this->softDeleteField => time()]);
@@ -345,7 +345,7 @@ class Model implements GridInterface
                         foreach ($deleteData as $data) {
                             $data->$relation()->detach();
                         }
-                    } elseif ($this->model->$relation() instanceof HasOne) {
+                    } elseif ($this->model->$relation() instanceof HasOne || $this->model->$relation() instanceof morphOne) {
                         foreach ($deleteData as $data) {
                             if (!is_null($data->$relation)) {
                                 $data->$relation->force()->delete();

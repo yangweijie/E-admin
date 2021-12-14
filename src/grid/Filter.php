@@ -759,7 +759,7 @@ class Filter
                     call_user_func($callback, $this->relationModel);
                 }
                 $tmpDb = clone $this->relationModel->db();
-                $relationSql = $tmpDb->removeWhereField('delete_time')->buildSql();
+                $relationSql = $tmpDb->removeOption('soft_delete')->buildSql();
                 $res = strpos($relationSql, 'WHERE');
                 if ($relation instanceof HasMany) {
                     $sql = $this->relationModel->db()->whereRaw("{$relation_table}.{$foreignKey}={$this->db->getTable()}.{$pk}")->buildSql();

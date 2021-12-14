@@ -177,7 +177,7 @@ class Admin
         } else {
             $nodeIds = [];
         }
-        if (self::id() != config('admin.admin_auth_id')) {
+        if (self::id() !=  config(Admin::getAppName().'.admin_auth_id')) {
             foreach ($nodes as $key => &$node) {
                 if (!in_array($node['id'], $nodeIds)) {
                     $node['is_auth'] = false;

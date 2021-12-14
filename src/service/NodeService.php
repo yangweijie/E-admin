@@ -28,15 +28,12 @@ class NodeService
 
     public function all()
     {
-
         if (app()->cache->has($this->cacheKey) && !env('APP_DEBUG')) {
-
             return app()->cache->get($this->cacheKey);
         } else {
             $files = $this->getControllerFiles();
             $data = $this->parse($files);
             app()->cache->set($this->cacheKey, $data);
-
             return $data;
         }
     }
@@ -45,7 +42,7 @@ class NodeService
     public function tree()
     {
         $files = $this->getControllerFiles();
-        $this->parse($files);
+        $this->parse($files,true);
         $data = [];
         foreach ($this->treeArr as $tree) {
             $data[] = $tree;
@@ -100,12 +97,13 @@ class NodeService
     /**
      * 解析控制器文件返回权限节点
      * @param $files
+     * @param $is_auth
      * @throws \ReflectionException
      */
-    protected function parse($files)
+    protected function parse($files,$is_auth = false)
     {
         $nodeIds = [];
-        if(config('admin.admin_auth_id') != Admin::id()){
+        if(config('admin.admin_auth_id') != Admin::id() && $is_auth){
             $userAuthModel = config(Admin::getAppName().'.database.user_auth_model');
             $auth_ids = $userAuthModel::where('user_id', Admin::id())->column('auth_id');
             $authNodeModel = config(Admin::getAppName().'.database.auth_node_model');
@@ -163,7 +161,7 @@ class NodeService
                                 $nodeData['label'] = $label . '添加';
                                 $nodeData['method'] = 'post';
                                 $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id()) {
+                                if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
                                     $data[] = $nodeData;
                                     $methodNode[] = $nodeData;
                                 }
@@ -171,12 +169,12 @@ class NodeService
                                 $nodeData['label'] = $label . '修改';
                                 $nodeData['method'] = 'put';
                                 $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id()) {
+                                if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
                                     $data[] = $nodeData;
                                     $methodNode[] = $nodeData;
                                 }
                             } else {
-                                if(in_array($id,$nodeIds) || config('admin.admin_auth_id') == Admin::id()){
+                                if(in_array($id,$nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth){
                                     $data[] = $nodeData;
                                     $methodNode[] = $nodeData;
                                 }
@@ -184,7 +182,7 @@ class NodeService
                                     $nodeData['label'] = '删除';
                                     $nodeData['method'] = 'delete';
                                     $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                    if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id()) {
+                                    if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
                                         $data[] = $nodeData;
                                         $methodNode[] = $nodeData;
                                     }
@@ -201,6 +199,7 @@ class NodeService
             }
             $this->treeArr[$moduleName]['children'] = array_values($this->treeArr[$moduleName]['children']);
         }
+
         return $data;
     }
 

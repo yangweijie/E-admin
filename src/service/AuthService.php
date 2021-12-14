@@ -13,22 +13,30 @@ use think\Model;
 class AuthService
 {
     public function checkDataAuth(array $fields,Query  $query){
-        if(Admin::id() && count($fields) > 0){
+        if(Admin::id() && config(Admin::getAppName().'.admin_auth_id') != Admin::id() && count($fields) > 0){
             $auth_ids = Db::name('SystemUserAuth')
                 ->where('user_id',Admin::id())
+                ->cache(2)
                 ->column('auth_id');
             //权限-数据权限
+
             //组织
             $groupIds = Db::name('SystemAuthData')
                 ->where('auth_type',1)
                 ->whereIn('auth_id',$auth_ids)
-                ->where('data_type',1)->column('data_id');
+                ->where('data_type',1)
+                ->cache(2)
+                ->column('data_id');
             $groupUserIds = Db::name('SystemUserAuth')
-                ->whereIn('auth_id',$groupIds)->column('user_id');
+                ->whereIn('auth_id',$groupIds)
+                ->cache(2)
+                ->column('user_id');
             //个人
             $userIds = Db::name('SystemAuthData')->where('auth_type',1)
                 ->whereIn('auth_id',$auth_ids)
-                ->where('data_type',2)->column('data_id');
+                ->where('data_type',2)
+                ->cache(2)
+                ->column('data_id');
             $userAuthIds = array_merge($groupUserIds,$userIds);
             //个人-数据权限
 
@@ -36,13 +44,19 @@ class AuthService
             $groupIds = Db::name('SystemAuthData')
                 ->where('auth_type',2)
                 ->where('auth_id',Admin::id())
-                ->where('data_type',1)->column('data_id');
+                ->where('data_type',1)
+                ->cache(2)
+                ->column('data_id');
             $groupUserIds = Db::name('SystemUserAuth')
-                ->whereIn('auth_id',$groupIds)->column('user_id');
+                ->whereIn('auth_id',$groupIds)
+                ->cache(2)
+                ->column('user_id');
             //个人
             $userIds = Db::name('SystemAuthData')->where('auth_type',2)
                 ->where('auth_id',Admin::id())
-                ->where('data_type',2)->column('data_id');
+                ->where('data_type',2)
+                ->cache(2)
+                ->column('data_id');
             $userAuthIds = array_merge($userAuthIds,$groupUserIds,$userIds);
 
             $userAuthIds = array_unique($userAuthIds);

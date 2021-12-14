@@ -58,6 +58,8 @@ class Auth extends Controller
                     ->title(admin_trans('auth.menu_grant'))
                     ->form($this->menu($data['id']));
             });
+            $grid->hideDeleteButton();
+            $grid->hideDeleteSelection();
             $grid->setForm($this->form())->dialog();
         });
     }

@@ -77,7 +77,7 @@ class Model implements FormInterface
                     } elseif ($this->model->$field() instanceof HasOne || $this->model->$field() instanceof BelongsTo || $this->model->$field() instanceof MorphOne) {
                         $relationData = $data[$field];
                         if (!isset($data[$this->pkField]) || empty($this->data->$field)) {
-                            $this->model->$field()->save($relationData);
+                            $this->model->$field = $this->model->$field()->save($relationData);
                         } else {
                             $this->data->$field->save($relationData);
                         }
@@ -110,7 +110,9 @@ class Model implements FormInterface
                     }
                 }
             }
-
+            if(!empty($this->data)){
+                $this->model = $this->data;
+            }
             Db::commit();
         } catch (HttpResponseException $e) {
             throw $e;

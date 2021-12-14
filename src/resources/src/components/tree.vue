@@ -22,7 +22,7 @@
             function checked(id,data,newArr){
                 data.forEach(item => {
                     if(item.id == id){
-                        if(!item.children){
+                        if(!item.children || ctx.attrs.checkStrictly){
                             newArr.push(item.id)
                         }
                     }else{
