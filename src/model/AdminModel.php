@@ -12,7 +12,6 @@ use Eadmin\Admin;
 
 class AdminModel extends \app\model\BaseModel
 {
-
     public function __construct(array $data = [])
     {
         $this->table = config('admin.database.user_table');

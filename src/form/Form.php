@@ -639,10 +639,9 @@ class Form extends Component
      */
     public function hasMany($relation, $title, \Closure $closure)
     {
-        if(empty($this->manyRelation)){
-            $field = $relation;
-        }else{
-            $field = $this->manyRelation.'.'.$relation;
+        $nesting = false;
+        if(!empty($this->manyRelation)){
+            $nesting = true;
         }
         $this->validatorBind($relation);
         $manyItem = FormMany::create($relation, []);
@@ -656,7 +655,6 @@ class Form extends Component
         $itemComponent = $this->itemComponent;
         $datas = $this->getData($relation) ?: [];
         $manyData = [];
-
         foreach ($itemComponent as $component) {
             $componentClone = clone $component;
             $this->valueModel($componentClone, []);
@@ -714,7 +712,9 @@ class Form extends Component
 //        $this->bind($ifField, 1);
 //        $manyItem->where($ifField, 1);
         $this->push($manyItem);
-        $this->setItemComponent($manyItem);
+        if($nesting){
+            $this->setItemComponent($manyItem);
+        }
         return $manyItem;
     }
 
@@ -988,14 +988,7 @@ class Form extends Component
                     $this->recursionValueModel($content);
                 }
             }
-        } elseif ($item instanceof FormMany) {
-            foreach ($item->content['default'] as $content) {
-                if ($content instanceof FormMany) {
-                    $this->valueModel($content,[]);
-                }
-                $this->recursionValueModel($content);
-            }
-        } elseif ($item->attr('setpItem')) {
+        }  elseif ($item->attr('setpItem')) {
             foreach ($item->content['default'] as $content) {
                 if ($content instanceof FormMany) {
                     $this->valueModel($content);

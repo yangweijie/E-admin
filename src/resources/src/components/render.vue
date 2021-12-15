@@ -41,6 +41,7 @@
                 }
             })
             const renderComponent = (data, slotProps) => {
+
                 if(!data.attribute){
                     return
                 }
@@ -204,13 +205,18 @@
                 if(!data.attribute.slotProps && slotProps){
                   data.attribute.slotProps = slotProps
                 }
+
                 //插槽名称对应内容
                 for (let slot in data.content) {
                     children[slot] = (scope) => {
                         if (scope === undefined || !isProxy(scope) && (scope instanceof Object && Object.keys(scope).length == 0)) {
                             scope = slotProps
                         }else{
-                            scope = Object.assign(scope,slotProps)
+                            scope = Object.assign(JSON.parse(JSON.stringify(slotProps)),scope)
+                            if(data.name == 'EadminManyItem' && slotProps.propField &&  slotProps.row){
+                                scope.parentIndex = slotProps.$index
+                                scope.parentPropField = slotProps.propField
+                            }
                         }
                         return userRender(data.content[slot], scope)
                     }
@@ -235,8 +241,13 @@
                         if(!modelValue[slotProps.validator][slotProps.propField][slotProps.$index]){
                             modelValue[slotProps.validator][slotProps.propField][slotProps.$index] = {}
                         }
+
                         let propField = attribute.prop
-                        attribute.prop = slotProps.propField + '.' + slotProps.$index+ '.' + propField
+                        if(data.attribute.slotProps.parentPropField){
+                            attribute.prop = slotProps.parentPropField + '.' + slotProps.parentIndex+ '.' + slotProps.propField + '.' + slotProps.$index+ '.' + propField
+                        }else{
+                            attribute.prop = slotProps.propField + '.' + slotProps.$index+ '.' + propField
+                        }
                         attribute.error = modelValue[slotProps.validator][slotProps.propField][slotProps.$index][propField]
                     }
                 }

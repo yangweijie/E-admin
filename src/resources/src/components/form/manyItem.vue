@@ -39,7 +39,7 @@
     </el-form-item>
     <div class="hasMany" v-else>
         <template v-for="(item,index) in value">
-            <slot :row="item" ></slot>
+            <slot :row="item" :$index="index" :prop-field="field" :validator="$attrs.validator"></slot>
             <el-form-item v-if="!disabled">
                 <el-button size="mini" v-if="value.length - 1 == index && (limit == 0 || limit > value.length)" type='primary' plain @click="add">{{ trans('manyItem.add') }}</el-button>
                 <el-button size="mini" type='danger' v-show='value.length > 0' @click="remove(index)">{{ trans('manyItem.remove') }}</el-button>
