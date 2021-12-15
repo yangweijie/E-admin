@@ -639,8 +639,12 @@ class Form extends Component
      */
     public function hasMany($relation, $title, \Closure $closure)
     {
+        if(empty($this->manyRelation)){
+            $field = $relation;
+        }else{
+            $field = $this->manyRelation.'.'.$relation;
+        }
         $this->validatorBind($relation);
-
         $manyItem = FormMany::create($relation, []);
         $validatorField = $this->bindAttr('model') . 'Error';
         $manyItem->attr('validator', $validatorField);
@@ -705,11 +709,12 @@ class Form extends Component
             $manyItem->content($item);
         }
         $manyItem->attr('columns', $columns);
-        $ifField = str_replace('.', '_', $relation);
-        $ifField = $this->bindAttr('model') . $ifField . 'Show';
-        $this->bind($ifField, 1);
-        $manyItem->where($ifField, 1);
+//        $ifField = str_replace('.', '_', $relation);
+//        $ifField = $this->bindAttr('model') . $ifField . 'Show';
+//        $this->bind($ifField, 1);
+//        $manyItem->where($ifField, 1);
         $this->push($manyItem);
+        $this->setItemComponent($manyItem);
         return $manyItem;
     }
 
@@ -982,6 +987,13 @@ class Form extends Component
                     }
                     $this->recursionValueModel($content);
                 }
+            }
+        } elseif ($item instanceof FormMany) {
+            foreach ($item->content['default'] as $content) {
+                if ($content instanceof FormMany) {
+                    $this->valueModel($content,[]);
+                }
+                $this->recursionValueModel($content);
             }
         } elseif ($item->attr('setpItem')) {
             foreach ($item->content['default'] as $content) {

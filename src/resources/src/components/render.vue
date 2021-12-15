@@ -1,7 +1,7 @@
 <script>
     import {defineComponent, toRaw, h,reactive, resolveComponent,isProxy,resolveDirective,withDirectives,getCurrentInstance,onBeforeUnmount} from 'vue'
     import {splitCode} from '@/utils/splitCode'
-    import {setObjectValue,findArrKey,isNumber} from '@/utils'
+    import {setObjectValue,getObjectValue,findArrKey,isNumber} from '@/utils'
     import dayjs from 'dayjs'
     import request from '@/utils/axios'
     export default defineComponent({
@@ -50,6 +50,7 @@
                     expression = 'try{data.attribute[bindAttr] = modelValue.' + data.bindAttribute[bindAttr]+'}catch(e){}'
                     eval(expression)
                 }
+
                 //双向绑定值
                 for (let modelBind in data.modelBind) {
                     let field = data.modelBind[modelBind]
@@ -201,7 +202,7 @@
                 }
 
                 if(!data.attribute.slotProps && slotProps){
-                    data.attribute.slotProps = slotProps
+                  data.attribute.slotProps = slotProps
                 }
                 //插槽名称对应内容
                 for (let slot in data.content) {
@@ -213,6 +214,7 @@
                         }
                         return userRender(data.content[slot], scope)
                     }
+
                 }
 
                 attribute = {...data.attribute}
@@ -230,14 +232,11 @@
                 //for 遍历中的 ElFormItem 验证prop error处理
                 if(data.name == 'ElFormItem'){
                     if(slotProps && slotProps.propField){
-
                         if(!modelValue[slotProps.validator][slotProps.propField][slotProps.$index]){
                             modelValue[slotProps.validator][slotProps.propField][slotProps.$index] = {}
                         }
                         let propField = attribute.prop
-
                         attribute.prop = slotProps.propField + '.' + slotProps.$index+ '.' + propField
-
                         attribute.error = modelValue[slotProps.validator][slotProps.propField][slotProps.$index][propField]
                     }
                 }
@@ -317,6 +316,7 @@
                 return value
             }
             function userRender(slot, scope) {
+
                 return slot.map(item => {
                     if (typeof (item.where) == 'object' && (item.where.AND.length > 0 || item.where.OR.length > 0)) {
                         // //条件if渲染实现

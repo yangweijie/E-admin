@@ -161,6 +161,34 @@ export function appendCss(url,css,cache) {
     style.setAttribute('data-key', 'eadmin_style_' + md5(url))
     document.getElementsByTagName('head')[0].appendChild(style)
 }
+
+export function getObjectValue(obj: any, path: string, strict: boolean): {
+    o: unknown
+    k: string
+    // @ts-ignore
+    v: Nullable<unknown>
+} {
+    let tempObj = obj
+    path = path.replace(/\[(\w+)\]/g, '.$1')
+    path = path.replace(/^\./, '')
+
+    const keyArr = path.split('.')
+    let i = 0
+    for (i; i < keyArr.length - 1; i++) {
+        if (!tempObj && !strict) break
+        const key = keyArr[i]
+
+        if (key in tempObj) {
+            tempObj = tempObj[key]
+        } else {
+            if (strict) {
+                throw new Error('please transfer a valid prop path to form item!')
+            }
+            break
+        }
+    }
+    return tempObj?.[keyArr[i]]
+}
 export function setObjectValue(obj, path, value) {
     const arr = path.split('.')
     const len = arr.length - 1

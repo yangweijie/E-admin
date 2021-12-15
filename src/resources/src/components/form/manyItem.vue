@@ -39,7 +39,7 @@
     </el-form-item>
     <div class="hasMany" v-else>
         <template v-for="(item,index) in value">
-            <slot :row="item" :$index="index" :prop-field="field" :validator="$attrs.validator"></slot>
+            <slot :row="item" ></slot>
             <el-form-item v-if="!disabled">
                 <el-button size="mini" v-if="value.length - 1 == index && (limit == 0 || limit > value.length)" type='primary' plain @click="add">{{ trans('manyItem.add') }}</el-button>
                 <el-button size="mini" type='danger' v-show='value.length > 0' @click="remove(index)">{{ trans('manyItem.remove') }}</el-button>
@@ -86,7 +86,6 @@
               })
             })
             watch(value,(val)=>{
-
                 ctx.emit('update:modelValue',val)
             })
             // 上移
