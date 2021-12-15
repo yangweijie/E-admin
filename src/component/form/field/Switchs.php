@@ -42,10 +42,12 @@ class Switchs extends Field
     public function state($options)
     {
         if(count($options) == count($options,1)){
-            $this->checkedChildren($options[0]);
-            $this->activeValue(array_key_first($options));
-            $this->unCheckedChildren($options[1]);
-            $this->inactiveValue(array_key_last($options));
+            $keys = array_keys($options);
+            $values = array_values($options);
+            $this->checkedChildren($values[0]);
+            $this->activeValue($keys[0]);
+            $this->unCheckedChildren($values[1]);
+            $this->inactiveValue($keys[1]);
         }else{
             list($active, $inactive) = $options;
             $this->checkedChildren(current($active));
