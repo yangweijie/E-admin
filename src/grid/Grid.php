@@ -294,6 +294,7 @@ class Grid extends Component
         if ($callback instanceof \Closure) {
             call_user_func($callback, $this->getFilter());
         }
+        $this->attr('formFilter',true);
     }
 
     public function getFilter()

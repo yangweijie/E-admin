@@ -38,7 +38,7 @@
                 </el-col>
                 <el-col :md="4" >
                     <div style="float: right;margin-left: 15px">
-                        <el-tooltip placement="top" :content="filterShow?trans('grid.collapseFilter'):trans('grid.expandFilter')"  v-if="filter">
+                        <el-tooltip placement="top" :content="filterShow?trans('grid.collapseFilter'):trans('grid.expandFilter')"  v-if="formFilter">
                             <el-button size="mini" icon="el-icon-search" circle @click="visibleFilter"></el-button>
                         </el-tooltip>
                         <el-tooltip placement="top" :content="trashed?trans('grid.dataList'):trans('grid.recycle')"  v-if="!hideTrashed">
@@ -65,7 +65,7 @@
             </el-row>
         </div>
         <!--筛选-->
-        <div :class="['filter',custom?'filterCustom':'']" v-if="filter" v-show="filterShow">
+        <div :class="['filter',custom?'filterCustom':'']" v-if="filter" v-show="formFilter && filterShow">
             <render :data="filter" ></render>
         </div>
         <div v-if="custom" >
@@ -232,6 +232,7 @@
             quickSearch: Boolean,
             hideDeleteSelection: Boolean,
             expandedRow: Boolean,
+            formFilter: Boolean,
             filter: [Object, Boolean],
             header: [Object, Boolean],
             expandFilter: Boolean,

@@ -964,7 +964,34 @@ class Form extends Component
         $item = array_pop($this->formItem);
         return $item;
     }
-
+    protected function recursionValueModel($item){
+        if ($item instanceof Tabs) {
+            foreach ($item->content['default'] as $pane) {
+                foreach ($pane->content['default'] as $content) {
+                    if ($content instanceof FormMany) {
+                        $this->valueModel($content);
+                    }
+                    $this->recursionValueModel($content);
+                }
+            }
+        } elseif ($item instanceof Row) {
+            foreach ($item->content['default'] as $col) {
+                foreach ($col->content['default'] as $content) {
+                    if ($content instanceof FormMany) {
+                        $this->valueModel($content);
+                    }
+                    $this->recursionValueModel($content);
+                }
+            }
+        } elseif ($item->attr('setpItem')) {
+            foreach ($item->content['default'] as $content) {
+                if ($content instanceof FormMany) {
+                    $this->valueModel($content);
+                }
+                $this->recursionValueModel($content);
+            }
+        }
+    }
     /**
      * 解析组件
      */
@@ -972,29 +999,7 @@ class Form extends Component
     {
         foreach ($this->formItem as $item) {
             $this->content($item);
-            if ($item instanceof Tabs) {
-                foreach ($item->content['default'] as $pane) {
-                    foreach ($pane->content['default'] as $content) {
-                        if ($content instanceof FormMany) {
-                            $this->valueModel($content);
-                        }
-                    }
-                }
-            } elseif ($item instanceof Row) {
-                foreach ($item->content['default'] as $col) {
-                    foreach ($col->content['default'] as $content) {
-                        if ($content instanceof FormMany) {
-                            $this->valueModel($content);
-                        }
-                    }
-                }
-            } elseif ($item->attr('setpItem')) {
-                foreach ($item->content['default'] as $content) {
-                    if ($content instanceof FormMany) {
-                        $this->valueModel($content);
-                    }
-                }
-            }
+            $this->recursionValueModel($item);
         }
         foreach ($this->itemComponent as $component) {
             //各个组件绑定值赋值
