@@ -25,6 +25,7 @@ class NodeService
     //节点缓存key
     protected $cacheKey = 'eadmin_node_list';
     protected $treeArr = [];
+    protected $fields = [];
 
     public function all()
     {
@@ -42,12 +43,30 @@ class NodeService
     public function tree()
     {
         $files = $this->getControllerFiles();
-        $this->parse($files,true);
+        $this->parse($files, true);
         $data = [];
         foreach ($this->treeArr as $tree) {
             $data[] = $tree;
         }
         return $data;
+    }
+
+    public function fields($tree = false)
+    {
+        if(count($this->fields) > 0){
+            return $this->fields;
+        }
+        $files = $this->getControllerFiles();
+        $this->parse($files, true);
+        if ($tree) {
+            $this->fields[] = [
+                'id' => 1,
+                'pid' => 0,
+                'label' => '全部',
+            ];
+            return Admin::tree($this->fields);
+        }
+        return $this->fields;
     }
 
     /**
@@ -56,7 +75,7 @@ class NodeService
      * @param PlugServiceProvider $plug 插件
      * @return array|bool
      */
-    protected function parseDocComment($doc,$plug = null)
+    protected function parseDocComment($doc, $plug = null)
     {
         if (preg_match('#^/\*\*(.*)\*/#s', $doc, $comment) === false) {
             return false;
@@ -80,9 +99,9 @@ class NodeService
                     $auth = true;
                 } elseif (preg_match('/@login\s*true/i', $line) && $login == false) {
                     $login = true;
-                } elseif (preg_match('/@plugConfig\s(.*)/i', $line,$arr) && isset($arr[1]) && $plug) {
+                } elseif (preg_match('/@plugConfig\s(.*)/i', $line, $arr) && isset($arr[1]) && $plug) {
                     $field = trim($arr[1]);
-                    if(!$plug::config($field)){
+                    if (!$plug::config($field)) {
                         $authPlug = false;
                     }
                 }
@@ -90,7 +109,7 @@ class NodeService
         } else {
             return false;
         }
-        return [trim($title), $auth, $login,$authPlug];
+        return [trim($title), $auth, $login, $authPlug];
 
     }
 
@@ -100,13 +119,13 @@ class NodeService
      * @param $is_auth
      * @throws \ReflectionException
      */
-    protected function parse($files,$is_auth = false)
+    protected function parse($files, $is_auth = false)
     {
         $nodeIds = [];
-        if(config('admin.admin_auth_id') != Admin::id() && $is_auth){
-            $userAuthModel = config(Admin::getAppName().'.database.user_auth_model');
+        if (config('admin.admin_auth_id') != Admin::id() && $is_auth) {
+            $userAuthModel = config(Admin::getAppName() . '.database.user_auth_model');
             $auth_ids = $userAuthModel::where('user_id', Admin::id())->column('auth_id');
-            $authNodeModel = config(Admin::getAppName().'.database.auth_node_model');
+            $authNodeModel = config(Admin::getAppName() . '.database.auth_node_model');
             $nodeIds = $authNodeModel::whereIn('auth_id', $auth_ids)->column('node_id');
         }
         $data = [];
@@ -121,12 +140,12 @@ class NodeService
             $namespace = $item['namespace'];
             $plug = $item['plug'] ?? false;
             $class = new \ReflectionClass($namespace);
-            $classDoc = $this->parseDocComment($class->getDocComment(),$plug);
+            $classDoc = $this->parseDocComment($class->getDocComment(), $plug);
             if ($classDoc === false) {
                 $title = $controller;
             } else {
                 $title = array_shift($classDoc);
-                if(empty($title)){
+                if (empty($title)) {
                     $title = $controller;
                 }
             }
@@ -139,12 +158,12 @@ class NodeService
             $methodNode = [];
             foreach ($class->getMethods() as $method) {
                 $doc = $method->getDocComment();
-                $res = $this->parseDocComment($doc,$plug);
+                $res = $this->parseDocComment($doc, $plug);
                 if ($method->class == $namespace && $method->isPublic()) {
                     $action = $method->getName();
                     $reflectionNamedType = $method->getReturnType();
                     if ($res !== false) {
-                        list($title, $auth, $login,$authPlug) = $res;
+                        list($title, $auth, $login, $authPlug) = $res;
                         $id = md5($namespace . $action . 'get');
                         $nodeData = [
                             'label' => $title,
@@ -161,7 +180,7 @@ class NodeService
                                 $nodeData['label'] = $label . '添加';
                                 $nodeData['method'] = 'post';
                                 $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
+                                if (in_array($nodeData['id'], $nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
                                     $data[] = $nodeData;
                                     $methodNode[] = $nodeData;
                                 }
@@ -169,20 +188,21 @@ class NodeService
                                 $nodeData['label'] = $label . '修改';
                                 $nodeData['method'] = 'put';
                                 $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
+                                if (in_array($nodeData['id'], $nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
                                     $data[] = $nodeData;
                                     $methodNode[] = $nodeData;
                                 }
                             } else {
-                                if(in_array($id,$nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth){
+                                if (in_array($id, $nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
                                     $data[] = $nodeData;
                                     $methodNode[] = $nodeData;
                                 }
                                 if ($reflectionNamedType && $reflectionNamedType->getName() == 'Eadmin\grid\Grid') {
+                                    $this->parseGridColumn($method, $namespace, $action);
                                     $nodeData['label'] = '删除';
                                     $nodeData['method'] = 'delete';
                                     $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
-                                    if(in_array($nodeData['id'],$nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
+                                    if (in_array($nodeData['id'], $nodeIds) || config('admin.admin_auth_id') == Admin::id() || !$is_auth) {
                                         $data[] = $nodeData;
                                         $methodNode[] = $nodeData;
                                     }
@@ -193,7 +213,7 @@ class NodeService
                 }
             }
             $this->treeArr[$moduleName]['children'][$key]['children'] = $methodNode;
-            list($auth, $login,$authPlug) = $classDoc;
+            list($auth, $login, $authPlug) = $classDoc;
             if (count($this->treeArr[$moduleName]['children'][$key]['children']) == 0 || !$authPlug) {
                 unset($this->treeArr[$moduleName]['children'][$key]);
             }
@@ -201,6 +221,36 @@ class NodeService
         }
 
         return $data;
+    }
+
+    protected function parseGridColumn($method, $namespace, $action)
+    {
+        $params = $method->getParameters();
+        $args = [];
+        foreach ($params as $key => $param) {
+            $name = $param->getName();
+            $args[$name] = null;
+        }
+        $grid = $method->invokeArgs(app()->invokeClass($namespace), $args);
+        json_encode($grid);
+        $columns = $grid->attr('columns');
+        $pid = md5($namespace . $action);
+        foreach ($columns as $column) {
+            if (empty($column['label'])) continue;
+            $this->fields[] = [
+                'pid' => $pid,
+                'id' => md5($column['prop'] . $namespace . $action),
+                'class' => $namespace . '\\' . $action,
+                'field' => $column['prop'],
+                'label' => $column['label'],
+            ];
+        }
+        $this->fields[] = [
+            'id' => $pid,
+            'pid' => 1,
+            'field' => '',
+            'label' => $grid->bind('eadmin_title'),
+        ];
     }
 
     /**
@@ -234,7 +284,7 @@ class NodeService
         foreach ($modules as $module) {
             $moduleName = basename($module);
             //权限模块
-            $authModuleName = config(Admin::getAppName().'.authModule');
+            $authModuleName = config(Admin::getAppName() . '.authModule');
             if (isset($authModuleName[$moduleName])) {
                 $authModuleTitle = $authModuleName[$moduleName];
                 $this->treeArr[$moduleName] = [
@@ -243,9 +293,9 @@ class NodeService
                 ];
                 foreach ($finder->files()->in($module . '/controller')->name('*.php') as $file) {
                     $controller = str_replace('.php', '', $file->getRealPath());
-                    $controller = strstr($controller,'controller'.DIRECTORY_SEPARATOR);
-                    $controller = explode(DIRECTORY_SEPARATOR,$controller);
-                    $controller = implode('\\',$controller);
+                    $controller = strstr($controller, 'controller' . DIRECTORY_SEPARATOR);
+                    $controller = explode(DIRECTORY_SEPARATOR, $controller);
+                    $controller = implode('\\', $controller);
                     $namespace = "app\\$moduleName\\$controller";
                     $controllerFiles[] = [
                         'namespace' => $namespace,
@@ -268,7 +318,7 @@ class NodeService
                             'namespace' => $namespace,
                             'module' => '',
                             'file' => $file,
-                            'plug'=>$serviceProvider
+                            'plug' => $serviceProvider
                         ];
                     }
                 }

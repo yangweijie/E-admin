@@ -37,6 +37,7 @@ use think\route\dispatch\Controller;
 class Admin
 {
     protected static $permissions = [];
+    protected static $authfields = [];
 
     /**
      * 配置系统参数
@@ -156,6 +157,41 @@ class Admin
     }
 
     /**
+     * 验证字段权限
+     * @param string $class 类方法
+     * @param string $field 字段
+     * @return bool
+     */
+    public static function checkFieldAuth($class,$field){
+        $fields = self::authFields();
+        foreach ($fields as $row){
+            if($row['class'] == $class && $field == $row['field']){
+                return false;
+            }
+        }
+        return true;
+    }
+    /**
+     * 获取隐藏字段权限
+     * @return mixed
+     */
+    public static function authFields()
+    {
+        if (!empty(self::$authfields)) {
+            return self::$authfields;
+        }
+        $key = 'eadmin_auth_field' . Admin::getAppName() . self::id();
+        $data = Cache::get($key);
+        if ($data) {
+            self::$authfields = $data;
+            return $data;
+        }
+        $data = self::user()->hideFields();
+        Cache::tag('eadmin_auth_field')->set($key, $data);
+        return $data;
+    }
+
+    /**
      * 获取权限节点
      * @return mixed
      */
@@ -177,7 +213,7 @@ class Admin
         } else {
             $nodeIds = [];
         }
-        if (self::id() !=  config(Admin::getAppName().'.admin_auth_id')) {
+        if (self::id() != config(Admin::getAppName() . '.admin_auth_id')) {
             foreach ($nodes as $key => &$node) {
                 if (!in_array($node['id'], $nodeIds)) {
                     $node['is_auth'] = false;
@@ -235,7 +271,7 @@ class Admin
      */
     public static function node()
     {
-        return new NodeService();
+        return app('admin.node');
     }
 
     /**
@@ -283,7 +319,7 @@ class Admin
                 $name = current($pathinfo);
                 if (empty(app('http')->getName())) {
                     app('http')->name(Admin::getAppName());
-                    app()->setNamespace("app\\".Admin::getAppName());
+                    app()->setNamespace("app\\" . Admin::getAppName());
                 }
                 if ($name == app('http')->getName()) {
                     array_shift($pathinfo);
@@ -365,16 +401,16 @@ class Admin
         $name = app('http')->getName();
         if (!empty($name)) {
             $map = config('app.app_map', []);
-            $mapName = array_search($name,$map);
+            $mapName = array_search($name, $map);
             if ($mapName !== false) {
                 $config = config($name);
-                \think\facade\Config::set($config,$mapName);
+                \think\facade\Config::set($config, $mapName);
                 return $mapName;
             }
             return $name;
         }
-        $name = app()->request->header('multi-app','admin');
-        if(!empty($name)){
+        $name = app()->request->header('multi-app', 'admin');
+        if (!empty($name)) {
             return $name;
         }
         return $name;

@@ -521,7 +521,10 @@ class Grid extends Component
             $column = new Column($field, $label, $this);
             $this->drive->realiton($field);
         }
-        $this->column[] = $column;
+        $class = $this->callClass.'\\'.$this->callFunction;
+        if(Admin::checkFieldAuth($class,$field)){
+            $this->column[] = $column;
+        }
         return $column;
     }
 

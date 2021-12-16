@@ -2,6 +2,8 @@
 return [
     'title'=>'访问权限管理',
     'parent'=>'父级',
+    'field_title_grant'=>'字段权限（隐藏选中的字段）',
+    'field_grant'=>'字段权限',
     'data_grant'=>'数据权限',
     'auth_grant'=>'功能权限',
     'menu_grant'=>'菜单权限',

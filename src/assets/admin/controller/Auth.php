@@ -19,7 +19,7 @@ use Eadmin\model\SystemAuthData;
 use Eadmin\model\SystemAuthMenu;
 use Eadmin\model\SystemAuthNode;
 use Eadmin\Admin;
-
+use think\facade\Cache;
 /**
  * 系统角色管理
  * Class Auth
@@ -44,16 +44,20 @@ class Auth extends Controller
             $grid->column('status', admin_trans('auth.fields.status'))->switch();
             $grid->actions(function (Actions $action, $data) {
                 $dropdown = $action->dropdown();
-                $dropdown->prepend(admin_trans('auth.auth_grant'),'el-icon-s-check')
-                    ->dialog()
+                $dropdown->prepend(admin_trans('auth.field_grant'),'fa fa-universal-access')->dialog()
                     ->width('70%')
-                    ->title(admin_trans('auth.auth_grant'))
-                    ->form($this->authNode($data['id']));
+                    ->title(admin_trans('auth.field_title_grant'))
+                    ->form($this->field($data['id']));
                 $dropdown->prepend(admin_trans('auth.data_grant'),'fa fa-database')
                     ->dialog()
                     ->width('50%')
                     ->title(admin_trans('auth.data_grant'))
                     ->form($this->dataAuth($data['id'],1));
+                $dropdown->prepend(admin_trans('auth.auth_grant'),'el-icon-s-check')
+                    ->dialog()
+                    ->width('70%')
+                    ->title(admin_trans('auth.auth_grant'))
+                    ->form($this->authNode($data['id']));
                 $dropdown->prepend(admin_trans('auth.menu_grant'),'el-icon-menu')->dialog()
                     ->title(admin_trans('auth.menu_grant'))
                     ->form($this->menu($data['id']));
@@ -81,6 +85,45 @@ class Auth extends Controller
             $form->text('name', admin_trans('auth.fields.name'))->required();
             $form->textarea('desc', admin_trans('auth.fields.desc'))->rows(4)->required();
             $form->number('sort', admin_trans('auth.fields.sort'))->default($model::max('sort')+1);
+        });
+    }
+    /**
+     * 字段权限
+     * @param $id
+     * @auth true
+     * @login true
+     * @return Form
+     */
+    public function field($id){
+        $model = config('admin.database.auth_model');
+        return Form::create(new $model, function (Form $form) use ($id) {
+            $form->edit($id);
+            $form->labelPosition('top');
+            $fieldAuthModel = config('admin.database.field_auth_model');
+            $nodes = $fieldAuthModel::where('auth_id', $id)->column('key');
+            $form->tree('fields')
+                ->data(Admin::node()->fields(true))
+                ->showCheckbox()
+                ->horizontal()
+                ->value($nodes)
+                ->defaultExpandAll();
+            $form->saving(function ($post) use($fieldAuthModel){
+                Cache::tag('eadmin_auth_field')->clear();
+                $fields = Admin::node()->fields();
+                $data = [];
+                $fieldAuthModel::where('auth_id', $post['id'])->delete();
+                foreach ($fields as $field){
+                    if(in_array($field['id'],$post['fields']) && !empty($field['field'])){
+                        $data[] = [
+                            'auth_id' => $post['id'],
+                            'field' => $field['field'],
+                            'class' => $field['class'],
+                            'key' => $field['id'],
+                        ];
+                    }
+                }
+                (new $fieldAuthModel)->saveAll($data);
+            });
         });
     }
     /**

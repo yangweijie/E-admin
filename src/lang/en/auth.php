@@ -2,6 +2,8 @@
 return [
     'title'=>'Access rights management',
     'parent'=>'Parent',
+    'field_title_grant'=>'Field permissions (hide selected fields)',
+    'field_grant'=>'Field permissions',
     'auth_grant'=>'Function permissions',
     'menu_grant'=>'Menu permissions',
     'data_grant'=>'Data permissions',

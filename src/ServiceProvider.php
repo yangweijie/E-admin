@@ -22,6 +22,7 @@ use Eadmin\model\SystemFile;
 use Eadmin\service\AuthService;
 use Eadmin\service\BackupData;
 use Eadmin\service\MenuService;
+use Eadmin\service\NodeService;
 use Eadmin\service\QueueService;
 use Eadmin\service\TokenService;
 use Eadmin\support\Translator;
@@ -160,6 +161,7 @@ class ServiceProvider extends Service
             'admin.notification' => Notification::class,
             'admin.translator' => Translator::class,
             'admin.auth' => AuthService::class,
+            'admin.node' => NodeService::class,
         ]);
     }
     protected function crontab(){

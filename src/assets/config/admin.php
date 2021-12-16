@@ -16,6 +16,7 @@ use Eadmin\model\SystemAuthData;
 use Eadmin\model\SystemFile;
 use Eadmin\model\SystemFileCate;
 use Eadmin\model\SystemUserAuth;
+use Eadmin\model\SystemFieldAuth;
 
 return [
     //超级管理员id
@@ -83,6 +84,9 @@ return [
         //数据权限表
         'auth_data_table' => 'system_auth_data',
         'auth_data_model' => SystemAuthData::class,
+        //字段权限表
+        'field_auth_table' => 'system_field_auth',
+        'field_auth_model' => SystemFieldAuth::class,
         //文件
         'file_table' => 'system_file',
         'file_model' => SystemFile::class,

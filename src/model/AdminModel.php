@@ -32,7 +32,13 @@ class AdminModel extends \app\model\BaseModel
     {
         return password_hash($val, PASSWORD_DEFAULT);
     }
-
+    // 获取隐藏字段
+    public function hideFields(){
+        $userAuthModel = config('admin.database.user_auth_model');
+        $roleIds = $userAuthModel::where('user_id', $this->id)->column('auth_id');
+        $fieldAuthModel = config('admin.database.field_auth_model');
+        return $fieldAuthModel::whereIn('auth_id', $roleIds)->select()->toArray();
+    }
     // 获取权限
     public function permissions()
     {
