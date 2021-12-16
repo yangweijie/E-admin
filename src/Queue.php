@@ -3,6 +3,7 @@
 
 namespace Eadmin;
 
+use Carbon\Carbon;
 use think\facade\Cache;
 use think\facade\Db;
 use think\queue\Job;
@@ -20,7 +21,7 @@ abstract class Queue
     protected $queueId = 0;
     protected $time;
     protected $queue;
-
+    protected $second = null;
     public function init($job)
     {
         $this->time = microtime(true);
@@ -62,9 +63,7 @@ abstract class Queue
 
                 $update['task_time'] = microtime(true) - $this->time;
             }
-
             Db::name($this->tableName)->where('id', $this->queueId)->update($update);
-
         }
         $cacheKey = 'queue_' . $this->queueId . '_progress';
         $data = Cache::get($cacheKey) ?: [];
@@ -75,6 +74,13 @@ abstract class Queue
             $data['status'] = Db::name($this->tableName)->where('id', $this->queueId)->value('status');
         }
         if (is_numeric($progress)) {
+            $second = (microtime(true) - $this->time);
+            if($progress > 0){
+                $second = $second / $progress;
+            }
+            $second =  (100-$progress) * $second;
+            $second = round($second,0);
+            $data['remain_time'] = Carbon::parse($second)->format('H小时i分s秒');
             $data['progress'] = $progress;
         }
         if (is_numeric($status)) {
@@ -84,7 +90,6 @@ abstract class Queue
             $data['history'][] = ['message' => $message, 'progress' => $data['progress'], 'datetime' => date('Y-m-d H:i:s')];
             $data['history'] = array_slice($data['history'],-100);
         }
-
         Cache::set($cacheKey, $data, 86400);
         return $data;
     }
