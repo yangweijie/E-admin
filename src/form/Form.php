@@ -685,7 +685,7 @@ class Form extends Component
             $manyData[] = $this->data;
             $this->data = [];
         }
-        if(empty($datas)){
+        if(empty($manyItem->getDefault())){
             $manyItem->default($manyData);
         }else{
             $manyItem->value($manyData);

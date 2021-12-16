@@ -295,12 +295,10 @@ class Model implements GridInterface
                     $res = $this->db->where('1=1')->update([$this->softDeleteField => time()]);
                 } else {
                     if (in_array($this->softDeleteField, $this->tableFields) &&  property_exists($this->model, 'withTrashed')) {
-                        $this->db = $this->model->onlyTrashed();
-                        $deleteData = $this->db->field($this->model()->getPk())->select();
+                        $res = $this->db->removeOption('soft_delete')->where($this->softDeleteField,'<>',0)->delete();
                     } else {
-                        $deleteData = $this->db->field($this->model()->getPk())->select();
+                        $res = $this->db->where('1=1')->delete();
                     }
-                    $this->deleteRelationData($deleteData);
                 }
             } else {
                 if ($this->isSotfDelete && !$trueDelete) {

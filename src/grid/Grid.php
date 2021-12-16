@@ -294,7 +294,6 @@ class Grid extends Component
         if ($callback instanceof \Closure) {
             call_user_func($callback, $this->getFilter());
         }
-        $this->attr('formFilter',true);
     }
 
     public function getFilter()
@@ -742,6 +741,7 @@ class Grid extends Component
             $form = $this->filter->render();
             $form->eventSuccess([$this->bindAttr('modelValue') => true]);
             //排除筛选多余字段
+            $this->attr('formFilter',$this->filter->filterShow());
             $this->attr('filterExceptField', $form->attr('exceptField'));
             $this->attr('filter', $form);
             $this->attr('filterField', $form->bindAttr('model'));

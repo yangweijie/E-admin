@@ -68,7 +68,6 @@ abstract class Queue
         }
         $cacheKey = 'queue_' . $this->queueId . '_progress';
         $data = Cache::get($cacheKey) ?: [];
-
         if (!isset($data['status'])) {
             $data['progress'] = 0;
         }
@@ -83,6 +82,7 @@ abstract class Queue
         }
         if (!is_null($message) || !is_null($progress) || !is_null($status)) {
             $data['history'][] = ['message' => $message, 'progress' => $data['progress'], 'datetime' => date('Y-m-d H:i:s')];
+            $data['history'] = array_slice($data['history'],-100);
         }
 
         Cache::set($cacheKey, $data, 86400);

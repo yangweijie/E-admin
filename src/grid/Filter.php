@@ -51,7 +51,7 @@ class Filter
     protected $relationLastMethod = '';
     protected $columnNum = 0;
     protected $hideAction = false;
-
+    protected $showNum = 0;
     public function __construct($model)
     {
         if ($model instanceof Model) {
@@ -536,6 +536,7 @@ class Filter
      */
     public function hide()
     {
+        $this->showNum--;
         $this->form->getLastItem()->style(['display' => 'none']);
     }
 
@@ -547,6 +548,7 @@ class Filter
      */
     public function parseFilter($method, $field)
     {
+        $this->showNum++;
         $requestField = $field;
         if ($this->db) {
             if (is_string($field)) {
@@ -844,7 +846,9 @@ class Filter
     {
         return $this->form;
     }
-
+    public function filterShow(){
+        return $this->showNum > 0;
+    }
     /**
      * @return Form
      */

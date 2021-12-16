@@ -19,7 +19,7 @@
                     </el-dialog>
                 </template>
                 <template #default="{ record , index}">
-                    <render :slot-props="{ row:record ,$index:index ,propField:field,validator:$attrs.validator}" :data="column.component"></render>
+                    <render :slot-props="propParam(record,index)" :data="column.component"></render>
                 </template>
             </a-table-column>
             <a-table-column :width="70" v-if="!disabled">
@@ -73,6 +73,10 @@
             manyData:Object,
             disabled:Boolean,
             table:Boolean,
+            slotProps:{
+              type:Object,
+              default:{},
+            },
         },
         emits:['update:modelValue'],
         setup(props,ctx){
@@ -88,6 +92,14 @@
             watch(value,(val)=>{
                 ctx.emit('update:modelValue',val)
             })
+            function propParam(record,index){
+              let param = { row:record ,$index:index ,propField:props.field,validator:ctx.attrs.validator}
+              if(props.slotProps.propField && props.slotProps.row){
+                param.parentIndex = props.slotProps.$index
+                param.parentPropField = props.slotProps.propField
+              }
+              return param
+            }
             // 上移
             function handleUp (index) {
                 const len = value[index - 1]
@@ -134,6 +146,7 @@
                 };
             }
             return {
+                propParam,
                 openBatch,
                 batch,
                 clear,
@@ -163,4 +176,5 @@
 .hasMany .el-col .el-form-item{
   margin-bottom: 0;
 }
+
 </style>

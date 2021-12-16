@@ -205,7 +205,6 @@
                 if(!data.attribute.slotProps && slotProps){
                   data.attribute.slotProps = slotProps
                 }
-
                 //插槽名称对应内容
                 for (let slot in data.content) {
                     children[slot] = (scope) => {
@@ -217,6 +216,7 @@
                                 scope.parentIndex = slotProps.$index
                                 scope.parentPropField = slotProps.propField
                             }
+
                         }
                         return userRender(data.content[slot], scope)
                     }
