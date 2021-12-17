@@ -1,5 +1,5 @@
 <template>
-  <span @click="exec"><slot></slot></span>
+  <span @click="clickHandel"><slot></slot></span>
   <teleport to="body">
     <div class="el-notification right" role="alert" style="bottom: 20px;" v-if="visible">
       <div class="el-notification__group" style="width: 100%">
@@ -16,6 +16,7 @@
 
 <script>
 import {defineComponent, reactive, toRefs,onBeforeUnmount,onDeactivated} from "vue";
+import {ElMessageBox} from 'element-plus';
 import {ElMessage} from 'element-plus'
 import request from '@/utils/axios'
 import {trans} from '@/utils'
@@ -24,8 +25,14 @@ export default defineComponent({
   props: {
     title: String,
     url:String,
+    confirm:String,
+    params: {
+      type:Object,
+      default:{}
+    },
   },
   setup(props) {
+    console.log(props)
     const state = reactive({
       progress: 0,
       status: '',
@@ -35,9 +42,26 @@ export default defineComponent({
     })
     let timer = null
     let alert = 0
+    function clickHandel(){
+      if(props.confirm){
+        ElMessageBox.confirm(props.confirm, '提示', {
+            type:'warning',
+            confirmButtonText:'确定',
+            cancelButtonText:'取消',
+        }).then(()=>{
+          exec()
+        })
+      }else{
+        exec()
+      }
+    }
     function exec(){
       alert = 0
-      request(props.url).then(res=>{
+      request({
+        url:props.url,
+        method:'post',
+        data:props.params
+      }).then(res=>{
         if(timer){
           state.progress=0
           state.status= ''
@@ -87,7 +111,7 @@ export default defineComponent({
       })
     }
     return {
-      exec,
+      clickHandel,
       close,
       ...toRefs(state)
     }

@@ -57,7 +57,7 @@ class NodeService
             return $this->fields;
         }
         $files = $this->getControllerFiles();
-        $this->parse($files, true);
+        $this->parse($files, true,true);
         if ($tree) {
             $this->fields[] = [
                 'id' => 1,
@@ -119,7 +119,7 @@ class NodeService
      * @param $is_auth
      * @throws \ReflectionException
      */
-    protected function parse($files, $is_auth = false)
+    protected function parse($files, $is_auth = false,$scanField = false)
     {
         $nodeIds = [];
         if (config('admin.admin_auth_id') != Admin::id() && $is_auth) {
@@ -198,7 +198,9 @@ class NodeService
                                     $methodNode[] = $nodeData;
                                 }
                                 if ($reflectionNamedType && $reflectionNamedType->getName() == 'Eadmin\grid\Grid') {
-                                    $this->parseGridColumn($method, $namespace, $action);
+                                    if($scanField){
+                                        $this->parseGridColumn($method, $namespace, $action);
+                                    }
                                     $nodeData['label'] = '删除';
                                     $nodeData['method'] = 'delete';
                                     $nodeData['id'] = md5($namespace . $action . $nodeData['method']);
@@ -225,11 +227,12 @@ class NodeService
 
     protected function parseGridColumn($method, $namespace, $action)
     {
+
         $params = $method->getParameters();
         $args = [];
         foreach ($params as $key => $param) {
             $name = $param->getName();
-            $args[$name] = null;
+            $args[$name] = 0;
         }
         $grid = $method->invokeArgs(app()->invokeClass($namespace), $args);
         json_encode($grid);

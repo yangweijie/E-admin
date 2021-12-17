@@ -685,10 +685,10 @@ class Form extends Component
             $manyData[] = $this->data;
             $this->data = [];
         }
-        if(empty($manyItem->getDefault())){
-            $manyItem->default($manyData);
-        }else{
+        if($this->isEdit){
             $manyItem->value($manyData);
+        }else{
+            $manyItem->default($manyData);
         }
         $this->itemComponent = $originItemComponent;
         $columns = [];

@@ -108,7 +108,7 @@ class Notification
         $this->data['proxyData'] = $data;
         return $this;
     }
-    public function data(array $data)
+    public function data($data)
     {
         $this->data = array_merge($this->data, ['data' => $data]);
     }

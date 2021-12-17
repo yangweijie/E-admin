@@ -177,6 +177,9 @@ class Admin
      */
     public static function authFields()
     {
+        if(!self::id()){
+            return [];
+        }
         if (!empty(self::$authfields)) {
             return self::$authfields;
         }

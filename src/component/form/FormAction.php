@@ -117,7 +117,7 @@ class FormAction extends Component
 
     /**
      * 添加左边自定义内容
-     * @param string $content
+     * @param mixed $content
      */
     public function addLeftAction($content)
     {
@@ -126,7 +126,7 @@ class FormAction extends Component
 
     /**
      * 添加右边自定义内容
-     * @param string $content
+     * @param mixed $content
      */
     public function addRightAction($content)
     {

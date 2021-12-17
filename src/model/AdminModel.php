@@ -37,7 +37,10 @@ class AdminModel extends \app\model\BaseModel
         $userAuthModel = config('admin.database.user_auth_model');
         $roleIds = $userAuthModel::where('user_id', $this->id)->column('auth_id');
         $fieldAuthModel = config('admin.database.field_auth_model');
-        return $fieldAuthModel::whereIn('auth_id', $roleIds)->select()->toArray();
+        if($fieldAuthModel){
+            return $fieldAuthModel::whereIn('auth_id', $roleIds)->select()->toArray();
+        }
+        return [];
     }
     // 获取权限
     public function permissions()
