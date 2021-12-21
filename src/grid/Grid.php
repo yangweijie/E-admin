@@ -324,7 +324,8 @@ class Grid extends Component
     {
         Event::listen(Deling::class, function ($id) use ($closure) {
             $trueDelete = Request::delete('trueDelete');
-            $closure($id, $trueDelete);
+            call_user_func_array($closure, [$id, $trueDelete]);
+           
         });
     }
     //删除后回调
@@ -332,7 +333,7 @@ class Grid extends Component
     {
         Event::listen(Deleted::class, function ($id) use ($closure) {
             $trueDelete = Request::delete('trueDelete');
-            $closure($id, $trueDelete);
+            call_user_func_array($closure, [$id, $trueDelete]);
         });
     }
     /**

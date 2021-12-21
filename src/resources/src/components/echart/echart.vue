@@ -4,8 +4,9 @@
 
 <script>
 import * as echarts from 'echarts'
-import {defineComponent,ref,onUpdated,onMounted,onBeforeUnmount,nextTick,onActivated} from 'vue'
 
+import {defineComponent,ref,onUpdated,onMounted,onBeforeUnmount,nextTick,onActivated} from 'vue'
+import chinaMap from '@/assets/map/chinaChange.json'
 export default defineComponent({
   name: 'EadminChart',
   props: {
@@ -23,6 +24,7 @@ export default defineComponent({
     }
   },
   setup(props){
+    echarts.registerMap('china',chinaMap)
     const echart = ref('')
     let chart = null
     function initChart() {

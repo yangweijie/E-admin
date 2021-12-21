@@ -142,10 +142,10 @@ class PlugService
     private function verify()
     {
         $data = [];
-        foreach ($this->serviceProvider as $serviceProvider) {
+        foreach ($this->plugPaths as $name=>$file) {
             $data[] = [
-                'name' => $serviceProvider->getName(),
-                'info' => $serviceProvider->getInfo(),
+                'name' => $name,
+                'info' => $this->info($name),
             ];
         }
         try {

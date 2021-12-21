@@ -10,6 +10,7 @@ namespace Eadmin\chart;
 
 
 use Carbon\Carbon;
+use Eadmin\chart\echart\MapChart;
 use Eadmin\component\basic\Button;
 use Eadmin\component\Component;
 use Eadmin\grid\Filter;
@@ -75,6 +76,8 @@ class Echart extends Component
             $this->chart = new FunnelChart($height, '100%');
         } elseif ($this->chartType == 'radar') {
             $this->chart = new RadarChart($height, '100%');
+        } elseif ($this->chartType == 'map') {
+            $this->chart = new MapChart($height, '100%');
         }
     }
 
@@ -187,7 +190,7 @@ class Echart extends Component
                     $this->lineAnalyze($name, $this->pkField, $text, $query, $after);
                 }
 
-            } elseif ($this->chartType == 'pie' || $this->chartType == 'funnel') {
+            } elseif ($this->chartType == 'pie' || $this->chartType == 'funnel' || $this->chartType == 'map') {
                 $this->pieAnalyze($name, $this->pkField, $text, $query, $after);
             } elseif ($this->chartType == 'radar') {
                 $max = array_shift($arguments);
@@ -237,14 +240,22 @@ class Echart extends Component
      */
     public function group($name, \Closure $closure)
     {
+        $this->groupMode = true;
         call_user_func($closure, $this);
+        $data = array_values($this->seriesData);
         if ($this->chart instanceof RadarChart) {
+            $this->groupSeries[] = [
+                'name' => $name,
+                'value' => $data,
+            ];
+        }elseif ($this->chart instanceof LineChart) {
+
             $this->groupSeries[] = [
                 'name' => $name,
                 'value' => $this->seriesData,
             ];
         } else {
-            $this->chart->series($name, $this->seriesData);
+            $this->chart->series($name, $data);
         }
         $this->seriesData = [];
     }
@@ -274,8 +285,10 @@ class Echart extends Component
     {
         $value = $this->parse($type, $field, $query, $after);
         $this->xAxis[] = $name;
+        $this->xAxis = array_unique($this->xAxis);
         $this->chart->xAxis($this->xAxis);
-        $this->seriesData[] = $value;
+
+        $this->seriesData[$name] = $value;
     }
 
 
@@ -400,7 +413,14 @@ class Echart extends Component
                 }
                 $this->seriesData = $series;
             }
+        }elseif ($this->chart instanceof LineChart){
+            $values = array_column($this->groupSeries,'value');
+            $this->chart->xAxis(array_column($this->groupSeries,'name'));
+            foreach ($this->xAxis as $xAxi){
+                $this->chart->series($xAxi, array_column($values,$xAxi));
+            }
         }
+
         if (count($this->seriesData) > 0) {
             $this->chart->series($this->title, $this->seriesData);
         }
@@ -444,6 +464,8 @@ class Echart extends Component
                 $end_date = Request::get('end_date');
                 $value = $db->whereBetweenTime($this->dateField, $start_date, $end_date)->$type($field);
                 break;
+            default:
+                $value = $db->$type($field);
         }
         if ($after instanceof \Closure) {
             $value = call_user_func($after, $value);

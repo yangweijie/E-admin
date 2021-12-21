@@ -32,7 +32,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    console.log(props)
     const state = reactive({
       progress: 0,
       status: '',

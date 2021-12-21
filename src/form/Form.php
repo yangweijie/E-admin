@@ -685,7 +685,7 @@ class Form extends Component
             $manyData[] = $this->data;
             $this->data = [];
         }
-        if($this->isEdit){
+        if($this->isEdit && !$nesting){
             $manyItem->value($manyData);
         }else{
             $manyItem->default($manyData);

@@ -8,6 +8,7 @@ use Eadmin\chart\EchartInterface;
 use Eadmin\chart\Gradual;
 use Eadmin\View;
 use mapleRegion\common\Enum;
+use think\facade\Log;
 
 /**
  * 折线图表
@@ -31,7 +32,6 @@ class LineChart extends EchartAbstract
             'xAxis' => [
                 'data' => [],
                 'type' => 'category',
-                'boundaryGap' => false,
             ],
             'grid' => [
                 'left' => '3%',
@@ -100,7 +100,9 @@ class LineChart extends EchartAbstract
     public function xAxis(array $data,array $options = [])
     {
         $this->options['xAxis'] = array_merge($this->options['xAxis'],$options);
+
         $this->options['xAxis']['data'] = $data;
+       
         return $this;
     }
 }
