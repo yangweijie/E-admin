@@ -37,7 +37,7 @@ use think\route\dispatch\Controller;
 class Admin
 {
     protected static $permissions = [];
-    protected static $authfields = [];
+    protected static $authFields = null;
 
     /**
      * 配置系统参数
@@ -180,13 +180,13 @@ class Admin
         if(!self::id()){
             return [];
         }
-        if (!empty(self::$authfields)) {
-            return self::$authfields;
+        if (is_array(self::$authFields)) {
+            return self::$authFields;
         }
         $key = 'eadmin_auth_field' . Admin::getAppName() . self::id();
         $data = Cache::get($key);
-        if ($data) {
-            self::$authfields = $data;
+        if (is_array($data)) {
+            self::$authFields = $data;
             return $data;
         }
         $data = self::user()->hideFields();
