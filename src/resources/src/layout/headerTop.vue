@@ -8,7 +8,7 @@
                  :background-color="state.theme == 'light-theme'?variables.theme:undefined"
                  @select="selectMenu" class="menu" mode="horizontal"
                  v-show="state.topMenuMode && state.device === 'desktop'">
-            <el-menu-item v-for="item in menus" :index="item.id+''">
+            <el-menu-item v-for="item in state.menus" :index="item.id+''">
                 <i :class="item.icon" v-if="item.icon"></i>
                 <span>{{item.name}}</span>
             </el-menu-item>
@@ -85,15 +85,14 @@
             const route = useRoute()
             const state = inject(store)
             const sidebar = state.sidebar
-            const menus = state.menus
             let linkMenuBool = false
             const activeIndex = computed(() => {
                 state.info.dropdownMenu = state.info.dropdownMenu.concat(JSON.parse(JSON.stringify(state.info.dropdownMenu)))
                 state.info.dropdownMenu.splice(0,state.info.dropdownMenu.length / 2)
                 let menu = findTree(state.menus, route.fullPath.substr(1), 'url'), menuLevels = []
-                if(route.path === '/' && menus.length > 0){
+                if(route.path === '/' && state.menus.length > 0){
                     action.selectMenuModule('')
-                    selectMenu(menus[0].id)
+                    selectMenu(state.menus[0].id)
 
                     return state.menuModule
                 } else if (menu) {
@@ -127,10 +126,10 @@
             })
             function selectMenuModule(val) {
 
-                for (var i = 0; i < menus.length; i++) {
-                    if (menus[i].id == val && menus[i].children) {
+                for (var i = 0; i < state.menus.length; i++) {
+                    if (state.menus[i].id == val && menus[i].children) {
                         action.sidebarVisible(true)
-                        let url = defaultMenu(menus[i].children)
+                        let url = defaultMenu(state.menus[i].children)
                         if (url && (action.getComponentIndex(route.fullPath) === -1 || linkMenuBool)) {
                             linkMenuBool = false
                             link(url)
@@ -152,7 +151,7 @@
             //选择菜单
             function selectMenu(index, indexPath) {
                 linkMenuBool = true
-                let menu = findTree(menus, index, 'id')
+                let menu = findTree(state.menus, index, 'id')
                 if(!state.menuModule){
                     selectMenuModule(index)
                 }
@@ -204,7 +203,6 @@
                 selectMenu,
                 collapse,
                 sidebar,
-                menus,
                 logout,
                 refreshs,
                 variables,

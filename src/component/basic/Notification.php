@@ -99,7 +99,15 @@ class Notification
         $this->data['refresh'] = true;
         return $this;
     }
-    public function menu(){}
+
+    /**
+     * 刷新菜单
+     * @return $this
+     */
+    public function refreshMenu(){
+        $this->data['menu'] = \Eadmin\Admin::menu()->tree(true);
+        return $this;
+    }
     /**
      * 改变bind字段数据
      * @param array $data

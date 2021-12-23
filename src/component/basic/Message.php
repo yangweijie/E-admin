@@ -67,7 +67,14 @@ class Message
         $this->response($message, 'error', $url);
         return $this;
     }
-
+    /**
+     * 刷新菜单
+     * @return $this
+     */
+    public function refreshMenu(){
+        $this->data['menu'] = \Eadmin\Admin::menu()->tree(true);
+        return $this;
+    }
     /**
      * 跳转url
      * @param string $url

@@ -38,7 +38,7 @@ class MenuService
                 $q->where('admin_visible', 1);
             })
             ->order('sort asc,id desc')
-            ->cache(10)
+            ->cache(2)
             ->select()->map(function ($item){
                 $item['name'] = str_replace('titles.','',admin_trans('menu.titles.'.$item['name']));
                 return $item;

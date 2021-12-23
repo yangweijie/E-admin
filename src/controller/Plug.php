@@ -195,7 +195,7 @@ class Plug extends Controller
         $file = $this->request->file('file');
         $res = Admin::plug()->install($file->getRealPath());
         if($res){
-            admin_success_message('安装完成');
+            admin_success_message('安装完成')->refreshMenu();
         }else{
             admin_error_message('安装失败');
         }
@@ -213,7 +213,7 @@ class Plug extends Controller
         }
         $res = Admin::plug()->onlineInstall($name,$version);
         if($res){
-            admin_success_message('安装完成');
+            admin_success_message('安装完成')->refreshMenu();
         }
         admin_error_message('安装失败');
     }
@@ -227,7 +227,7 @@ class Plug extends Controller
     {
         $name = $this->request->put('name');
         Admin::plug()->uninstall($name);
-        admin_success_message('卸载完成');
+        admin_success_message('卸载完成')->refreshMenu();
     }
 
 

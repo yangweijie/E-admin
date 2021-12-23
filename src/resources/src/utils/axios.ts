@@ -87,13 +87,25 @@ service.interceptors.response.use(
                         }
                     }
                 })
-            } else if (res.code == 80020) {
-                ElMessage({
-                    showClose: true,
-                    dangerouslyUseHTMLString: true,
-                    message: res.message,
-                    type: res.type
-                })
+            } else if (res.code == 80020 || res.code == 80021) {
+                if(res.code == 80020 ){
+                    ElMessage({
+                        showClose: true,
+                        dangerouslyUseHTMLString: true,
+                        message: res.message,
+                        type: res.type
+                    })
+                }else if(res.code == 80021 ){
+                    ElNotification({
+                        showClose: true,
+                        dangerouslyUseHTMLString: true,
+                        title: res.title,
+                        message: res.message,
+                        type: res.type,
+                        duration: 1500
+                    })
+                }
+
                 if (res.url) {
                     if (res.url == 'back') {
                         if (res.refresh) {
@@ -105,33 +117,8 @@ service.interceptors.response.use(
                         return
                     }
                 }
-                if (res.refresh) {
-                    refresh()
-                }
-                if (res.type == 'success') {
-                    res.code = 200
-                    return res
-                }
-            } else if (res.code == 80021) {
-                ElNotification({
-                    showClose: true,
-                    dangerouslyUseHTMLString: true,
-                    title: res.title,
-                    message: res.message,
-                    type: res.type,
-                    duration: 1500
-                })
-                if (res.url) {
-                    if (res.url == 'back') {
-                        if (res.refresh) {
-                            action.refresh(true)
-                        }
-                        router.back()
-                        return
-                    } else {
-                        link(res.url)
-                        return
-                    }
+                if (res.menu) {
+                    state.menus = res.menu
                 }
                 if (res.refresh) {
                     refresh()
@@ -140,7 +127,7 @@ service.interceptors.response.use(
                     res.code = 200
                     return res
                 }
-            } else if (res.code === 40021) {
+            }else if (res.code === 40021) {
                 link(res.url)
                 return
             } else if (res.code == 422 || res.code == 412) {
