@@ -36,6 +36,7 @@ class CreateSystemMenu extends Migrator
         $table->addColumn(Column::string('mark')->setDefault('')->setComment('标记'));
         $table->addColumn(Column::integer('sort')->setDefault(0)->setComment('菜单排序'));
         $table->addColumn(Column::tinyInteger('status')->setDefault(1)->setComment('状态(0:禁用,1:启用)'));
+        $table->addColumn(Column::tinyInteger('open')->setDefault(1)->setComment('菜单展开(0:禁用,1:启用)'));
         $table->addColumn(Column::tinyInteger('admin_visible')->setDefault(1)->setComment('超级管理员状态(0:隐藏,1:显示)'));
 		$table->addColumn(Column::dateTime('create_time')->setDefault('CURRENT_TIMESTAMP')->setComment('创建时间'));
 		$table->addColumn(Column::dateTime('update_time')->setNullable()->setComment('更新时间'));

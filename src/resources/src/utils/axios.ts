@@ -22,6 +22,7 @@ service.interceptors.request.use(
         // please modify it according to the actual situation
         config.headers['Authorization'] = localStorage.getItem(state.app + '_eadmin_token')
         config.headers['multi-app'] = state.app
+        config.headers['X-Requested-With'] = 'XMLHttpRequest'
         return config
     },
     (error: any) => {

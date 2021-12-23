@@ -10,6 +10,7 @@ return [
         'icon'=>'菜单图标',
         'sort'=>'排序',
         'status'=>'状态',
+        'open'=>'菜单展开',
         'super_status'=>'超级管理员状态',
     ],
     'options'=>[

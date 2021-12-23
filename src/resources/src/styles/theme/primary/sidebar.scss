@@ -102,10 +102,10 @@
       border-radius: 0 !important;
     }
   }
-  .mobile .sidebar-container {
-    position: fixed;
-    z-index: 9999;
-  }
+
 }
 
-
+.mobile .sidebar-container {
+  position: fixed;
+  z-index: 9999;
+}

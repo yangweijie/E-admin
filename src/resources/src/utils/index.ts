@@ -324,7 +324,6 @@ export function randomCoding(length){
     return idvalue;
 }
 export function empty(value) {
-    console.log(value)
     if(!value && value !== 0){
         return true
     }

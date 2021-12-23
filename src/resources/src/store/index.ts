@@ -49,7 +49,6 @@ const states = reactive({
     theme:'',
     //表格grid激活刷新
     gridActivatedRefresh:true,
-    gridFirst:true,
     lang:{},
     app:'',
 });

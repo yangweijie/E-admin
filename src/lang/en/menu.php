@@ -10,6 +10,7 @@ return [
         'icon' => 'icon',
         'sort' => 'sort',
         'status' => 'status',
+        'open'=>'Menu open',
         'super_status' => 'Super administrator status',
     ],
     'options' => [

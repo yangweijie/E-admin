@@ -266,7 +266,7 @@
             const quickSearchValue = ref('')
             const selectIds = ref(props.selection || [])
             const expandedRowKeys = ref([])
-
+            let initLoad = true
             const trashed = ref(false)
             const excel  = reactive({
                 excelVisible:false,
@@ -313,6 +313,16 @@
             onMounted(()=>{
                 if(!props.static){
                   loading.value = true
+                  initLoad = false
+                  nextTick(()=>{
+                     setTimeout(()=>{
+                       tableData.value = props.data
+                       initLoad = true
+                       tableAutoWidth()
+                       loading.value = false
+
+                     })
+                  })
                 }
             })
             onUnmounted((e)=>{
@@ -339,7 +349,7 @@
             })
 
             watch(loading, (value) => {
-                if (value) {
+                if (value && initLoad) {
                     //SidebarGrid 赋值添加按钮
                     if(ctx.attrs.SidebarGrid && props.addButton && props.addButton.attribute.params.hasOwnProperty([ctx.attrs.SidebarGrid]) && props.addButton.name === 'EadminDialog'){
                         props.addButton.attribute.params[ctx.attrs.SidebarGrid]  = props.addParams[ctx.attrs.SidebarGrid]
@@ -430,13 +440,16 @@
                       if(item.prop === 'EadminAction'){
                         if(!item.width){
                           let width = 0
-                          document.getElementsByClassName('EadminAction').forEach(item => {
-                            let offsetWidth = item.offsetWidth
-                            if (width < offsetWidth) {
-                              width = offsetWidth
-                            }
+                          const timer = setInterval(()=>{
+                            document.getElementsByClassName('EadminAction').forEach(item => {
+                              let offsetWidth = item.offsetWidth
+                              if (width < offsetWidth) {
+                                width = offsetWidth
+                              }
+                            })
+                            item.width = width+20
                           })
-                          item.width = width+20
+                          clearInterval(timer)
                         }
                         //有滚动条操作列fixed
                         if(dragTable.value && !item.fixed){
@@ -599,24 +612,13 @@
                     tableData.value = res.data
                     total.value = res.total
                     header.value = res.header
-
                     let action = findTree(originColumns,'EadminAction','prop')
                     if(action && !action.width){
                         action = findTree(columns.value,'EadminAction','prop')
                         delete action.width
                     }
                     tools.value = res.tools
-                    nextTick(()=>{
-                      if(state.gridFirst){
-                        setTimeout(()=>{
-                          state.gridFirst = false
-                          tableAutoWidth()
-                        })
-                      }else{
-                        tableAutoWidth()
-                      }
-
-                    })
+                    tableAutoWidth()
                 }).finally(() => {
                     ctx.emit('update:modelValue', false)
                 })

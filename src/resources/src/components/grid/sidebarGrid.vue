@@ -19,14 +19,14 @@
             <el-input prefix-icon="el-icon-search" size="small" v-model="keyword"></el-input>
         </div>
         <div class="tree-group">
-            <el-tree v-bind="tree.attribute" highlight-current :data="treeData" :current-node-key="current" @node-click="onNodeClick"></el-tree>
+            <el-tree ref="eadminTree" v-bind="tree.attribute" :data="treeData" :current-node-key="current" @node-click="onNodeClick"></el-tree>
         </div>
     </el-card>
 </template>
 
 <script>
     import {trans} from '@/utils'
-    import {defineComponent,reactive,toRefs,computed} from "vue";
+    import {defineComponent,reactive,toRefs,computed,ref} from "vue";
     import useHttp from "../../hooks/use-http";
     import { ElMessageBox} from 'element-plus'
     export default defineComponent({
@@ -63,9 +63,11 @@
               default:[],
             },
         },
-        emits:['update:gridValue','update:gridParams','update:dataSource'],
+        emits:['update:gridValue','update:gridParams','update:source'],
         setup(props,ctx){
+          console.log(props.tree)
             ctx.emit('update:gridParams',props.params)
+            const eadminTree = ref()
             const {loading,http} = useHttp()
             const state = reactive({
                 current:props.defaultValue,
@@ -94,6 +96,7 @@
             })
             function onNodeClick(row) {
                 state.current = row[props.tree.attribute.nodeKey]
+                eadminTree.value.setCurrentKey(state.current)
                 let params = {}
                 params[props.field] = state.current
                 if(state.current){
@@ -147,10 +150,12 @@
                     url:'/eadmin.rest',
                     params:Object.assign({eadmin_sidebar_data:true},ctx.attrs.remoteParams)
                 }).then(res=>{
-                    state.dataSource = data.concat(res.data)
-                    if(state.dataSource.length > 0){
-                        onNodeClick(state.dataSource[0])
-                    }
+                  state.dataSource = data.concat(res.data)
+                  if(state.dataSource.length > 0){
+                    setTimeout(()=>{
+                      onNodeClick(state.dataSource[0])
+                    })
+                  }
                 })
             }
             function del() {
@@ -167,6 +172,7 @@
             }
 
             return {
+                eadminTree,
                 trans,
                 del,
                 loading,

@@ -24,14 +24,19 @@ class MapChart extends EchartAbstract
 
             'visualMap' => [
                 'min' => 0,
-                'max' => 2500,
+                'max' => 10,
                 'text' => ['高', '低'],
-                'realtime' => false,
+                'realtime' => true,
                 'calculable' => true,
                 'show' => true,
                 'inRange' => [
-                    'color' => ['#e0ffff', '#006edd']
-                ]
+                    'color' => ['#f1f1f1', '#25aed4']
+                ],
+                'orient' => 'horizontal',
+                'bottom' => '1%',
+                'left' => '0',
+                'itemWidth' => '12px',
+                'itemHeight' => '200px'
             ],
 
             'series' => []
@@ -45,8 +50,18 @@ class MapChart extends EchartAbstract
             'name' => $name,
             'type' => 'map',
             'map' => 'china',
+            'zoom'=>1.1,
+            'showLegendSymbol'=>false,
             'selectedMode' => 'single',
-            'roam' => false,
+            'itemStyle' => [
+                'normal' => [
+                    'areaColor' => '#f1f1f1',
+                    'borderColor' => '#fff',
+                ],
+                'emphasis' => [
+                    'areaColor' => '#5CD2B7'
+                ]
+            ],
             'label' => [
                 'show' => true
             ],

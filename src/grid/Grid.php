@@ -168,9 +168,7 @@ class Grid extends Component
      */
     public function header($header)
     {
-        if (is_string($header)) {
-            $header = explode('', $header);
-        } elseif ($header instanceof Component) {
+        if ($header instanceof Component || is_string($header)) {
             $header = [$header];
         }
         foreach ($header as &$item) {

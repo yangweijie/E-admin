@@ -59,6 +59,7 @@ class Menu extends Controller
                 return Link::create($val)->href("#/$val");
             });
             $grid->column('status', admin_trans('menu.fields.status'))->switch();
+            $grid->column('open', admin_trans('menu.fields.open'))->switch();
             $grid->column('admin_visible', admin_trans('menu.fields.super_status'))->switch(admin_trans('menu.options.admin_visible'));
             $grid->actions(function (Actions $action, $data) {
                 $action->prepend(
