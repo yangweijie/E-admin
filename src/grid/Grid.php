@@ -318,12 +318,11 @@ class Grid extends Component
     }
 
     //删除前回调
-    public function deling(\Closure $closure)
+    public function deling($closure)
     {
         Event::listen(Deling::class, function ($id) use ($closure) {
             $trueDelete = Request::delete('trueDelete');
             call_user_func_array($closure, [$id, $trueDelete]);
-           
         });
     }
     //删除后回调
@@ -457,7 +456,7 @@ class Grid extends Component
 
     public function tools($tools)
     {
-       if (is_array($tools)) {
+        if (is_array($tools)) {
             foreach ($tools as $tool) {
                 $this->tools($tool);
             }
@@ -748,28 +747,21 @@ class Grid extends Component
             $this->attr('filter', $form);
             $this->attr('filterField', $form->bindAttr('model'));
         }
-
-        //是否分页
-        if (!$this->hidePage) {
-            $this->attr('pagination', $this->pagination->attribute);
-        }
         //添加操作列
         if (!$this->hideAction) {
             $this->column[] = $this->actionColumn->column();
         }
-        //静态表格
-        if ($this->attr('static')) {
-            $data = $this->parseData();
-            $this->attr('data', $data);
+        if(request()->isAjax()){
+            $this->attr('data', $this->parseData());
         }
-
+        //是否分页
+        if (!$this->hidePage) {
+            $this->attr('pagination', $this->pagination->attribute);
+        }
         if (request()->has('ajax_request_data') && request()->get('eadmin_class') == $this->callClass && !$this->attr('static')) {
-
-            $data = $this->parseData();
-
             return [
                 'code' => 200,
-                'data' => $data,
+                'data' => $this->attr('data'),
                 'header' => $this->attr('header'),
                 'tools' => $this->attr('tools'),
                 'total' => $this->pagination->attr('total')
