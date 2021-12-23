@@ -113,7 +113,7 @@ class Auth extends Controller
                 $data = [];
                 $fieldAuthModel::where('auth_id', $post['id'])->delete();
                 foreach ($fields as $field){
-                    if(in_array($field['id'],$post['fields']) && !empty($field['field'])){
+                    if(in_array($field['id'],$post['fields'],true) && !empty($field['field'])){
                         $data[] = [
                             'auth_id' => $post['id'],
                             'field' => $field['field'],

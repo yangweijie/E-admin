@@ -432,7 +432,9 @@
               }
             }
             function tableAutoWidth(){
-
+                if(ctx.attrs.defaultExpandAllRows){
+                  expandedRowKeys.value = treeMap(tableData.value,'eadmin_id')
+                }
                 nextTick(()=>{
                     //操作列自适应
                   if(props.autoLayout){
@@ -606,9 +608,6 @@
                     url: props.loadDataUrl,
                     params: globalRequestParams()
                 }).then(res => {
-                    if(ctx.attrs.defaultExpandAllRows){
-                        expandedRowKeys.value = treeMap(res.data,'eadmin_id')
-                    }
                     tableData.value = res.data
                     total.value = res.total
                     header.value = res.header

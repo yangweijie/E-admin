@@ -99,6 +99,7 @@ class Notification
         $this->data['refresh'] = true;
         return $this;
     }
+    public function menu(){}
     /**
      * 改变bind字段数据
      * @param array $data

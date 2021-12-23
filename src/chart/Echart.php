@@ -53,7 +53,7 @@ class Echart extends Component
     protected $date_type = null;
     protected $pkField = '';
     protected $groupMode = false;
-
+    protected $xAxis = [];
     /**
      * Echart constructor.
      * @param string $title 标题
