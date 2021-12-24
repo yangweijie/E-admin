@@ -14,7 +14,7 @@ use think\helper\Str;
  * @link https://element-plus.gitee.io/#/zh-CN/component/radio
  * @method $this textColor(string $color) 按钮形式的 Radio 激活时的文本颜色    #ffffff
  * @method $this fill(string $color) 按钮形式的 Radio 激活时的填充色和边框色 #409EFF
- * @method $this border(bool $border) 是否显示边框
+ * @method $this border(bool $border = true) 是否显示边框
  * @method $this size(string $size) 单选框组尺寸，仅对按钮形式的 Radio 或带有边框的 Radio 有效 medium / small / mini
  * @package Eadmin\component\form\field
  */
@@ -25,6 +25,23 @@ class RadioGroup extends Field
     //禁用数据
     protected $disabledData = [];
 
+    protected $optionBindField = null;
+    public function __construct($field = null, $value = '')
+    {
+        parent::__construct($field, $value);
+        $this->optionBindField = Str::random(30, 3);
+    }
+
+    /**
+     * 设置options绑定js变量
+     * @param $field
+     * @return $this
+     */
+    public function setOptionField($field)
+    {
+        $this->optionBindField = $field;
+        return $this;
+    }
     /**
      * 禁用选项数据
      * @param array $data 禁用数据
@@ -46,7 +63,7 @@ class RadioGroup extends Field
      */
     public function options(array $data, bool $buttonTheme = false)
     {
-    	$options = [];
+        $options = [];
         foreach ($data as $value => $label) {
             if (in_array($value, $this->disabledData)) {
                 $disabled = true;
@@ -70,16 +87,15 @@ class RadioGroup extends Field
         $field = $radio->bindAttr('modelValue');
         $radio->removeBind($field);
         $radio->removeAttr('modelValue');
-        $optionBindField = Str::random(30, 3);
-        $this->bindValue($options, 'options', $optionBindField);
+        $this->bindValue($options, 'options', $this->optionBindField);
         if($this->formItem){
-            $this->formItem->form()->except([$optionBindField]);
+            $this->formItem->form()->except([$this->optionBindField]);
             if (empty($this->formItem->form()->manyRelation())) {
-                $mapField = $this->formItem->form()->bindAttr('model') . '.' . $optionBindField;
+                $this->optionBindField = $this->formItem->form()->bindAttr('model') . '.' . $this->optionBindField;
             }
         }
         $radioOption = $radio
-            ->map($options,$optionBindField)
+            ->map($options,$this->optionBindField)
             ->mapAttr('label', 'value')
             ->mapAttr('key', 'value')
             ->mapAttr('slotDefault', 'label')

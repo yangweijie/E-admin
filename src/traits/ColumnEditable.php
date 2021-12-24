@@ -94,6 +94,7 @@ trait ColumnEditable
         $params = $this->grid->getCallMethod();
         $id = $this->grid->drive()->getPk();
         $field = 'eadmin_editable' . str_replace('.', '_', $this->prop) . $data[$id];
+
         $params['eadmin_ids'] = [$data[$id]];
         $params['eadmin_editable_bind'] = $field;
         $params['eadmin_field'] = $this->prop;
@@ -112,7 +113,8 @@ trait ColumnEditable
                 ->onCheckAll();
         }
         if (!empty($this->editable['options'])) {
-            $component->options($this->editable['options']);
+            $optionField = 'editable_'.str_replace('.', '_', $this->prop);
+            $component->setOptionField($optionField)->options($this->editable['options']);
         }
         $component->where($field, 1)->attr('ref', $field);
         if (!$this->editable['show']) {

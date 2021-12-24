@@ -127,7 +127,7 @@
             function selectMenuModule(val) {
 
                 for (var i = 0; i < state.menus.length; i++) {
-                    if (state.menus[i].id == val && menus[i].children) {
+                    if (state.menus[i].id == val && state.menus[i].children) {
                         action.sidebarVisible(true)
                         let url = defaultMenu(state.menus[i].children)
                         if (url && (action.getComponentIndex(route.fullPath) === -1 || linkMenuBool)) {

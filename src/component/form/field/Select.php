@@ -59,6 +59,11 @@ class Select extends Field
         $this->optionBindField = Str::random(30, 3);
     }
 
+    /**
+     * 设置options绑定js变量
+     * @param $field
+     * @return $this
+     */
     public function setOptionField($field)
     {
         $this->optionBindField = $field;

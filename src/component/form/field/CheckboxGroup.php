@@ -26,7 +26,7 @@ class CheckboxGroup extends Field
     protected $name = 'EadminCheckboxGroup';
     //禁用数据
     protected $disabledData = [];
-
+    protected $optionBindField = null;
     public function __construct($field = null, $value = [])
     {
         if (empty($value)) {
@@ -34,8 +34,18 @@ class CheckboxGroup extends Field
         }
         $this->default = $value;
         parent::__construct($field, $value);
+        $this->optionBindField = Str::random(30, 3);
     }
-
+    /**
+     * 设置options绑定js变量
+     * @param $field
+     * @return $this
+     */
+    public function setOptionField($field)
+    {
+        $this->optionBindField = $field;
+        return $this;
+    }
     /**
      * 禁用选项数据
      * @param array $data 禁用数据
@@ -72,17 +82,16 @@ class CheckboxGroup extends Field
         } else {
             $checkbox = new Checkbox;
         }
-        $mapField = Str::random(30, 3);
-        $this->bindValue($options, 'options', $mapField);
+        $this->bindValue($options, 'options', $this->optionBindField);
         if ($this->formItem) {
-            $this->formItem->form()->except([$mapField]);
+            $this->formItem->form()->except([$this->optionBindField]);
         }
 
         if ($this->formItem && empty($this->formItem->form()->manyRelation())) {
-            $mapField = $this->formItem->form()->bindAttr('model') . '.' . $mapField;
+            $this->optionBindField = $this->formItem->form()->bindAttr('model') . '.' . $this->optionBindField;
         }
         $checkboxOption = $checkbox
-            ->map($options, $mapField)
+            ->map($options, $this->optionBindField)
             ->mapAttr('label', 'value')
             ->mapAttr('key', 'value')
             ->mapAttr('slotDefault', 'label')
