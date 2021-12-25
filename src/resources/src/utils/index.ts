@@ -331,9 +331,26 @@ export function empty(value) {
         return true
     }
 }
-export function offsetTop(el) {
+export function getPopupEl(el) {
+    if(el.className.indexOf('eadmin-dialog') > -1 || el.className.indexOf('eadmin-drawer') > -1){
+        return el
+    }
     if(el.parentElement) {
-        return offsetTop(el.parentElement) + el.offsetTop
+        return getPopupEl(el.parentElement)
+    }
+    return null
+}
+export function offsetTop(el,filterClass = []) {
+
+
+    // @ts-ignore
+    for(let key in filterClass){
+        if(el.className.indexOf(filterClass[key]) > -1){
+            return 0
+        }
+    }
+    if(el.offsetParent) {
+        return offsetTop(el.offsetParent,filterClass) + el.offsetTop
     }
     return el.offsetTop
 }

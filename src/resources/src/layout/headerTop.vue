@@ -68,7 +68,7 @@
     import {useRoute} from 'vue-router'
     import {link, findParent, findTree,refresh,trans} from '@/utils'
     import {defineComponent, watch, inject, computed} from 'vue'
-    import {store, action, state} from '@/store'
+    import {store, action} from '@/store'
     import router from "../router";
     import screenfull from "@/components/screenfull.vue";
     import notice from "@/layout/notice.vue";

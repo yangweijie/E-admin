@@ -51,7 +51,7 @@ class Actions extends Html
     {
         parent::__construct();
         $this->grid = $grid;
-        $this->attr('class', 'EadminAction');
+        $this->attr('class', request()->get('eadmin_grid',$this->grid->bindAttr('modelValue')).'EadminAction');
         $this->column = new Column('EadminAction', '', $grid);
         $this->editText = admin_trans('admin.edit');
         $this->delText = admin_trans('admin.delete');

@@ -26,7 +26,7 @@
 
 <script>
     import {trans} from '@/utils'
-    import {defineComponent,reactive,toRefs,computed,ref} from "vue";
+    import {defineComponent,reactive,toRefs,computed,ref,watch} from "vue";
     import useHttp from "../../hooks/use-http";
     import { ElMessageBox} from 'element-plus'
     export default defineComponent({
@@ -38,6 +38,7 @@
             hideFilter: Boolean,
             hideTools: Boolean,
             gridValue: Boolean,
+            initLoad: Boolean,
             header: Boolean,
             hideAll: Boolean,
             tree: Object,
@@ -65,7 +66,6 @@
         },
         emits:['update:gridValue','update:gridParams','update:source'],
         setup(props,ctx){
-          console.log(props.tree)
             ctx.emit('update:gridParams',props.params)
             const eadminTree = ref()
             const {loading,http} = useHttp()
@@ -75,6 +75,7 @@
                 editUrl:'',
                 dataSource: JSON.parse(JSON.stringify(props.source)),
             })
+
             if(!props.hideAll){
                 const all = {}
                 all[props.tree.attribute.nodeKey] = ''
@@ -84,8 +85,14 @@
             if(props.defaultValue){
                 let params = {}
                 params[props.field] = props.defaultValue
+                state.editUrl = '/eadmin/'+state.current+'/edit.rest'
                 ctx.emit('update:gridParams',params)
             }
+            watch(()=>props.initLoad,(value)=>{
+                if(value && props.defaultValue){
+                  ctx.emit('update:gridValue',true)
+                }
+            })
             const addParams = computed(()=>{
                 let params = {}
                 params[props.field] = state.current

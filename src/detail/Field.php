@@ -48,7 +48,7 @@ class Field extends Column
         ]);
         if (!empty($label)) {
             $label = Html::create($label . ':')->tag('div')
-                ->attr('style', ['color' => '#888888', 'marginRight' => '5px','width'=>$width.'px','textAlign'=>'right']);
+                ->attr('style', ['color' => '#888888', 'marginRight' => '5px','width'=>$width.'px','textAlign'=>'right','lineHeight'=>'1.5']);
             $this->content($label);
         }
         $this->value = $content;

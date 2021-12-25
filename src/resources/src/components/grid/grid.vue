@@ -183,7 +183,7 @@
     import {useHttp} from '@/hooks'
     import request from '@/utils/axios'
     import {store,action} from '@/store'
-    import {forEach, unique, deleteArr, buildURL, debounce,treeMap,empty,findTree,offsetTop,trans} from '@/utils'
+    import {forEach, unique, deleteArr, buildURL, debounce,treeMap,empty,findTree,offsetTop,trans,getPopupEl} from '@/utils'
     import {ElMessageBox,ElMessage} from 'element-plus'
     import Sortable from 'sortablejs'
     import {useRoute} from 'vue-router'
@@ -247,10 +247,15 @@
             proxyData:Object,
             //自定义视图
             custom:[Object, Boolean],
+            initLoad: {
+              type:[Boolean,Number],
+              default:true
+            },
         },
         inheritAttrs: false,
-        emits: ['update:modelValue','update:selection','update:data'],
+        emits: ['update:modelValue','update:selection','update:data','update:initLoad'],
         setup(props, ctx) {
+            let sortable = null
             const route = useRoute()
             const state = inject(store)
             const proxyData = props.proxyData
@@ -266,7 +271,7 @@
             const quickSearchValue = ref('')
             const selectIds = ref(props.selection || [])
             const expandedRowKeys = ref([])
-            let initLoad = true
+            let initLoad = props.initLoad
             const trashed = ref(false)
             const excel  = reactive({
                 excelVisible:false,
@@ -311,21 +316,30 @@
             }
 
             onMounted(()=>{
+
                 if(!props.static){
+                  if(initLoad){
+                    initLoad = false
+                  }
                   loading.value = true
-                  initLoad = false
                   nextTick(()=>{
-                     setTimeout(()=>{
+                    setTimeout(()=>{
                        tableData.value = props.data
                        initLoad = true
-                       tableAutoWidth()
+                       ctx.emit('update:initLoad',initLoad)
+                       if(state.gridFirst){
+                          state.gridFirst = false
+                          setTimeout(tableAutoWidth,300)
+                       }else{
+                          tableAutoWidth()
+                       }
                        loading.value = false
-
                      })
                   })
                 }
             })
             onUnmounted((e)=>{
+                sortable.destroy()
                 if(excel.excelTimer != null){
                     clearInterval(excel.excelTimer)
                 }
@@ -349,6 +363,7 @@
             })
 
             watch(loading, (value) => {
+
                 if (value && initLoad) {
                     //SidebarGrid 赋值添加按钮
                     if(ctx.attrs.SidebarGrid && props.addButton && props.addButton.attribute.params.hasOwnProperty([ctx.attrs.SidebarGrid]) && props.addButton.name === 'EadminDialog'){
@@ -399,13 +414,18 @@
                 if(proxyData[props.filterField]){
                     filterInitData = JSON.parse(JSON.stringify(proxyData[props.filterField]))
                 }
-                autoHeight(props.autoHeight)
                 dragSort()
             })
-            function autoHeight(auto=false){
+            function autoHeight(){
+
               //自适应最大高度
-              if(!ctx.attrs.scroll.y && auto){
-                ctx.attrs.scroll.y = window.innerHeight - offsetTop(tableBox.value) - 65
+              if(!ctx.attrs.scroll.y){
+                const popupEl = getPopupEl(tableBox.value)
+                if(popupEl){
+                  ctx.attrs.scroll.y = popupEl.offsetHeight - offsetTop(tableBox.value,['eadmin-dialog','eadmin-drawer']) - 55
+                }else{
+                  ctx.attrs.scroll.y = window.innerHeight - offsetTop(tableBox.value) - 110
+                }
               }
               try {
                 if(ctx.attrs.scroll.y){
@@ -425,11 +445,30 @@
                       })
                       column.width = width+1
                     }
+
+                    if(column.prop === 'EadminAction' && dragTable.value && !column.fixed){
+                      nextTick(()=>{
+                        const el = dragTable.value.$el.querySelectorAll('.ant-table-body')[0]
+                        const table = dragTable.value.$el.querySelectorAll('.ant-table-body > table')[0]
+                        if(table.clientWidth > el.clientWidth){
+                          column.fixed = 'right'
+                        }
+                      })
+                    }
                   })
                 }
               }catch (e) {
 
               }
+            }
+            function getTdMaxWidth(width){
+              document.getElementsByClassName(ctx.attrs.eadmin_grid + 'EadminAction').forEach(item => {
+                let offsetWidth = item.offsetWidth
+                if (width < offsetWidth) {
+                  width = offsetWidth
+                }
+              })
+              return width
             }
             function tableAutoWidth(){
                 if(ctx.attrs.defaultExpandAllRows){
@@ -442,16 +481,13 @@
                       if(item.prop === 'EadminAction'){
                         if(!item.width){
                           let width = 0
-                          const timer = setInterval(()=>{
-                            document.getElementsByClassName('EadminAction').forEach(item => {
-                              let offsetWidth = item.offsetWidth
-                              if (width < offsetWidth) {
-                                width = offsetWidth
-                              }
-                            })
-                            item.width = width+20
+                          document.getElementsByClassName(ctx.attrs.eadmin_grid + 'EadminAction').forEach(item => {
+                            let offsetWidth = item.offsetWidth
+                            if (width < offsetWidth) {
+                              width = offsetWidth
+                            }
                           })
-                          clearInterval(timer)
+                          item.width = width + 20
                         }
                         //有滚动条操作列fixed
                         if(dragTable.value && !item.fixed){
@@ -459,9 +495,11 @@
                           const table = dragTable.value.$el.querySelectorAll('.ant-table-body > table')[0]
                           if(table.clientWidth > el.clientWidth){
                             item.fixed = 'right'
-                            //高度自适应
-                            autoHeight(true)
                           }
+                        }
+                        //高度自适应
+                        if(props.autoHeight || item.fixed || ctx.attrs.scroll.y){
+                          autoHeight()
                         }
                       }
                     })
@@ -472,7 +510,7 @@
             function dragSort(){
                 if(dragTable.value){
                     const el = dragTable.value.$el.querySelectorAll('.ant-table-body > table > tbody')[0]
-                    Sortable.create(el, {
+                    sortable = Sortable.create(el, {
                         handle:'.sortHandel',
                         ghostClass: 'sortable-ghost', // Class name for the drop placeholder,
                         onEnd: evt => {

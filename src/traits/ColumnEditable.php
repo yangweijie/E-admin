@@ -113,7 +113,7 @@ trait ColumnEditable
                 ->onCheckAll();
         }
         if (!empty($this->editable['options'])) {
-            $optionField = 'editable_'.str_replace('.', '_', $this->prop);
+            $optionField = $this->grid->bindAttr('modelValue').str_replace('.', '_', $this->prop);
             $component->setOptionField($optionField)->options($this->editable['options']);
         }
         $component->where($field, 1)->attr('ref', $field);

@@ -281,7 +281,7 @@ class PlugService
             $content = json_decode($content, true);
 
             $this->plugs = $content['data']['data'];
-            $this->total = $content['data']['total'];
+
 
             if(count($this->plugs) > 0){
                 $names = array_column($this->installed(), 'name');
@@ -295,6 +295,7 @@ class PlugService
                     $plug['install'] = true;
                 }
             }
+            $this->total = $content['data']['total'];
         }
         return $this->plugs;
     }
@@ -339,6 +340,7 @@ class PlugService
             }
             $plugs[] = $info;
         }
+        $this->total = count($plugs);
         return $plugs;
     }
 
