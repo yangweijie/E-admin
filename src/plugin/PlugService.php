@@ -506,7 +506,9 @@ class PlugService
                 unlink($plugZip);
                 return false;
             }
-        } catch (\Exception $exception) {
+        } catch (PlugException $exception) {
+            throw new PlugException($exception->getMessage(),$exception->getCode());
+        }catch (\Exception $exception) {
             return false;
         }
     }
@@ -549,12 +551,9 @@ class PlugService
                     $this->buildIde();
                     return true;
                 }
-                return false;
-            } else {
-                return false;
             }
         } catch (\Exception $exception) {
-            return false;
+            throw new PlugException($exception->getMessage(),$exception->getCode());
         }
     }
 
