@@ -50,7 +50,7 @@ class Menu extends Controller
             $grid->treeTable();
             $grid->title(admin_trans('menu.title'));
             $grid->column('name', admin_trans('menu.fields.name'))->display(function ($val, $data) {
-                return "<i class='{$data['icon']}'></i> " . $val;
+                return "<i class='{$data['icon']}'></i> " . admin_trans('menu.titles.'.$val,$val);
             });
             $grid->column('url',  admin_trans('menu.fields.url'))->display(function ($val) {
                 if(empty($val) || $val == '#'){
