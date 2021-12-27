@@ -108,9 +108,9 @@ class ResourceController extends Controller
         $reflect  = new \ReflectionMethod($instance, $action);
         $class = explode('\\',$class);
         $controller = end($class);
-        $app = request()->param('eadmin_app','');
-        app('http')->name(Admin::getAppName());
-        app()->setNamespace("app\\".$app);
+        $appName = Admin::getAppName();
+        app('http')->name($appName);
+        app()->setNamespace("app\\".$appName);
         $this->request->setController($controller);
         $actionName = $reflect->getName();
         $this->request->setAction($actionName);
