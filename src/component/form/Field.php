@@ -149,13 +149,13 @@ abstract class Field extends Component
 
 	/**
 	 * icon形式的帮助内容
-	 * @param string       $content 提示的信息
+	 * @param mixed  $content 提示的信息
 	 * @param string $icon 图标样式
 	 * @param string $placement Tooltip 的出现位置 top/top-start/top-end/bottom/bottom-start/bottom-end/left/left-start/left-end/right/right-start/right-end
 	 * @param string $effect 主题  dark / light
 	 * @return $this
 	 */
-	public function tip(string $content, string $icon = 'el-icon-warning-outline', string $placement = 'top-start', string $effect = 'light')
+	public function tip($content, string $icon = 'el-icon-warning-outline', string $placement = 'top-start', string $effect = 'light')
 	{
 		$this->formItem->content(Tip::create(
 			Html::create()

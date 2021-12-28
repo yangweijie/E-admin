@@ -419,7 +419,7 @@
             function autoHeight(){
 
               //自适应最大高度
-              if(!ctx.attrs.scroll.y){
+              if(!ctx.attrs.scroll.y && props.autoHeight){
                 const popupEl = getPopupEl(tableBox.value)
                 if(popupEl){
                   ctx.attrs.scroll.y = popupEl.offsetHeight - offsetTop(tableBox.value,['eadmin-dialog','eadmin-drawer']) - 55

@@ -137,6 +137,7 @@ export default defineComponent({
         content_css: `/eadmin/tinymce/skins/content/default/content.css`,
         height: props.height,
         width: props.width,
+        fontsize_formats:'10px 11px 12px 14px 16px 18px 20px 24px 36px',
         menubar: false,
         plugins: 'axupimgs advlist anchor autolink autosave code codesample colorpicker  contextmenu directionality fullscreen hr image imagetools insertdatetime link lists media nonbreaking noneditable pagebreak preview print save searchreplace spellchecker tabfocus table template textcolor textpattern visualblocks visualchars wordcount',
         toolbar: props.toolbar,
