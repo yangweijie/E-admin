@@ -51,6 +51,7 @@ class Tabs extends Field
 		$content = end($tabPane->content['default']);
 		if (is_object($content) && $destroy) {
 			$content->where($this->bindAttr('modelValue'), $this->getContentCount());
+            $content->attr('eadmin_lazy',true);
 		}
 		$this->content($tabPane);
 		return $this;

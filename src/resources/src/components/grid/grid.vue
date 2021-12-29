@@ -316,9 +316,8 @@
             }
 
             onMounted(()=>{
-
                 if(!props.static){
-                  if(initLoad){
+                  if(initLoad && !ctx.attrs.eadmin_lazy){
                     initLoad = false
                   }
                   loading.value = true
