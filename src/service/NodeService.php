@@ -101,7 +101,7 @@ class NodeService
                     $login = true;
                 } elseif (preg_match('/@plugConfig\s(.*)/i', $line, $arr) && isset($arr[1]) && $plug) {
                     $field = trim($arr[1]);
-                    if (!$plug::config($field)) {
+                    if (!$plug->config($field)) {
                         $authPlug = false;
                     }
                 }

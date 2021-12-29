@@ -28,9 +28,9 @@ class TokenService
     //过期时间
     protected $expire = 7200;
     //当前token
-    protected static $token = '';
+    protected $token = '';
     protected $model = '';
-    protected static $userModel = null;
+    protected $userModel = null;
     protected $unique = false;
     protected $authFields = [];
     protected $config = [];
@@ -60,6 +60,7 @@ class TokenService
         $this->unique = $this->config['unique'];
         $this->expire = $this->config['expire'] ?? 7200;
         $this->authFields = $this->config['auth_field'] ?? [];
+
         if (isset($this->config['debug']) && $this->config['debug']) {
             $user = $this->model::find($this->config['uid']);
             $tokens = $this->encode($user);
@@ -77,7 +78,7 @@ class TokenService
     public function logout($token = '')
     {
         if (empty($token)) {
-            return Cache::set(md5(self::$token), time(), $this->expire);
+            return Cache::set(md5($this->token), time(), $this->expire);
         } else {
             return Cache::set(md5($token), time(), $this->expire);
         }
@@ -91,7 +92,7 @@ class TokenService
      */
     public function get()
     {
-        return self::$token ? self::$token : Request::header('Authorization');
+        return $this->token ? $this->token : Request::header('Authorization');
     }
 
     /**
@@ -102,7 +103,7 @@ class TokenService
      */
     public function set($token)
     {
-        self::$token = $token;
+        $this->token = $token;
         return true;
     }
 
@@ -114,7 +115,7 @@ class TokenService
      */
     public function clear()
     {
-        self::$token = '';
+        $this->token = '';
         return true;
     }
 
@@ -197,7 +198,7 @@ class TokenService
     public function auth($token = null)
     {
         if (is_null($token)) {
-            $token = self::$token ? self::$token : Request::header('Authorization') ?? urldecode(Request::param('Authorization'));
+            $token = $this->token ? $this->token : Request::header('Authorization') ?? urldecode(Request::param('Authorization'));
         }
         if (empty($token)) {
             $this->errorCode(40000, admin_trans('token.login_auth'),['multi_app'=>Admin::getAppName()]);
@@ -238,7 +239,7 @@ class TokenService
      */
     public function getVar($name)
     {
-        $token = self::$token ? self::$token : rawurldecode(Request::header('Authorization'));
+        $token = $this->token ? $this->token : rawurldecode(Request::header('Authorization'));
         $data = $this->decode($token);
         if (isset($data[$name])) {
             return $data[$name];
@@ -268,14 +269,14 @@ class TokenService
         if (is_null($this->id())) {
             return null;
         }
-        if (is_null(self::$userModel)) {
+        if (is_null($this->userModel)) {
             $user = new $this->model;
             $tableFields = $user->getTableFields();
-            self::$userModel = $user->lock($lock)
+            $this->userModel = $user->lock($lock)
                 ->when(in_array('delete_time', $tableFields), function (Query $query) {
                     $query->where('delete_time',0);
                 })->find($this->id());
         }
-        return self::$userModel;
+        return $this->userModel;
     }
 }

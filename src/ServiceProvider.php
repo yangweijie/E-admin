@@ -162,6 +162,7 @@ class ServiceProvider extends Service
             'admin.translator' => Translator::class,
             'admin.auth' => AuthService::class,
             'admin.node' => NodeService::class,
+            'admin.token' => TokenService::class,
         ]);
     }
     protected function crontab(){
