@@ -508,7 +508,7 @@ class PlugService
             }
         } catch (PlugException $exception) {
             throw new PlugException($exception->getMessage(),$exception->getCode());
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             return false;
         }
     }

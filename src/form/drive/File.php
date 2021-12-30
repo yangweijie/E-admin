@@ -38,7 +38,7 @@ class File implements FormInterface
 
     public function edit($id)
     {
-        
+
     }
 
     public function getPk()
@@ -49,6 +49,7 @@ class File implements FormInterface
     public function save(array $data)
     {
         unset($data['eadmin_app'],$data['eadmin_class'],$data['eadmin_function'],$data['eadmin_step_num']);
+        $data = array_merge($this->data,$data);
         $content = var_export($data, true);
         $content = <<<PHP
 <?php

@@ -35,6 +35,7 @@ class PlugDispatch extends Controller
         if(isset($result[3])){
             $this->actionName .=Str::studly($result[3]);
         }
+        $this->request->setAction($this->actionName);
         $this->dispatch = [$this->controller, $this->actionName];
     }
 

@@ -33,18 +33,7 @@ if (!function_exists('sysconf')) {
         return Admin::sysconf($name, $value);
     }
 }
-if (!function_exists('admin_log')) {
-    function admin_log($action, $content)
-    {
-        SystemLog::create([
-            'username' => TokenService::instance()->user()->nickname ?? 'cli',
-            'geoip' => request()->ip(),
-            'action' => $action,
-            'node' => request()->url(),
-            'content' => $content,
-        ]);
-    }
-}
+
 
 if (!function_exists('admin_success')) {
     /**

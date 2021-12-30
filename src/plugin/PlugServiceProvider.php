@@ -172,9 +172,6 @@ PHP;
             $pathinfo = ltrim($pathinfo,'/');
             $pathArr = explode('/', $pathinfo);
             if($pathArr[0] == 'api'){
-                $namespace = $this->getNamespace().'controller\\api\\';
-                $method = Request::method();
-                $method = strtolower($method);
                 //兼容快捷路由和按请求方式访问
                 $function = '';
                 $rule = '';
@@ -182,10 +179,7 @@ PHP;
                     $function = '<function>';
                     $rule = '/';
                 }
-                $route = '<controller>/' . $method . $function;
                 $rule = '<controller>' . $rule . $function;
-
-//                $this->app->route->any($rule, $namespace . $route);
                 $this->app->route->any($rule, PlugDispatch::class);
             }else{
                 $namespace = $this->getNamespace();

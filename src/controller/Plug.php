@@ -64,11 +64,13 @@ class Plug extends Controller
         $size = $this->request->get('size', 20);
         if ($type == 1) {
             $data = Admin::plug()->installed($search);
+            $total = 0;
         } else {
             $data = Admin::plug()->all($search, $cate_id, $page, $size);
+            $total = Admin::plug()->total();
         }
         $grid = new Grid($data);
-        $grid->drive()->setTotal(Admin::plug()->total());
+        $grid->drive()->setTotal($total);
         $grid->title('插件管理');
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');

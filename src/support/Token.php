@@ -1,6 +1,7 @@
 <?php
 
 namespace Eadmin\support;
+use Eadmin\service\ApiTokenService;
 use Eadmin\service\TokenService;
 use think\Facade;
 use think\Model;
@@ -24,7 +25,7 @@ class Token extends Facade
 {
     protected static function getFacadeClass()
     {
-        return TokenService::class;
+        return ApiTokenService::class;
     }
     public static function __callStatic($method, $params)
     {
