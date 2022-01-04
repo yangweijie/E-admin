@@ -120,6 +120,7 @@ class Plug extends Controller
                         ->typePrimary()
                         ->dialog()
                         ->width('50%')
+                        ->title('')
                         ->form($rows['setting'])->whenShow(!empty($rows['setting']))
                 );
             }

@@ -33,14 +33,12 @@ class Model implements FormInterface
         $this->pkField = $this->model->getPk();
     }
     protected function methodExists($class,$method){
-       foreach (class_parents($class) as $parent){
-           if(method_exists($parent,$method))
-           {
-               return false;
-           }
-       }
-        if (method_exists($class, $method)) {
-            return true;
+        $constructor  = new \ReflectionClass($class);
+        if($constructor->hasMethod($method)){
+            $method = $constructor->getMethod($method);
+            if( $constructor->name == $method->class){
+                return true;
+            }
         }
         return false;
     }
