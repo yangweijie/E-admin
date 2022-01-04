@@ -12,6 +12,7 @@ use Eadmin\Admin;
 use Eadmin\traits\ApiJson;
 use think\db\Query;
 use think\facade\Cache;
+use think\facade\Log;
 use think\facade\Request;
 use Eadmin\model\AdminModel;
 use Eadmin\Service;
@@ -34,12 +35,18 @@ class TokenService
     protected $unique = false;
     protected $authFields = [];
     protected $config = [];
-
+    protected static $instance = [];
     public function __construct($type = null)
     {
         $this->init($type);
-    }
 
+    }
+    public static function instance($type){
+        if(!isset(self::$instance[$type])){
+            self::$instance[$type] = new static($type);
+        }
+        return self::$instance[$type];
+    }
     /**
      * 初始化
      * @param string $type 配置类型
@@ -203,7 +210,9 @@ class TokenService
         if (empty($token)) {
             $this->errorCode(40000, admin_trans('token.login_auth'),['multi_app'=>Admin::getAppName()]);
         }
+
         $data = $this->decode($token);
+
         if ($data === false) {
             $this->errorCode(40001, admin_trans('token.login_auth_error'),['multi_app'=>Admin::getAppName()]);
         } elseif (Cache::has(md5($token)) && $this->unique) {

@@ -1,9 +1,7 @@
 <?php
 
 namespace Eadmin\support;
-use Eadmin\service\ApiTokenService;
 use Eadmin\service\TokenService;
-use think\Facade;
 use think\Model;
 
 /**
@@ -21,14 +19,10 @@ use think\Model;
  * @method bool clear() static 清除token
  * @method Model user($lock=false) static 获取用户模型
  */
-class Token extends Facade
+class Token
 {
-    protected static function getFacadeClass()
-    {
-        return ApiTokenService::class;
-    }
     public static function __callStatic($method, $params)
     {
-        return call_user_func_array([static::createFacade('',['api']), $method], $params);
+        return call_user_func_array([TokenService::instance('api'), $method], $params);
     }
 }

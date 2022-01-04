@@ -238,7 +238,7 @@ class Admin
 
     public static function token()
     {
-        return app('admin.token')->init('admin');
+        return TokenService::instance('admin');
     }
 
     /**
