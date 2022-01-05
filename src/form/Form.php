@@ -837,7 +837,7 @@ class Form extends Component
         //数字类型转换处理
         if (is_array($value) && count($value) == count($value, 1)) {
             foreach ($value as &$v) {
-                if (!is_array($v) && is_numeric($value) && preg_match('/^\d{1,11}$/', $v)) {
+                if (!is_array($v) && is_numeric($v) && preg_match('/^\d{1,11}$/', $v)) {
                     $v = intval($v);
                 } elseif (is_numeric($v) && strpos($v, '.') !== false) {
                     $v = floatval($v);
