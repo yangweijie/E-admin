@@ -640,7 +640,7 @@ class Form extends Component
     public function hasMany($relation, $title, \Closure $closure)
     {
         $nesting = false;
-        if(!empty($this->manyRelation)){
+        if (!empty($this->manyRelation)) {
             $nesting = true;
         }
         $this->validatorBind($relation);
@@ -685,9 +685,9 @@ class Form extends Component
             $manyData[] = $this->data;
             $this->data = [];
         }
-        if($this->isEdit && !$nesting){
+        if ($this->isEdit && !$nesting) {
             $manyItem->value($manyData);
-        }else{
+        } else {
             $manyItem->default($manyData);
         }
         $this->itemComponent = $originItemComponent;
@@ -707,12 +707,12 @@ class Form extends Component
             $manyItem->content($item);
         }
         $manyItem->attr('columns', $columns);
-//        $ifField = str_replace('.', '_', $relation);
-//        $ifField = $this->bindAttr('model') . $ifField . 'Show';
-//        $this->bind($ifField, 1);
-//        $manyItem->where($ifField, 1);
+        //        $ifField = str_replace('.', '_', $relation);
+        //        $ifField = $this->bindAttr('model') . $ifField . 'Show';
+        //        $this->bind($ifField, 1);
+        //        $manyItem->where($ifField, 1);
         $this->push($manyItem);
-        if($nesting){
+        if ($nesting) {
             $this->setItemComponent($manyItem);
         }
         return $manyItem;
@@ -835,21 +835,22 @@ class Form extends Component
     public function setData(string $field, $value)
     {
         //数字类型转换处理
+        $value = $this->converNumber($value);
+        Arr::set($this->data, $field, $value);
+    }
+
+    protected function converNumber($value)
+    {
         if (is_array($value) && count($value) == count($value, 1)) {
             foreach ($value as &$v) {
-                if (!is_array($v) && is_numeric($v) && preg_match('/^\d{1,11}$/', $v)) {
-                    $v = intval($v);
-                } elseif (is_numeric($v) && strpos($v, '.') !== false) {
-                    $v = floatval($v);
-                }
+                $v = $this->converNumber($v);
             }
-
         } elseif (!is_array($value) && is_numeric($value) && preg_match('/^\d{1,11}$/', $value)) {
             $value = intval($value);
         } elseif (is_numeric($value) && strpos($value, '.') !== false) {
             $value = floatval($value);
         }
-        Arr::set($this->data, $field, $value);
+        return $value;
     }
 
     public function getData($field = null)
@@ -969,7 +970,9 @@ class Form extends Component
         $item = array_pop($this->formItem);
         return $item;
     }
-    protected function recursionValueModel($item){
+
+    protected function recursionValueModel($item)
+    {
         if ($item instanceof Tabs) {
             foreach ($item->content['default'] as $pane) {
                 foreach ($pane->content['default'] as $content) {
@@ -988,7 +991,7 @@ class Form extends Component
                     $this->recursionValueModel($content);
                 }
             }
-        }  elseif ($item->attr('setpItem')) {
+        } elseif ($item->attr('setpItem')) {
             foreach ($item->content['default'] as $content) {
                 if ($content instanceof FormMany) {
                     $this->valueModel($content);
@@ -997,6 +1000,7 @@ class Form extends Component
             }
         }
     }
+
     /**
      * 解析组件
      */
