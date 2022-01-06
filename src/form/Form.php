@@ -845,7 +845,7 @@ class Form extends Component
             foreach ($value as &$v) {
                 $v = $this->converNumber($v);
             }
-        } elseif (!is_array($value) && is_numeric($value) && preg_match('/^\d{1,11}$/', $value)) {
+        } elseif (!is_array($value) && is_numeric($value) && preg_match('/^(0|[1-9][0-9]*)$/', $value) && preg_match('/^\d{1,11}$/', $value)) {
             $value = intval($value);
         } elseif (is_numeric($value) && strpos($value, '.') !== false) {
             $value = floatval($value);
