@@ -428,9 +428,9 @@
               }
               try {
                 if(ctx.attrs.scroll.y){
-                  columns.value.forEach(column=>{
+                  columns.value.forEach((column,index)=>{
                     let width = 0
-                    if(!column.width){
+                    if(!originColumns[index].width && column.prop !== 'EadminAction'){
                       document.getElementsByClassName('eadmin_table_th_'+column.prop).forEach(item=>{
                         let offsetWidth = item.parentNode.parentNode.parentNode.parentNode.offsetWidth
                         if(width < offsetWidth){
@@ -444,7 +444,6 @@
                       })
                       column.width = width+1
                     }
-
                     if(column.prop === 'EadminAction' && dragTable.value && !column.fixed){
                       nextTick(()=>{
                         const el = dragTable.value.$el.querySelectorAll('.ant-table-body')[0]
