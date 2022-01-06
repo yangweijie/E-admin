@@ -813,28 +813,23 @@ class Form extends Component
      */
     public function setData(string $field, $value)
     {
-
         //数字类型转换处理
+        $value = $this->converNumber($value);
+        Arr::set($this->data, $field, $value);
+    }
+
+    protected function converNumber($value)
+    {
         if (is_array($value) && count($value) == count($value, 1)) {
             foreach ($value as &$v) {
-                if (!is_array($v) && preg_match('/^\d{1,11}$/', $v)) {
-                    $v = intval($v);
-                } elseif (is_numeric($v) && strpos($v, '.') !== false) {
-                    $v = floatval($v);
-                }
+                $v = $this->converNumber($v);
             }
-        } elseif (!is_array($value) && preg_match('/^\d{1,11}$/', $value)) {
+        } elseif (!is_array($value) && is_numeric($value) && preg_match('/^(0|[1-9][0-9]*)$/', $value) && preg_match('/^\d{1,11}$/', $value)) {
             $value = intval($value);
         } elseif (is_numeric($value) && strpos($value, '.') !== false) {
             $value = floatval($value);
         }
-
-        if (strpos($field, '.')) {
-            [$relation, $field] = explode('.', $field);
-            $this->data[$relation][$field] = $value;
-        } else {
-            $this->data[$field] = $value;
-        }
+        return $value;
     }
 
     public function getData($field = null)
