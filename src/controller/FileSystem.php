@@ -24,7 +24,7 @@ class FileSystem extends Controller
         $cate_id = $this->request->get('cate_id');
         $ext = $this->request->get('ext');
         $model =  config(Admin::getAppName().'.database.file_model');
-        $data = $model::where('admin_id', Admin::id())
+        $model = $model::where('admin_id', Admin::id())
             ->where('is_delete',0)
             ->when($cate_id, ['cate_id'=>$cate_id])
             ->when($search, [['real_name', 'like', "%{$search}%"]])
@@ -36,9 +36,9 @@ class FileSystem extends Controller
                     $exts = explode(',',$ext);
                     $query->whereIn('ext',$exts);
                 }
-
-            })
-            ->pages()
+            });
+        $count = $model->count();
+        $data = $model->pages()
             ->select()->map(function ($item) {
                 $item['dir'] = false;
                 $item['size'] = FileService::instance()->getSize($item['file_size']);
@@ -49,7 +49,6 @@ class FileSystem extends Controller
             })->toArray();
         $fileSystem = new \Eadmin\component\basic\FileSystem($data);
         $fileSystem->initPath(\think\facade\Filesystem::disk('local')->path('/'))
-            ->attr('height', '350px')
             ->attr('display','menu')
             ->uploadFinder();
         $grid = $fileSystem;
@@ -63,8 +62,7 @@ class FileSystem extends Controller
             ->field('cate_id')
             ->height(362);
         if(empty($type)){
-            $sidebarGrid->sidebar()->bindAttValue('dataSource',[],true);
-            $grid->bindAttr('cate',$sidebarGrid->sidebar()->bindAttr('dataSource'));
+            $grid->bindAttr('cate','sidebar_source');
         }
         $sidebarGrid->sidebar()->attr('fileSystem',$fileSystem);
         $sidebarGrid->model()
@@ -73,6 +71,7 @@ class FileSystem extends Controller
             ->where(function (Query $query){
                 $query->whereOr('admin_id',Admin::id())->whereOr('per_type',0);
             });
+        $sidebarGrid->title('附件管理');
         return $sidebarGrid;
     }
     public function cateForm()

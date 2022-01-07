@@ -40,7 +40,7 @@
         </el-row>
       </template>
       <div>
-        <a-table v-if="showType === 'grid'" :scroll="{y:height?height:'calc(100vh - 320px)'}" :locale="{emptyText:trans('filesystem.empty')}"  row-key="id" :pagination="false" :row-selection="rowSelection" :columns="tableColumns" :data-source="tableData" :loading="loading" :custom-row="customRow">
+        <a-table v-if="showType === 'grid'" :scroll="{y:finderHeight}" :locale="{emptyText:trans('filesystem.empty')}"  row-key="id" :pagination="false" :row-selection="rowSelection" :columns="tableColumns" :data-source="tableData" :loading="loading" :custom-row="customRow">
           <template #name="{ text , record , index }">
             <div class="filename" @click="changePath(record.path,record.dir)">
               <el-image :src="record.url" :preview-src-list="[record.url]"
@@ -65,15 +65,18 @@
             </div>
           </template>
         </a-table>
-        <div v-else class="menuGrid" :style="{height:height?height:'calc(100vh - 280px)'}">
+        <div v-else class="menuGrid" :style="{height:finderHeight}">
           <el-row v-loading="loading" :gutter="15" style="padding: 0px 20px">
 
-            <el-col class="menuBox" :lg="4" :md="6" :sm="6" :xs="12" v-for="item in tableData"  @mouseenter="mouseenterIndex = item.id" @mouseleave="mouseenterIndex=''" @click="select(item)">
+            <el-col class="menuBox" :lg="4" :md="6" :sm="6" :xs="12" v-for="(item,index) in tableData" @mouseenter="mouseenterIndex = item.id" @mouseleave="mouseenterIndex=''" @click="select(item)">
 
               <div :class="[selectIds.indexOf(item.id) !== -1?'selected':'','item']">
+                <div class="zoom_action" v-show="mouseenterIndex == item.id && item.file_type.indexOf('image') > -1">
+                  <span class="el-icon-zoom-in" @click.stop="preview(item,index)"></span>
+                </div>
                 <i class="el-icon-circle-check" v-if="selectIds.indexOf(item.id) !== -1"></i>
-                <el-image :src="item.url" :preview-src-list="[item.url]" fit="contain"
-                          style="width: 80px;height: 80px;" @click="changePath(item.path,item.dir )">
+                <el-image :src="item.url" :preview-src-list="item.previewList" :ref="el=>setRef(el,index)" fit="contain"
+                          style="width: 80px;height: 80px;" @click="changePath(item.path,item.dir)">
                   <template #error >
                     <el-image :src="fileIcon(item.dir ? '.dir':item.name)"
                               style="width: 80px;height: 80px;" @click="changePath(item.path,item.dir )">
@@ -117,8 +120,8 @@
 </template>
 
 <script>
-    import {computed, defineComponent, reactive, toRefs, onActivated, watch,ref} from "vue";
-    import {deleteArr, fileIcon, unique,link,trans} from '@/utils'
+    import {computed, defineComponent, reactive, toRefs, onActivated, watch,ref,onBeforeUpdate,nextTick} from "vue";
+    import {deleteArr, fileIcon, unique,link,trans,offsetTop,getPopupEl} from '@/utils'
     import request from '@/utils/axios'
     import {useHttp} from "@/hooks";
     import {ElMessageBox,ElLoading} from 'element-plus';
@@ -166,9 +169,12 @@
 
             const {loading, http} = useHttp()
             const filesystem = ref('')
+            const previewImage = []
             const finerCate = computed(()=>{
                 const arr = JSON.parse(JSON.stringify(props.cate))
-                arr.shift()
+                if(arr.length >0 && !arr[0].id){
+                  arr.shift()
+                }
                 return arr
             })
             let finderParam =  ref({})
@@ -222,6 +228,7 @@
                 selectIds:[],
                 selectUrls:[],
                 selectCate:'',
+                finderHeight: props.height
             })
             loadData()
             watch(()=>state.selectCate,value=>{
@@ -256,6 +263,23 @@
                     loadData()
                 }
             })
+            watch(()=>state.showType,value=>{
+              autoHeight()
+            })
+            autoHeight()
+            function autoHeight(){
+              nextTick(()=>{
+                if(!props.height){
+                  let height = window.innerHeight - offsetTop(filesystem.value)
+                  if(state.showType == 'grid'){
+                    height -= 180
+                  }else{
+                    height -= 130
+                  }
+                  state.finderHeight  = height + 'px'
+                }
+              })
+            }
             function customRow(record){
                 return {
                     onMouseenter:event=>{
@@ -393,6 +417,20 @@
                     uploadProgressLoading.close()
                 }
             }
+
+            const setRef = (el,index)=>{
+              previewImage[index] = el
+            }
+            function preview(item,index){
+                const image = previewImage[index]
+                item.previewList = [item.url]
+                image.showViewer = true
+                watch(()=>image.showViewer,value=>{
+                  if(!value){
+                    item.previewList = []
+                  }
+                })
+            }
             const breadcrumb = computed(() => {
                 const arr = state.path.split('/').filter(item => {
                     return item
@@ -510,9 +548,12 @@
                 loading,
                 rowSelection,
                 fileIcon,
+                previewImage,
                 ...toRefs(state),
                 filesystem,
+                setRef,
                 finerCate,
+                preview,
                 trans
             }
         }
@@ -589,5 +630,20 @@
         position: absolute;
         top: 10px;
         right: 10px;
+    }
+    .zoom_action {
+      position: absolute;
+      width: 100%;
+      height: 30px;
+      cursor: pointer;
+      left: 0;
+      bottom: 0;
+      text-align: center;
+      color: #fff;
+      font-size: 18px;
+      background-color: rgba(0,0,0,.3);
+      border-radius: 5%;
+      z-index: 999;
+      transition: opacity .3s;
     }
 </style>

@@ -243,7 +243,8 @@ class SidebarGrid extends Component
         if ($this->treePid) {
             $data = Admin::tree($data, $this->treeId, $this->treePid);
         }
-        $this->sidebar->attr('source',$data);
+        $this->sidebar->bind('sidebar_source',$data);
+        $this->sidebar->bindAttr('source','sidebar_source');
         //加载数据
         if(request()->has('eadmin_sidebar_data')){
 

@@ -95,7 +95,7 @@
     <el-dialog :title="trans('el.upload.resource')" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
       <el-row :gutter="10">
         <el-col :md="5" :sm="7" :xs="20" :span="5">
-            <render :data="finder" v-model:grid-params="gridParams" v-model:grid-value="gridValue" v-model:dataSource="finerCate"></render>
+            <render :data="finder" v-model:grid-params="gridParams" v-model:grid-value="gridValue" v-model:bind-source="finerCate"></render>
         </el-col>
         <el-col :md="19" :sm="24" :xs="24" :span="19">
             <render :data="finder.attribute.fileSystem" :limit="limit" :multiple="multiple" display="menu" :height="finderHeight" v-model="gridValue" :cate="finerCate" :addParams="gridParams" v-model:selection="selection"></render>

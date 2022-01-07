@@ -28,11 +28,6 @@ class FileSystem extends Component
         parent::__construct();
         $this->bindAttValue('modelValue', false, true);
         $this->bindAttValue('addParams',[]);
-		$this->attr('total', count($data));
-		$page = Request::get('page', 1);
-		$size = Request::get('size', 100);
-		$page = ($page - 1) * $size;
-		$data = array_slice($data, $page, $size);
 		$this->data($data);
         $this->attr('upload', Upload::create()
             ->finder(false)

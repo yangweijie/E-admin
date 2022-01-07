@@ -59,12 +59,16 @@
                 type: String,
                 default:'group_id',
             },
+            bindSource:{
+              type: Array,
+              default:[],
+            },
             source :{
               type: Array,
               default:[],
             },
         },
-        emits:['update:gridValue','update:gridParams','update:source'],
+        emits:['update:gridValue','update:gridParams','update:source','update:bindSource'],
         setup(props,ctx){
             ctx.emit('update:gridParams',props.params)
             const eadminTree = ref()
@@ -141,6 +145,7 @@
             const treeData = computed(()=>{
                 const data =  filterTree(state.dataSource)
                 ctx.emit('update:source',data)
+                ctx.emit('update:bindSource',data)
                 return data
             })
             function getData() {
