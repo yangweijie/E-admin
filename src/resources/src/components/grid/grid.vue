@@ -478,7 +478,7 @@
                           if(state.gridFirst){
                             setTimeout(()=>{
                               item.width  = getTdMaxWidth(width)
-                            })
+                            },1000)
                             state.gridFirst = false
                           }else{
                             item.width  = getTdMaxWidth(width)
