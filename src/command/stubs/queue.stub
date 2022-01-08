@@ -7,7 +7,7 @@ use Eadmin\Queue;
 class $className extends Queue
 {
     //重试次数
-    protected $retry = 0;
+    protected $tries = 0;
     /**
      * 执行任务
      * @param $data
@@ -19,5 +19,13 @@ class $className extends Queue
             $this->progress('任务进行中',10);
         **/
         return true;
+    }
+
+    /**
+     * 失败执行
+     * @param $data
+     */
+    public function fail($data){
+
     }
 }
