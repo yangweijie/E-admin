@@ -6,7 +6,8 @@ use Eadmin\Queue;
 
 class $className extends Queue
 {
-
+    //重试次数
+    protected $retry = 0;
     /**
      * 执行任务
      * @param $data

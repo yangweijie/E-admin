@@ -21,7 +21,7 @@ abstract class Queue
     protected $queueId = 0;
     protected $time;
     protected $queue;
-    protected $second = null;
+    protected $retry = 0;
     public function init($job)
     {
         $this->time = microtime(true);
@@ -166,5 +166,9 @@ abstract class Queue
             }
         }
         $this->error('<b style="color: red">任务失败</b>');
+        //任务重试
+        if($this->retry > 0 && $this->job->attempts() <= $this->retry){
+            $this->release();
+        }
     }
 }
