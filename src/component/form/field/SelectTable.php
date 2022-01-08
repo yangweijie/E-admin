@@ -59,6 +59,9 @@ class SelectTable extends Field
      */
     public function from($from)
     {
+        if(is_string($from)){
+            $from = url($from);
+        }
         $params = Admin::parseUrlQuery($from);
         $from = Admin::dispatch($from);
         $this->params(array_merge($from->getCallMethod(),$params));

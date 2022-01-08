@@ -69,6 +69,9 @@ class Dialog extends Field
      */
     public function form($form)
     {
+        if(is_string($form)){
+            $form = url($form);
+        }
         $this->url('/eadmin.rest');
         $params = Admin::parseUrlQuery($form);
         $form = Admin::dispatch($form);
