@@ -326,14 +326,10 @@
                        tableData.value = props.data
                        initLoad = true
                        ctx.emit('update:initLoad',initLoad)
-                       if(state.gridFirst){
-                          state.gridFirst = false
-                          setTimeout(tableAutoWidth,300)
-                       }else{
-                          tableAutoWidth()
-                       }
+                       tableAutoWidth()
                        loading.value = false
                      })
+
                   })
                 }
             })
@@ -466,7 +462,7 @@
                   width = offsetWidth
                 }
               })
-              return width
+              return width + 20
             }
             function tableAutoWidth(){
                 if(ctx.attrs.defaultExpandAllRows){
@@ -479,13 +475,14 @@
                       if(item.prop === 'EadminAction'){
                         if(!item.width){
                           let width = 0
-                          document.getElementsByClassName(ctx.attrs.eadmin_grid + 'EadminAction').forEach(item => {
-                            let offsetWidth = item.offsetWidth
-                            if (width < offsetWidth) {
-                              width = offsetWidth
-                            }
-                          })
-                          item.width = width + 20
+                          if(state.gridFirst){
+                            setTimeout(()=>{
+                              item.width  = getTdMaxWidth(width)
+                            })
+                            state.gridFirst = false
+                          }else{
+                            item.width  = getTdMaxWidth(width)
+                          }
                         }
                         //有滚动条操作列fixed
                         if(dragTable.value && !item.fixed){

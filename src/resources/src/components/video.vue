@@ -13,7 +13,7 @@
         setup(props){
             const video = ref('')
             nextTick(()=>{
-                const options = Object.assign(props.options,{el:video.value})
+                const options = Object.assign(JSON.parse(JSON.stringify(props.options)),{el:video.value})
                 new Player(options)
             })
             return {

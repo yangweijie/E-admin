@@ -408,7 +408,7 @@ class Column extends Component
             $video->url($val)->size($width, $height);
             return $video;
         })
-            ->closeExport();
+            ->closeExport()->width($width);
         return $this;
     }
 
