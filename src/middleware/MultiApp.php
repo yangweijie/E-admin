@@ -22,14 +22,17 @@ class MultiApp
         $response = $next($request);
         $header = 'Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-CSRF-TOKEN, X-Requested-With, multi-app, version';
         $allow = $response->getHeader('Access-Control-Allow-Headers');
-        if(!empty($allow)){
-            $header .=', multi-app, version';
+        if (!empty($allow)) {
+            $header = $allow . ', multi-app, version';
         }
-        
+        $allow_headers = implode(', ', config('admin.cross.allow_headers', []));
+        if (!empty($allow_headers)) {
+            $header .= ', ' . $allow_headers;
+        }
         $response->header([
-            'multi-app'=>$moudel,
-            'Access-Control-Expose-Headers'=>'multi-app',
-            'Access-Control-Allow-Headers'=>$header
+            'multi-app' => $moudel,
+            'Access-Control-Expose-Headers' => 'multi-app',
+            'Access-Control-Allow-Headers' => $header
         ]);
         return $response;
     }

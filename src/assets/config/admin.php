@@ -130,5 +130,10 @@ return [
             'zh-cn' => '中文',
             'en' => 'English',
         ]
+    ],
+    //跨域
+    'cross'=>[
+        //header
+        'allow_headers'=>['corp_id']
     ]
 ];
