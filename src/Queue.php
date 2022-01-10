@@ -22,6 +22,7 @@ abstract class Queue
     protected $time;
     protected $queue;
     protected $tries = 0;
+    protected $historyLog = [];
     public function init($job)
     {
         $this->time = microtime(true);
@@ -66,7 +67,10 @@ abstract class Queue
             Db::name($this->tableName)->where('id', $this->queueId)->update($update);
         }
         $cacheKey = 'queue_' . $this->queueId . '_progress';
-        $data = Cache::get($cacheKey) ?: [];
+        $data = $this->historyLog;
+        if(empty($data)){
+            $data = Cache::get($cacheKey) ?: [];
+        }
         if (!isset($data['status'])) {
             $data['progress'] = 0;
         }
@@ -91,6 +95,7 @@ abstract class Queue
             $data['history'] = array_slice($data['history'],-100);
         }
         Cache::set($cacheKey, $data, 86400);
+        $this->historyLog = $data;
         return $data;
     }
 
@@ -107,6 +112,7 @@ abstract class Queue
     //执行失败
     public function error($message)
     {
+        $this->job->delete();
         $this->progress($message, 100, 4);
     }
 
