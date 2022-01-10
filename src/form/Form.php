@@ -835,15 +835,15 @@ class Form extends Component
     public function setData(string $field, $value)
     {
         //数字类型转换处理
-        $value = $this->converNumber($value);
+        $value = $this->convertNumber($value);
         Arr::set($this->data, $field, $value);
     }
 
-    protected function converNumber($value)
+    protected function convertNumber($value)
     {
         if (is_array($value) && count($value) == count($value, 1)) {
             foreach ($value as &$v) {
-                $v = $this->converNumber($v);
+                $v = $this->convertNumber($v);
             }
         } elseif (!is_array($value) && is_numeric($value) && preg_match('/^(0|[1-9][0-9]*)$/', $value) && preg_match('/^\d{1,11}$/', $value)) {
             $value = intval($value);

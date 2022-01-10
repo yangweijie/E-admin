@@ -157,21 +157,27 @@ class Plug extends Controller
         $grid->tools([
             Button::create('创建扩展')
                 ->typeWarning()
-                ->sizeSmall()
                 ->dialog()
                 ->form($this->add()),
             Button::create('本地安装')->upload('plug/zipInstall')->ext('zip'),
+            Button::create('刷新授权')
+                ->url('plug/refreshAuthorization'),
             Button::create('登录')
                 ->typeDanger()
                 ->whenShow(!Admin::plug()->isLogin())
-                ->sizeSmall()
                 ->dialog()
                 ->form($this->login()),
         ]);
         $grid->quickSearch();
         return $grid;
     }
-
+    /**
+     * 刷新授权
+     */
+    public function refreshAuthorization(){
+        Admin::plug()->refreshAuthorization();
+        admin_success_message('授权已刷新')->refreshMenu();
+    }
     /**
      * 登录
      * @return Form

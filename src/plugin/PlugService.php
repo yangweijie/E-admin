@@ -51,6 +51,7 @@ class PlugService
     protected $client;
     protected $total = 0;
     protected $loginToken = '';
+
     public function __construct()
     {
         $this->initialize();;
@@ -78,9 +79,11 @@ class PlugService
      * 登录token
      * @return mixed
      */
-    public function token(){
+    public function token()
+    {
         return Cache::get($this->loginToken);
     }
+
     /**
      * 是否登录
      * @return bool
@@ -108,19 +111,31 @@ class PlugService
         return $this->plugPathBase;
     }
 
+    /**
+     * 刷新授权
+     */
+    public function refreshAuthorization()
+    {
+        return Cache::delete($this->unauthorizedKey());
+    }
+
+    protected function unauthorizedKey()
+    {
+        return 'plugverify' . date('Y-m-d');
+    }
 
     /**
      * 注册扩展
      */
     public function register()
     {
-        if (count($this->plugPaths) > 0 && !Cache::has('plugverify' . date('Y-m-d'))) {
+        if (count($this->plugPaths) > 0 && !Cache::has($this->unauthorizedKey())) {
             $this->verify();
         }
         $loader = Composer::loader();
-        $unauthorized = Cache::get('plugverify'.date('Y-m-d')) ?? [];
+        $unauthorized = Cache::get($this->unauthorizedKey()) ?? [];
         foreach ($this->plugPaths as $name => $plugPaths) {
-            if(in_array($name,$unauthorized)) continue;
+            if (in_array($name, $unauthorized)) continue;
             $arr = $this->info($name);
             $arr['plug_path'] = $plugPaths;
             $psr4 = Arr::get($arr, 'namespace');
@@ -139,10 +154,13 @@ class PlugService
         }
     }
 
+    /**
+     * 验证插件授权，应用插件需要授权使用，移除或绕过授权验证，保留追究法律责任的权利
+     */
     private function verify()
     {
         $data = [];
-        foreach ($this->plugPaths as $name=>$file) {
+        foreach ($this->plugPaths as $name => $file) {
             $data[] = [
                 'name' => $name,
                 'info' => $this->info($name),
@@ -152,13 +170,14 @@ class PlugService
             $response = $this->client->post('verify', [
                 'form_params' => [
                     'domain' => request()->host(),
+                    'cli' => request()->isCli(),
                     'plugs' => $data,
                 ]
             ]);
             if ($response->getStatusCode() == 200) {
                 $content = $response->getBody()->getContents();
                 $content = json_decode($content, true);
-                Cache::set('plugverify' . date('Y-m-d'), $content['data'], 60 * 60 * 24);
+                Cache::set($this->unauthorizedKey(), $content['data'], 60 * 60 * 24);
             }
         } catch (\Exception $exception) {
 
@@ -171,15 +190,17 @@ class PlugService
      * @param $name
      * @return null
      */
-    public function getLogin($name){
-        $file = $this->plugPathBase . DIRECTORY_SEPARATOR . $name.DIRECTORY_SEPARATOR.'logo.png';
+    public function getLogin($name)
+    {
+        $file = $this->plugPathBase . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . 'logo.png';
 
-        if(is_file($file)){
-            $content =  file_get_contents($file);
+        if (is_file($file)) {
+            $content = file_get_contents($file);
             return 'data:image/png;base64,' . base64_encode($content);
         }
         return null;
     }
+
     public function authorize($info)
     {
         $response = $this->client->post('authorize', [
@@ -283,7 +304,7 @@ class PlugService
             $this->plugs = $content['data']['data'];
 
 
-            if(count($this->plugs) > 0){
+            if (count($this->plugs) > 0) {
                 $names = array_column($this->installed(), 'name');
             }
             foreach ($this->plugs as &$plug) {
@@ -507,7 +528,7 @@ class PlugService
                 return false;
             }
         } catch (PlugException $exception) {
-            throw new PlugException($exception->getMessage(),$exception->getCode());
+            throw new PlugException($exception->getMessage(), $exception->getCode());
         } catch (\Exception $exception) {
             return false;
         }
@@ -553,7 +574,7 @@ class PlugService
                 }
             }
         } catch (\Exception $exception) {
-            throw new PlugException($exception->getMessage(),$exception->getCode());
+            throw new PlugException($exception->getMessage(), $exception->getCode());
         }
     }
 
@@ -588,26 +609,26 @@ PHP;
      * 卸载
      * @param string $name 插件名称
      */
-    public function uninstall($name,$except=[])
+    public function uninstall($name, $except = [])
     {
         //查找插件依赖关系
         $plugs = array_keys($this->plugPaths);
         $requires = [];
         $except[] = $name;
         foreach ($plugs as $plug) {
-            if (in_array($plug,$except)) continue;
-            if($this->isInstall($plug)){
+            if (in_array($plug, $except)) continue;
+            if ($this->isInstall($plug)) {
                 $info = $this->info($plug);
                 $requires = array_merge($requires, array_keys($info['plugin']));
             }
         }
-        if($this->isInstall($name)){
+        if ($this->isInstall($name)) {
             $info = $this->info($name);
             $requires = array_diff(array_keys($info['plugin']), $requires);
 
             //卸载依赖插件
             foreach ($requires as $require) {
-                $this->uninstall($require,$except);
+                $this->uninstall($require, $except);
             }
             $path = $this->plugPathBase . '/' . $name;
             $this->dataMigrate('rollback', $path);

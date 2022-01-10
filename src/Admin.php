@@ -470,7 +470,7 @@ class Admin
         app()->route->post('plug/enable', Plug::class . '@enable');
         app()->route->post('plug/install', Plug::class . '@install');
         app()->route->post('plug/uninstall', Plug::class . '@uninstall');
-        app()->route->post('plug/uploadGit', Plug::class . '@uploadGit');
+        app()->route->post('plug/refreshAuthorization', Plug::class . '@refreshAuthorization');
         app()->route->get('plug', Plug::class . '@index');
 
         //数据库备份
