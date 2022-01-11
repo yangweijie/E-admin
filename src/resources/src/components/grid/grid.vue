@@ -324,12 +324,14 @@
                   nextTick(()=>{
                     setTimeout(()=>{
                        if(!ctx.attrs.eadmin_lazy){
-                        tableData.value = props.data
+                         tableData.value = props.data
                        }
                        initLoad = true
                        ctx.emit('update:initLoad',initLoad)
                        tableAutoWidth()
-                       loading.value = false
+                       if(!ctx.attrs.eadmin_lazy){
+                          loading.value = false
+                       }
                      })
 
                   })

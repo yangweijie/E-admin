@@ -749,7 +749,7 @@ class Grid extends Component
         if (!$this->hideAction) {
             $this->column[] = $this->actionColumn->column();
         }
-        if(request()->isAjax() && $this->attr('eadmin_lazy')){
+        if(request()->isAjax() && !$this->attr('eadmin_lazy')){
             $this->attr('data', $this->parseData());
         }
         //是否分页
