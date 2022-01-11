@@ -130,7 +130,7 @@ class SystemMenuSeeder extends Seeder
                     'id' => 1158,
                     'pid' => 2,
                     'name' => 'development',
-                    'icon' => 'el-icon-s-tools',
+                    'icon' => 'fa fa-wrench',
                     'url' => '',
                     'sort' => 133,
                     'open' => 1,

@@ -183,6 +183,9 @@ class LogService extends Service
                 return false;
             }
         } else {
+            if (!$this->pageOffset) {
+                return false;
+            }
             $filesize = $this->getFilesize();
             if ($this->pageOffset['end'] >= $filesize - 1) {
                 return false;
@@ -222,7 +225,7 @@ class LogService extends Service
 
     public function getFilesize()
     {
-        return filesize($this->filePath);
+        return is_file($this->filePath) ? filesize($this->filePath) : 0;
     }
 
     /**
