@@ -10,8 +10,14 @@
         <el-scrollbar>
         <ul class="iconCollection">
             <li v-for="icon in iconList" @click="selectIcon(icon)">
-                <i :class="icon"></i><div class="iconText">{{icon}}</div>
+              <i :class="icon" @mouseover="e=>popper(e,icon)" @mouseout="hide"></i>
             </li>
+          <transition name="el-fade-in-linear">
+            <div ref="tooltip" class="el-popper el-popover" v-show="popperVisible" @mouseover="clearTime" @mouseout="hide">
+              <span>{{iconText}}</span>
+              <span class="el-popper__arrow" data-popper-arrow="" style="position: absolute; left: 0px; transform: translate(46px, 0px);"></span>
+            </div>
+          </transition>
             <div v-if="iconList.length == 0" style="margin: 0 auto">暂无图标</div>
         </ul>
         </el-scrollbar>
@@ -19,6 +25,7 @@
 </template>
 
 <script>
+    import { createPopper } from '@popperjs/core';
     import {defineComponent,ref,watch} from 'vue'
     export default defineComponent({
         name: "EadminIcon",
@@ -31,7 +38,11 @@
             const elementUI = ["platform-eleme", "eleme", "delete-solid", "delete", "s-tools", "setting", "user-solid", "user", "phone", "phone-outline", "more", "more-outline", "star-on", "star-off", "s-goods", "goods", "warning", "warning-outline", "question", "info", "remove", "circle-plus", "success", "error", "zoom-in", "zoom-out", "remove-outline", "circle-plus-outline", "circle-check", "circle-close", "s-help", "help", "minus", "plus", "check", "close", "picture", "picture-outline", "picture-outline-round", "upload", "upload2", "download", "camera-solid", "camera", "video-camera-solid", "video-camera", "message-solid", "bell", "s-cooperation", "s-order", "s-platform", "s-fold", "s-unfold", "s-operation", "s-promotion", "s-home", "s-release", "s-ticket", "s-management", "s-open", "s-shop", "s-marketing", "s-flag", "s-comment", "s-finance", "s-claim", "s-custom", "s-opportunity", "s-data", "s-check", "s-grid", "menu", "share", "d-caret", "caret-left", "caret-right", "caret-bottom", "caret-top", "bottom-left", "bottom-right", "back", "right", "bottom", "top", "top-left", "top-right", "arrow-left", "arrow-right", "arrow-down", "arrow-up", "d-arrow-left", "d-arrow-right", "video-pause", "video-play", "refresh", "refresh-right", "refresh-left", "finished", "sort", "sort-up", "sort-down", "rank", "loading", "view", "c-scale-to-original", "date", "edit", "edit-outline", "folder", "folder-opened", "folder-add", "folder-remove", "folder-delete", "folder-checked", "tickets", "document-remove", "document-delete", "document-copy", "document-checked", "document", "document-add", "printer", "paperclip", "takeaway-box", "search", "monitor", "attract", "mobile", "scissors", "umbrella", "headset", "brush", "mouse", "coordinate", "magic-stick", "reading", "data-line", "data-board", "pie-chart", "data-analysis", "collection-tag", "film", "suitcase", "suitcase-1", "receiving", "collection", "files", "notebook-1", "notebook-2", "toilet-paper", "office-building", "school", "table-lamp", "house", "no-smoking", "smoking", "shopping-cart-full", "shopping-cart-1", "shopping-cart-2", "shopping-bag-1", "shopping-bag-2", "sold-out", "sell", "present", "box", "bank-card", "money", "coin", "wallet", "discount", "price-tag", "news", "guide", "male", "female", "thumb", "cpu", "link", "connection", "open", "turn-off", "set-up", "chat-round", "chat-line-round", "chat-square", "chat-dot-round", "chat-dot-square", "chat-line-square", "message", "postcard", "position", "turn-off-microphone", "microphone", "close-notification", "bangzhu", "time", "odometer", "crop", "aim", "switch-button", "full-screen", "copy-document", "mic", "stopwatch", "medal-1", "medal", "trophy", "trophy-1", "first-aid-kit", "discover", "place", "location", "location-outline", "location-information", "add-location", "delete-location", "map-location", "alarm-clock", "timer", "watch-1", "watch", "lock", "unlock", "key", "service", "mobile-phone", "bicycle", "truck", "ship", "basketball", "football", "soccer", "baseball", "wind-power", "light-rain", "lightning", "heavy-rain", "sunrise", "sunrise-1", "sunset", "sunny", "cloudy", "partly-cloudy", "cloudy-and-sunny", "moon", "moon-night", "dish", "dish-1", "food", "chicken", "fork-spoon", "knife-fork", "burger", "tableware", "sugar", "dessert", "ice-cream", "hot-water", "water-cup", "coffee-cup", "cold-drink", "goblet", "goblet-full", "goblet-square", "goblet-square-full", "refrigerator", "grape", "watermelon", "cherry", "apple", "pear", "orange", "coffee", "ice-tea", "ice-drink", "milk-tea", "potato-strips", "lollipop", "ice-cream-square", "ice-cream-round"].map(s => "el-icon-" + s);
             let iconList = ref(fontAwesome.concat(elementUI))
             const value = ref(props.modelValue)
+            const tooltip = ref('')
+            const iconText = ref('')
             const visible = ref(false)
+            const popperVisible = ref(false)
+            let timer = null
             watch(value,(val)=>{
                 ctx.emit('update:modelValue', val)
             })
@@ -44,11 +55,41 @@
                 value.value = icon
                 visible.value = false
             }
+            function clearTime(){
+                clearTimeout(timer)
+            }
+            function hide(){
+              timer = setTimeout(()=>{
+                popperVisible.value = false
+              },1000)
+            }
+            function popper(e,text){
+              clearTimeout(timer)
+              iconText.value = text
+              popperVisible.value = true
+              createPopper(e.target, tooltip.value, {
+                placement: 'bottom',
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 12],
+                    },
+                  },
+                ],
+              })
+            }
             return {
+                clearTime,
+                hide,
+                iconText,
+                tooltip,
+                popper,
                 value,
                 iconList,
                 selectIcon,
                 visible,
+                popperVisible,
                 filterIcons
 
             }
@@ -70,8 +111,8 @@
 
 .iconCollection li{
     cursor: pointer;
-    width: 180px;
-    height: 100px;
+    width: 40px;
+    height: 40px;
     border:1px solid #ededed;
     display: flex;
     flex-direction: column;
