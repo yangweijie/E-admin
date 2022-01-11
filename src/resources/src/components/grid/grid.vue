@@ -317,13 +317,15 @@
 
             onMounted(()=>{
                 if(!props.static){
-                  if(initLoad){
+                  if(initLoad && !ctx.attrs.eadmin_lazy){
                     initLoad = false
                   }
                   loading.value = true
                   nextTick(()=>{
                     setTimeout(()=>{
-                       tableData.value = props.data
+                       if(!ctx.attrs.eadmin_lazy){
+                        tableData.value = props.data
+                       }
                        initLoad = true
                        ctx.emit('update:initLoad',initLoad)
                        tableAutoWidth()
