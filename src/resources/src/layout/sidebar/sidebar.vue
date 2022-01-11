@@ -22,7 +22,7 @@
     import {link, findTree,treeMapFilter} from '@/utils'
     import Logo from '../logo.vue'
     import menuItem from './menuItem.vue'
-    import {defineComponent, inject, computed,watchEffect,ref} from 'vue'
+    import {defineComponent, inject, computed,watch,ref} from 'vue'
     import {store, action} from '@/store'
 
     export default defineComponent({
@@ -41,13 +41,14 @@
                return item+''
             })
 
-            //侧边栏菜单渲染
+           //侧边栏菜单渲染
             const menus = computed(() => {
-                let menu = null
+                let menu = []
                 if(state.topMenuMode && state.device === 'desktop'){
                     state.menus.forEach(res => {
                         if (res.id == state.menuModule && res.children) {
-                            menu = res.children
+                          menu = res.children
+
                         }
                     })
                 }else{

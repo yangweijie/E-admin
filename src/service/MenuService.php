@@ -20,7 +20,7 @@ use Eadmin\Service;
  */
 class MenuService
 {
-   
+
     /**
      * 获取所有菜单
      * @return array|mixed
@@ -30,7 +30,7 @@ class MenuService
      */
     public function all($admin_visible = false)
     {
-       
+
         $table = config( Admin::getAppName().'.database.menu_table');
         $data = Db::name($table)
             ->where('status', 1)
@@ -38,12 +38,12 @@ class MenuService
                 $q->where('admin_visible', 1);
             })
             ->order('sort asc,id desc')
-            ->cache(2)
+            ->cache('eadmin_menu_all',2)
             ->select()->map(function ($item){
                 $item['name'] = str_replace('titles.','',admin_trans('menu.titles.'.$item['name']));
                 return $item;
             })->toArray();
-        
+
         return $data;
     }
 

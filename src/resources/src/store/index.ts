@@ -280,7 +280,6 @@ const action = {
     },
     logout() {
         return new Promise((resolve, reject) => {
-            console.log(state.app)
             request({
                 url: '/' + states.app + '/login/logout'
             }).then((res: any) => {

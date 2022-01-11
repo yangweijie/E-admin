@@ -76,6 +76,14 @@ class Menu extends Controller
             $grid->sortInput();
             $grid->setForm($this->form())->dialog();
             $grid->quickSearch();
+            $grid->updated(function (){
+                cache('eadmin_menu_all',null);
+                admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.save_success'))->refreshMenu();
+            });
+            $grid->deleted(function (){
+                cache('eadmin_menu_all',null);
+                admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.delete_complete'))->refreshMenu();
+            });
         });
     }
 
@@ -98,6 +106,7 @@ class Menu extends Controller
             $form->icon('icon', admin_trans('menu.fields.icon'));
             $form->number('sort', admin_trans('menu.fields.sort'))->default($model::where('pid',$pid)->max('sort')+1);
             $form->saved(function (){
+                cache('eadmin_menu_all',null);
                 admin_success(admin_trans('admin.operation_complete'), admin_trans('admin.save_success'))->refreshMenu();
             });
         });

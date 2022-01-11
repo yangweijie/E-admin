@@ -4,11 +4,7 @@
             <i :class="menu.icon" v-if="menu.icon"></i><span>{{menu.name}}</span>
         </template>
         <template v-for="item in menu.children" :key="item.id">
-            <menu-item v-if="item.children" :menu="item"></menu-item>
-            <el-menu-item :index="item.id+''" v-else>
-                <i :class="item.icon" v-if="item.icon"></i>
-                <span>{{item.name}}</span>
-            </el-menu-item>
+            <menu-item :menu="item"></menu-item>
         </template>
     </el-submenu>
     <el-menu-item :index="menu.id+''" v-else>
@@ -18,7 +14,7 @@
 </template>
 <script>
 
-    import {defineComponent} from 'vue'
+    import {defineComponent,watch,ref} from 'vue'
 
     export default defineComponent({
         name: "menuItem",
@@ -27,10 +23,7 @@
             menu: [Object, Array]
         },
         setup(props) {
-            const menu = props.menu
-            return {
-                menu
-            }
+
         }
     })
 </script>
