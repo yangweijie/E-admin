@@ -125,6 +125,71 @@ class SystemMenuSeeder extends Seeder
                     'mark'   => '',
                     'status' => 1,
                 ),
+            10 =>
+                array (
+                    'id' => 1158,
+                    'pid' => 2,
+                    'name' => 'development',
+                    'icon' => '',
+                    'url' => '',
+                    'sort' => 133,
+                    'open' => 1,
+                    'status' => 1,
+                    'admin_visible' => 1,
+
+                ),
+            11 =>
+                array (
+                    'id' => 1159,
+                    'pid' => 1158,
+                    'name' => 'debug_log',
+                    'icon' => 'fa fa-file-o',
+                    'url' => 'log/debug',
+                    'mark' => '',
+                    'sort' => 133,
+                    'open' => 1,
+                    'status' => 1,
+                    'admin_visible' => 1,
+                ),
+            12 =>
+                array (
+                    'id' => 1160,
+                    'pid' => 1158,
+                    'name' => 'system_queue',
+                    'icon' => 'fa fa-tasks',
+                    'url' => 'queue',
+                    'mark' => '',
+                    'sort' => 134,
+                    'open' => 1,
+                    'status' => 1,
+                    'admin_visible' => 1,
+                ),
+            13 =>
+                array (
+                    'id' => 1161,
+                    'pid' => 1158,
+                    'name' => 'time_task',
+                    'icon' => 'el-icon-time',
+                    'url' => 'crontab',
+                    'mark' => '',
+                    'sort' => 133,
+                    'open' => 1,
+                    'status' => 1,
+                    'admin_visible' => 1,
+                ),
+            14 =>
+                array (
+                    'id' => 1170,
+                    'pid' => 1158,
+                    'name' => 'plug_manage',
+                    'icon' => 'fa fa-plug',
+                    'url' => 'plug',
+                    'mark' => '',
+                    'sort' => 135,
+                    'open' => 1,
+                    'status' => 1,
+                    'admin_visible' => 1,
+                ),
         );
         if ($this->hasTable('system_menu')) {
             $this->table('system_menu')->insert($data)->save();

@@ -30,5 +30,10 @@ return [
         'access_auth_manage' => 'Permissions',
         'backup' => 'Database backup',
         'attachment'=>'Attachment',
+        'development'=>'Development Tool',
+        'time_task'=>'Timed task',
+        'debug_log'=>'Debug log',
+        'system_queue'=>'System queue',
+        'plug_manage'=>'Plug',
     ]
 ];

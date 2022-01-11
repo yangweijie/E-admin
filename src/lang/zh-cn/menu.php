@@ -30,5 +30,10 @@ return [
         'access_auth_manage'=>'访问权限管理',
         'backup'=>'数据库备份',
         'attachment'=>'附件管理',
+        'development'=>'开发工具',
+        'time_task'=>'定时任务',
+        'debug_log'=>'调试日志',
+        'system_queue'=>'系统队列',
+        'plug_manage'=>'插件管理',
     ]
 ];
