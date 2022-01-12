@@ -524,7 +524,9 @@ class Grid extends Component
         }
         return $column;
     }
-
+    public function getColumns(){
+        return $this->column;
+    }
     public function collectColumns(\Closure $closure)
     {
         $offset = count($this->column);

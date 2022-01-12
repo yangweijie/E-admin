@@ -227,7 +227,6 @@ class NodeService
 
     protected function parseGridColumn($method, $namespace, $action)
     {
-
         $params = $method->getParameters();
         $args = [];
         foreach ($params as $key => $param) {
@@ -235,17 +234,19 @@ class NodeService
             $args[$name] = 0;
         }
         $grid = $method->invokeArgs(app()->invokeClass($namespace), $args);
-        json_encode($grid);
-        $columns = $grid->attr('columns');
+        $grid->exec();
+        $callMethod = $grid->getCallMethod();
+
+        $columns = $grid->getColumns();
         $pid = md5($namespace . $action);
         foreach ($columns as $column) {
-            if (empty($column['label'])) continue;
+            if (empty($column->attr('label'))) continue;
             $this->fields[] = [
                 'pid' => $pid,
-                'id' => md5($column['prop'] . $namespace . $action),
-                'class' => $namespace . '\\' . $action,
-                'field' => $column['prop'],
-                'label' => $column['label'],
+                'id' => md5($column->attr('prop') .$namespace . $action),
+                'class' => $callMethod['eadmin_class'] . '\\' . $callMethod['eadmin_function'],
+                'field' => $column->attr('prop'),
+                'label' => $column->attr('label'),
             ];
         }
         $this->fields[] = [
