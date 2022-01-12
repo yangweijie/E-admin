@@ -61,8 +61,12 @@ class AuthService
 
             $userAuthIds = array_unique($userAuthIds);
             $query->where(function (Query  $query) use($fields,$userAuthIds){
-                foreach ($fields as $field){
-                    $query->whereOr($query->getTable().'.'.$field,Admin::id());
+                foreach ($fields as $key=>$field){
+                    if(is_numeric($key)){
+                        $query->whereOr($query->getTable().'.'.$field,Admin::id());
+                    }else{
+                        $query->whereOr($query->getTable().'.'.$field,Admin::user()->$key);
+                    }
                     if(count($userAuthIds) > 0){
                         $query->whereIn($query->getTable().'.'.$field,$userAuthIds,'OR');
                     }
