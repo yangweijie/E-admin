@@ -329,13 +329,13 @@
             function userRender(slot, scope) {
 
                 return slot.map(item => {
-                    if (typeof (item.where) == 'object' && (item.where.AND.length > 0 || item.where.OR.length > 0)) {
+                    if (item && typeof (item.where) == 'object' && (item.where.AND.length > 0 || item.where.OR.length > 0)) {
                         // //条件if渲染实现
                         let expression = whereCompile(item.where.AND, item.where.OR,scope)
                         expression = expression + ' ? renderComponent(item,scope) : null'
                         return eval(expression)
                     } else {
-                        if (typeof (item) == 'object') {
+                        if (item && typeof (item) == 'object') {
                             return renderComponent(item, scope)
                         } else {
                             if(item && typeof(item) == 'string' &&item.indexOf('#') !== 0){
@@ -482,6 +482,7 @@
             }
             //赋值方法
             function setProxyData(data,type){
+
                 for(let field in data.bind){
                     if(!modelValue.hasOwnProperty(field) && type === 1){
                         modelValue[field] = data.bind[field]
@@ -493,7 +494,7 @@
                 }
                 for(let slot in data.content){
                     data.content[slot].forEach(item=>{
-                        if(typeof(item) == 'object'){
+                        if(item && typeof(item) == 'object'){
                             setProxyData(item,type)
                         }
                     })

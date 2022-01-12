@@ -249,7 +249,7 @@
             custom:[Object, Boolean],
             initLoad: {
               type:[Boolean,Number],
-              default:true
+              default:false
             },
         },
         inheritAttrs: false,
@@ -271,7 +271,7 @@
             const quickSearchValue = ref('')
             const selectIds = ref(props.selection || [])
             const expandedRowKeys = ref([])
-            let initLoad = props.initLoad
+            let initLoad = true
             const trashed = ref(false)
             const excel  = reactive({
                 excelVisible:false,
@@ -317,19 +317,19 @@
 
             onMounted(()=>{
                 if(!props.static){
-                  if(initLoad && !ctx.attrs.eadmin_lazy){
+                  if(!props.initLoad){
                     initLoad = false
                   }
                   loading.value = true
                   nextTick(()=>{
                     setTimeout(()=>{
-                       if(!ctx.attrs.eadmin_lazy){
+                       if(!props.initLoad){
                          tableData.value = props.data
                        }
                        initLoad = true
                        ctx.emit('update:initLoad',initLoad)
                        tableAutoWidth()
-                       if(!ctx.attrs.eadmin_lazy){
+                       if(!props.initLoad){
                           loading.value = false
                        }
                      })

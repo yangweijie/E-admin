@@ -64,6 +64,7 @@ x: number | true, y: number
  * @method $this expandRowByClick(bool $bool = true) 通过点击行来展开子行
  * @method $this stripe(bool $bool = true) 斑马纹表格
  * @method $this showHeader(bool $bool = true) 是否显示表头
+ * @method $this initLoad(bool $bool = true) 初始化加载数据
  * @method $this loadDataUrl(string $value) 设置加载数据url
  * @method $this params(array $value) 加载数据附加参数
  * @method $this selectionType(string $value) 多选checkbox 单选radio
@@ -749,7 +750,7 @@ class Grid extends Component
         if (!$this->hideAction) {
             $this->column[] = $this->actionColumn->column();
         }
-        if(request()->isAjax() && !$this->attr('eadmin_lazy')){
+        if(request()->isAjax() && !$this->attr('initLoad')){
             $this->attr('data', $this->parseData());
         }
         //是否分页

@@ -84,9 +84,8 @@ class Dropdown extends Component
         if (!empty($icon) && is_string($content)) {
             $content = '<i class="' . $icon . '" /> ' . $content;
         }
-        $item = new DropdownItem('');
+        $item = new DropdownItem($content);
         $item->dropdown($this);
-        $item->content($content);
         return $item;
     }
     /**
