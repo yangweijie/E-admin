@@ -17,7 +17,6 @@ use think\app\Url;
 /**
  * Class Component
  * @package Eadmin\component
- * @method $this style(array $value) 样式
  */
 abstract class Component implements \JsonSerializable
 {
@@ -190,6 +189,17 @@ abstract class Component implements \JsonSerializable
 
     }
 
+    /**
+     * 样式
+     * @param array $value
+     * @return $this
+     */
+    public function style(array $value){
+        $style = $this->attr('style') ?? [];
+        $style = array_merge($style,$value);
+        $this->attr('style',$style);
+        return $this;
+    }
     /**
      * @param string $name 指令名称
      * @param string|array $value 值

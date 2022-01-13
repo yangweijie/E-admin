@@ -28,4 +28,7 @@ class Image extends Component
     {
         return new self();
     }
+    public function size(int $width,int $height){
+        return $this->style(['width' => $width.'px', 'height' => $height.'px']);
+    }
 }

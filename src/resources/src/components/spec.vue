@@ -73,7 +73,10 @@
         inheritAttrs: false,
         props: {
             field:String,
-            data: Array,
+            data: {
+              type:Array,
+              default:[],
+            },
             disabled: Boolean,
             specId: {
                 type:[String, Number],
@@ -86,7 +89,7 @@
         emits: ['update:modelValue', 'update:specs'],
         setup(props, ctx) {
             const state = reactive({
-                group:[],
+                group:props.data,
                 specGroup: props.specId == '' ? '':'select'+props.specId,
                 selectSpec: [],
                 hoverIndex:-1,
@@ -103,14 +106,13 @@
             let selectValue = props.modelValue
             let propsSpecs = props.specs
             if(propsSpecs){
-                props.data.unshift({
+                state.group.unshift({
                     id:'select'+props.specId,
                     name:'当前规格',
                     specs:toRaw(propsSpecs)
                 })
 
             }
-            state.group = props.data
             //规格分组
             const specs = computed(() => {
                 const spec = findTree(state.group, state.specGroup, 'id')
