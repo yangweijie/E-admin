@@ -51,7 +51,7 @@ class PlugService
     protected $client;
     protected $total = 0;
     protected $loginToken = '';
-
+    protected $unauthorized = [];
     public function __construct()
     {
         $this->initialize();;
@@ -73,6 +73,7 @@ class PlugService
             }
         }
         $this->loginToken = md5(Request::header('Authorization') . 'plug');
+        $this->unauthorized = Cache::get($this->unauthorizedKey()) ?? [];
     }
 
     /**
@@ -133,9 +134,8 @@ class PlugService
             $this->verify();
         }
         $loader = Composer::loader();
-        $unauthorized = Cache::get($this->unauthorizedKey()) ?? [];
         foreach ($this->plugPaths as $name => $plugPaths) {
-            if (in_array($name, $unauthorized)) continue;
+            if (!$this->checkAuthorized($name)) continue;
             $arr = $this->info($name);
             $arr['plug_path'] = $plugPaths;
             $psr4 = Arr::get($arr, 'namespace');
@@ -153,7 +153,14 @@ class PlugService
             }
         }
     }
-
+    /**
+     * 是否授权
+     * @param string $name 插件标示
+     * @return bool
+     */
+    public function checkAuthorized($name){
+        return !in_array($name, $this->unauthorized);
+    }
     /**
      * 验证插件授权，应用插件需要授权使用，移除或绕过授权验证，保留追究法律责任的权利
      */
@@ -177,6 +184,7 @@ class PlugService
             if ($response->getStatusCode() == 200) {
                 $content = $response->getBody()->getContents();
                 $content = json_decode($content, true);
+                $this->unauthorized = $content['data'];
                 Cache::set($this->unauthorizedKey(), $content['data'], 60 * 60 * 24);
             }
         } catch (\Exception $exception) {
@@ -190,7 +198,7 @@ class PlugService
      * @param $name
      * @return null
      */
-    public function getLogin($name)
+    public function getLogo($name)
     {
         $file = $this->plugPathBase . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . 'logo.png';
 
@@ -305,15 +313,12 @@ class PlugService
 
 
             if (count($this->plugs) > 0) {
-                $names = array_column($this->installed(), 'name');
+                $installed = $this->installed();
             }
             foreach ($this->plugs as &$plug) {
                 $plug['install'] = false;
-                if (in_array($plug['name'], $names)) {
-                    $info = $this->info($plug['name']);
-                    $plug['version'] = $info['version'];
-                    $plug['status'] = $this->info($plug['name'])['status'];
-                    $plug['install'] = true;
+                if (array_key_exists($plug['name'],$installed)) {
+                    $plug = $installed[$plug['name']];
                 }
             }
             $this->total = $content['data']['total'];
@@ -351,7 +356,7 @@ class PlugService
             $info['requires'] = [];
             $index = array_search($info['name'], $names);
             if ($index !== false) {
-                $info = $onlinePlugs[$index];
+                $info = array_merge($info,$onlinePlugs[$index]);
             }
             if (isset($this->serviceProvider[$info['name']])) {
                 $service = $this->serviceProvider[$info['name']];
@@ -359,7 +364,8 @@ class PlugService
                     $info['setting'] = app()->invoke([$service, 'setting']);
                 }
             }
-            $plugs[] = $info;
+            $info['authorized'] = $this->checkAuthorized($info['name']);
+            $plugs[$info['name']] = $info;
         }
         $this->total = count($plugs);
         return $plugs;

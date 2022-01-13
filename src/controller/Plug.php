@@ -4,6 +4,7 @@
 namespace Eadmin\controller;
 
 use Eadmin\Admin;
+use Eadmin\component\basic\Badge;
 use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Card;
 use Eadmin\component\basic\Dropdown;
@@ -79,9 +80,14 @@ class Plug extends Controller
             return Html::div()->content([
                 Image::create()
                     ->style(['width'=>'60px','height'=>'60px','marginRight'=>'10px',"borderRadius" => '5px'])
-                    ->src(Admin::plug()->getLogin($data['name'])),
+                    ->src(Admin::plug()->getLogo($data['name'])),
                 Html::div()->content([
-                    Html::div()->content(Tag::create($data['title'])->size('mini')->effect('dark')),
+                    Html::div()->content(Tag::create($data['title'])->size('mini')->effect('dark'))->whenShow($data['authorized']),
+                    Html::div()->content(
+                        Badge::create()->content(
+                            Tag::create($data['title'])->size('mini')->effect('dark')
+                        )->value('未授权')->type('danger')
+                    )->whenShow(!$data['authorized']),
                     Html::div()->content($data['name']),
                     Html::div()->content($data['description'])
                 ])
