@@ -34,6 +34,7 @@ use Eadmin\component\form\FormItem;
 use Eadmin\component\form\FormMany;
 use Eadmin\component\form\step\FormSteps;
 use Eadmin\component\form\step\Result;
+use Eadmin\component\layout\Column;
 use Eadmin\component\layout\Row;
 use Eadmin\contract\FormInterface;
 use Eadmin\form\drive\File;
@@ -552,7 +553,18 @@ class Form extends Component
         $this->push($item);
         return $item;
     }
-
+    /**
+     * 添加一列（必须配合row使用）
+     * @param \Closure $closure
+     * @param int $span 栅格占据的列数
+     */
+    public function column(\Closure $closure,$span){
+        $formItems = $this->collectFields($closure);
+        $column = new Column();
+        $column->content($formItems)->span($span);
+        $this->push($column);
+        return $column;
+    }
     /**
      * 添加一行布局
      * @param string $title
@@ -573,8 +585,12 @@ class Form extends Component
             $this->push(Divider::create()->content($title)->contentPosition('left'));
         }
         foreach ($formItems as $item) {
-            $column = $row->column($item, $item->md ?? 24);
-            $column->setWhere($item->getWhere());
+            if($item instanceof Column){
+                $row->content($item);
+            }else{
+                $column = $row->column($item, $item->md ?? 24);
+                $column->setWhere($item->getWhere());
+            }
         }
         $this->push($row);
         return $row;
