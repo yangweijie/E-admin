@@ -1,9 +1,23 @@
 <script>
-    import {defineComponent, toRaw, h,reactive, resolveComponent,isProxy,resolveDirective,withDirectives,getCurrentInstance,onBeforeUnmount} from 'vue'
+import {
+  defineComponent,
+  watch,
+  toRaw,
+  h,
+  reactive,
+  resolveComponent,
+  isProxy,
+  resolveDirective,
+  withDirectives,
+  getCurrentInstance,
+  onBeforeUnmount,
+  inject
+} from 'vue'
     import {splitCode} from '@/utils/splitCode'
     import {setObjectValue,getObjectValue,findArrKey,isNumber} from '@/utils'
     import dayjs from 'dayjs'
     import request from '@/utils/axios'
+    import { store,action} from '@/store'
     export default defineComponent({
         name: "render",
         props: {
@@ -40,6 +54,16 @@
                     setProxyData(props.data,0)
                 }
             })
+            // const state = inject(store)
+            // watch(()=>state.proxyData,data=>{
+            //     for (let key in data){
+            //
+            //       if(modelValue.hasOwnProperty(key)){
+            //
+            //        setObjectValue(modelValue,key,data[key])
+            //       }
+            //     }
+            // })
             const renderComponent = (data, slotProps) => {
 
                 if(!data.attribute){

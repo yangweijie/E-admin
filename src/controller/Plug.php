@@ -7,6 +7,7 @@ use Eadmin\Admin;
 use Eadmin\component\basic\Badge;
 use Eadmin\component\basic\Button;
 use Eadmin\component\basic\Card;
+use Eadmin\component\basic\Dialog;
 use Eadmin\component\basic\Dropdown;
 use Eadmin\component\basic\Html;
 use Eadmin\component\basic\Image;
@@ -21,6 +22,7 @@ use Eadmin\Controller;
 use Eadmin\form\drive\Config;
 use Eadmin\grid\Actions;
 use Eadmin\grid\Grid;
+use Eadmin\plugin\PlugException;
 use Symfony\Component\Process\Process;
 use think\facade\Console;
 use think\facade\Db;
@@ -76,24 +78,33 @@ class Plug extends Controller
         $grid->hideSelection();
         $grid->column('cate.name', '分类')->tag('info', 'plain');
         $grid->column('title', '名称')->display(function ($val, $data) {
-
             return Html::div()->content([
                 Image::create()
                     ->style(['width'=>'60px','height'=>'60px','marginRight'=>'10px',"borderRadius" => '5px'])
                     ->src(Admin::plug()->getLogo($data['name'])),
                 Html::div()->content([
-                    Html::div()->content(Tag::create($data['title'])->size('mini')->effect('dark'))->whenShow($data['authorized']),
-                    Html::div()->content(
-                        Badge::create()->content(
+                    Html::div()->when(empty($data['authorized']),function (Html $html)use($data){
+                        $html->content(Badge::create()->content(
                             Tag::create($data['title'])->size('mini')->effect('dark')
-                        )->value('未授权')->type('danger')
-                    )->whenShow(!$data['authorized']),
+                        )->value('未授权')->type('danger'));
+                    },function (Html $html) use($data){
+                        $html->content(Tag::create($data['title'])->size('mini')->effect('dark'));
+                    }),
                     Html::div()->content($data['name']),
                     Html::div()->content($data['description'])
                 ])
             ])->style(Style::FLEX_CENTER);
         });
 
+        $grid->column('price', '价格')->display(function ($val,$data){
+            if(!isset($data['is_free'])){
+                return '--';
+            }elseif(empty( $data['is_free'])){
+               return Html::create('￥'.$data['price'])->style(['color'=>'red']);
+            }else{
+                return '免费';
+            }
+        });
         $grid->column('version', '版本');
         $grid->actions(function (Actions $actions, $rows) {
             $actions->hideDel();
@@ -133,7 +144,7 @@ class Plug extends Controller
             if ($rows['install']) {
                 if ($rows['status']) {
                     $actions->append(
-                        Button::create('禁用')->sizeSmall()->typeInfo()->save(['id' => $rows['name'], 'status' => 0], 'plug/enable', '确认禁用？')
+                        Button::create('禁用')->sizeSmall()->plain()->typeInfo()->save(['id' => $rows['name'], 'status' => 0], 'plug/enable', '确认禁用？')
                     );
                 } else {
                     $actions->append(
@@ -147,16 +158,28 @@ class Plug extends Controller
                         ->save(['name' => $rows['name']], 'plug/uninstall', '确认卸载？')
                 );
             } else {
-                $dropdown = Dropdown::create(
-                    Button::create('安装'. ' <i class="el-icon-arrow-down" />')
-                    ->sizeSmall()
-                    ->typePrimary()
-                );
-                foreach ($rows['versions'] as $row){
-                    $dropdown->item($row['version'])->save(['name'=>$rows['name'],'version'=>$row['version']],'plug/install','确认安装？');
+                if($rows['is_buy']){
+                    $dropdown = Dropdown::create(
+                        Button::create('安装'. ' <i class="el-icon-arrow-down" />')
+                            ->typePrimary()
+                    );
+                    foreach ($rows['versions'] as $row){
+                        $dropdown->item($row['version'])->save(['name'=>$rows['name'],'version'=>$row['version']],'plug/install','确认安装？');
+                    }
+                    $actions->append($dropdown);
+                }else{
+                    $actions->append(
+                        Dialog::create(Button::create('购买')
+                            ->typePrimary())
+                            ->width('600px')
+                            ->content(Html::create()->tag('iframe')
+                                ->attr('src','https://www.ex-admin.com/index/store/detail.html?id='.$rows['id'].'&iframe_pay=true&token='.urlencode(Admin::plug()->token()))
+                                ->attr('frameborder',0)
+                                ->attr('height','470px')
+                                ->attr('width','100%')
+                            )
+                    );
                 }
-
-                $actions->append($dropdown);
             }
         });
         $grid->hideDeleteButton();
@@ -228,11 +251,15 @@ class Plug extends Controller
         if(!Admin::plug()->isLogin()){
             admin_error_message('请先登陆');
         }
-        $res = Admin::plug()->onlineInstall($name,$version);
-        if($res){
-            admin_success_message('安装完成')->refreshMenu()->refresh();
+        try {
+            Admin::plug()->onlineInstall($name,$version);
+        }catch (PlugException $exception){
+            if($exception->getCode() == 410){
+                admin_error_message('安装失败')->bind(['plug_pay_'.$name=>true]);
+            }
+            admin_error_message('安装失败');
         }
-        admin_error_message('安装失败');
+        admin_success_message('安装完成')->refreshMenu()->refresh();
     }
 
     /**

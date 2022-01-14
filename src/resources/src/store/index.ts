@@ -52,10 +52,14 @@ const states = reactive({
     gridFirst:true,
     lang:{},
     app:'',
+    proxyData:[]
 });
 export const state = states
 //操作方法
 const action = {
+    setProxyData(data){
+        state.proxyData = data
+    },
     multiAppInit(){
         if(!state.app){
             this.setMultiApp(window['multiApp'])

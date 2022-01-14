@@ -15,6 +15,7 @@ use Eadmin\support\Composer;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -298,6 +299,9 @@ class PlugService
     {
         if (count($this->plugs) == 0) {
             $response = $this->client->post("list", [
+                'headers' => [
+                    'Authorization' => self::token()
+                ],
                 'form_params' => [
                     'cate_id' => $cate_id,
                     'page' => $page,
@@ -351,6 +355,7 @@ class PlugService
         $names = array_column($onlinePlugs, 'name');
         foreach ($this->plugPaths as $name => $plug) {
             $info = $this->info($name);
+            $info['is_buy'] = true;
             $info['install'] = true;
             $info['versions'] = [];
             $info['requires'] = [];
@@ -501,19 +506,22 @@ class PlugService
      */
     public function onlineInstall($name, $version)
     {
+
         $plugZip = app()->getRuntimePath() . 'plug' . time() . '.zip';
-        $this->client->get('install', [
-            'query' => [
-                'name' => $name,
-                'version' => $version,
-            ],
-            'headers' => [
-                'Authorization' => self::token()
-            ],
-            'save_to' => $plugZip
-        ]);
+
+
         $filesystem = new Filesystem();
         try {
+            $response = $this->client->get('install', [
+                'query' => [
+                    'name' => $name,
+                    'version' => $version,
+                ],
+                'headers' => [
+                    'Authorization' => self::token()
+                ],
+                'save_to' => $plugZip
+            ]);
             $zip = new \ZipArchive();
             if ($zip->open($plugZip) === true) {
                 $path = app()->getRuntimePath() . 'plugin';
@@ -533,10 +541,8 @@ class PlugService
                 unlink($plugZip);
                 return false;
             }
-        } catch (PlugException $exception) {
+        }catch (\Exception $exception) {
             throw new PlugException($exception->getMessage(), $exception->getCode());
-        } catch (\Exception $exception) {
-            return false;
         }
     }
 

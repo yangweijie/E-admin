@@ -59,6 +59,9 @@ service.interceptors.response.use(
                 action.refreshToken()
             }
         }
+        if(res.proxyData){
+            action.setProxyData(res.proxyData)
+        }
         // if the custom code is not 20000, it is judged as an error.
         if (res.code !== 200) {
             // 登陆验证token判断
