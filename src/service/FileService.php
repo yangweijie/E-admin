@@ -137,41 +137,66 @@ class FileService extends Service
     }
 
     /**
+     * 保存文件
+     * @param string $filename 文件名
+     * @param mixed $content 文件内容
+     * @return bool|string
+     */
+    public function save($filename,$content){
+        return $this->upload($content,$filename);
+    }
+    /**
      * 上传文件
      * @param mixed $file 文件对象或文件内容
      * @param string $fileName 文件名
      * @param string $saveDir 保存目录
      * @param string $upType disk
-     * @param bool $isUniqidmd5 是否唯一文件名
+     * @param bool $isUniqidmd5 是否使用MD5文件名
      * @return  bool|string
      */
     public function upload($file, $fileName = null, $saveDir = '/', $upType = '', bool $isUniqidmd5 = false)
     {
+        //存储上传驱动类型
         if (!empty($upType)) {
             $this->upType = $upType;
         }
-
-        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-        if(in_array($ext,$this->disableExt)){
-            return false;
-        }
-        if ($isUniqidmd5) {
-            $fileName = md5((string)microtime(true)) . '.' . $ext;;
+        //获取文件名
+        if($file instanceof File && $isUniqidmd5){
+            $fileName = md5_file($file->getRealPath()). '.' . $extension;
+        }elseif ($isUniqidmd5) {
+            $fileName = md5((string)microtime(true)) . '.' . $extension;
         } elseif (empty($fileName)) {
             $fileName = $file->getOriginalName();
         }
+        //原文件名
         $real_name = $fileName;
-        $path = trim($saveDir . '/' . $fileName, '/');
-        if ($file instanceof File) {
+        if($file instanceof File){
             $real_name = $file->getOriginalName();
-            $stream = file_get_contents($file->getRealPath());
-        } else {
-            $stream = $file;
         }
+
+        //获取文件名后缀
+        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+
+        //判断禁止上传文件后缀
+        if(in_array($extension,$this->disableExt)){
+            return false;
+        }
+        //获取上传内容
+        $stream = $file;
+        if ($file instanceof File) {
+            $stream = file_get_contents($file->getRealPath());
+        }
+        //保存路径
+        $path = trim($saveDir . '/' . $fileName, '/');
+        //判断是否存在
+        if(Filesystem::disk($this->upType)->has($path)){
+            return $this->url($path);
+        }
+        //写入文件
         $result = Filesystem::disk($this->upType)->put($path, $stream);
+
         if ($result) {
             $filename = Filesystem::disk($this->upType)->path($path);
-            $extension = pathinfo($filename)['extension'];
             $this->compressImage($filename);
             $url = $this->url($path);
             $this->saveData($fileName,$real_name,$url,$path,$extension);
