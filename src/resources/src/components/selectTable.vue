@@ -13,20 +13,20 @@
             </el-option>
         </el-select>
         <el-button icon="el-icon-plus" type="primary" plain style="margin-left: 5px;height: 36px" @click="open" :disabled="$attrs.disabled"></el-button>
-        <el-dialog top="50px" v-model="visible" :append-to-body="true" width="80%" destroy-on-close>
-            <render :data="content"  v-model:selection="selection" :scroll="height"  :add-params="params"
-                    :selection-type="multiple ? 'checkbox':'radio'"></render>
-            <template #footer>
-                <div :class="multiple && selection.length > 0 ? 'footer':''">
-                    <div v-if="multiple && selection.length > 0">{{ trans('selectTable.selected') }}: {{selection.length}}</div>
-                    <div>
-                        <el-button type="primary" @click="submit">{{ trans('selectTable.confirm') }}</el-button>
-                        <el-button @click="visible = false">{{ trans('selectTable.cancel') }}</el-button>
-                    </div>
-                </div>
-            </template>
-        </el-dialog>
     </div>
+    <el-dialog top="50px" v-model="visible" :append-to-body="true" width="80%" destroy-on-close>
+      <render :data="content"  v-model:selection="selection" :scroll="height"  :add-params="params"
+              :selection-type="multiple ? 'checkbox':'radio'"></render>
+      <template #footer>
+        <div :class="multiple && selection.length > 0 ? 'footer':''">
+          <div v-if="multiple && selection.length > 0">{{ trans('selectTable.selected') }}: {{selection.length}}</div>
+          <div>
+            <el-button type="primary" @click="submit">{{ trans('selectTable.confirm') }}</el-button>
+            <el-button @click="visible = false">{{ trans('selectTable.cancel') }}</el-button>
+          </div>
+        </div>
+      </template>
+    </el-dialog>
 </template>
 
 <script>

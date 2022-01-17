@@ -71,7 +71,7 @@ class Watch implements ArrayAccess
 	{
 
 		if (empty($field)) {
-          
+
 			return $this->data;
 		} else {
 			return Arr::get($this->data,$field);
@@ -95,7 +95,7 @@ class Watch implements ArrayAccess
 	 */
 	public function set($field, $value)
 	{
-        if(!$this->init || $this->init && empty($this->get($field))){
+        if(!$this->init || ($this->init && empty($this->get($field) && !is_array($this->get($field))))){
             Arr::set($this->data,$field,$value);
         }
 	}
