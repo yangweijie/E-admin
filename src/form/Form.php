@@ -1043,6 +1043,8 @@ class Form extends Component
             $this->setData('eadmin_step', $this->steps->bindAttr('current'));
             $this->setData('eadmin_step_reset', $this->bindAttr('reset'));
         }
+        //watch初始化数据
+        $this->watchInit();
         //将值绑定到form
         $this->bind($field, $this->data);
         //tab验证字段

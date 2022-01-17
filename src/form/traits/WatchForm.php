@@ -10,6 +10,7 @@ namespace Eadmin\form\traits;
 
 use Eadmin\traits\ApiJson;
 use think\facade\Request;
+use think\helper\Arr;
 
 
 /**
@@ -32,26 +33,24 @@ trait WatchForm
         $fields = array_keys($this->watchs);
         $this->attr('watch',$fields);
     }
-
+    protected function watchInit(){
+        $watch   = new \Eadmin\form\Watch($this->data,true);
+        foreach ($this->watchs as $field=>$closure){
+            $value = Arr::get($this->data,$field);
+            call_user_func_array($closure, [$value, $watch,$value]);
+        }
+        $this->data = $watch->get();
+    }
     /**
      * 监听数据回调
      */
     protected function watchCall($data)
     {
         if (Request::has('eadmin_form_watch')) {
-            $init = true;
-            if($data['field'] == 'batch_init_watch'){
-                $batch = $data['newValue'];
-            }else{
-                $batch[] = $data;
-                $init = false;
-            }
-            $watch   = new \Eadmin\form\Watch($data['form'],$init);
-            foreach ($batch as $item){
-                $closure = $this->watchs[$item['field']];
-                $watch->set($item['field'],$item['newValue']);
-                call_user_func_array($closure, [$item['newValue'], $watch, $item['oldValue']]);
-            }
+            $watch   = new \Eadmin\form\Watch($data['form']);
+            $closure = $this->watchs[$data['field']];
+            $watch->set($data['field'],$data['newValue']);
+            call_user_func_array($closure, [$data['newValue'], $watch, $data['oldValue']]);
 			$this->successCode([
 				'form'      => $watch->get(),
 				'showField' => $watch->getShowField(),
