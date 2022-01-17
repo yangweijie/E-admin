@@ -173,8 +173,10 @@
 .manyItemEadminTable .el-form-item{
   margin-bottom: 0;
 }
-.hasMany .el-col .el-form-item{
-  margin-bottom: 0;
+/*.hasMany .el-col .el-form-item{*/
+/*  margin-bottom: 5px;*/
+/*}*/
+.hasMany .el-divider--horizontal{
+  margin: 24px 35px;
 }
-
 </style>

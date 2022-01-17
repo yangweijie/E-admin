@@ -116,8 +116,8 @@ import {
                                     })
                                 }
                             }
-
-                            slotProps.row[field] = value
+                          expression = 'slotProps.row.'+field+' = value'
+                          eval(expression)
                         }
                     } else {
                         expression = 'modelBind == "modelValue" && modelValue.'+field+' === null && (data.name === "ElTimePicker" || data.name === "ElDatePicker") ? modelValue.' + field + ' = modelValue.' + data.bindAttribute.timeValue+':null'

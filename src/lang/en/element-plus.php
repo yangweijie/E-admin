@@ -80,6 +80,7 @@ return [
             'cancel'=> 'Cancel',
         ],
         'selectTable'=>[
+            'select' => 'select',
             'selected'=> 'Selected',
             'confirm'=> 'OK',
             'cancel'=> 'Cancel',

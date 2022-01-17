@@ -80,6 +80,7 @@ return [
             'cancel' => '取 消',
         ],
         'selectTable' => [
+            'select' => '选择',
             'selected' => '已选中',
             'confirm' => '确定',
             'cancel' => '取消',

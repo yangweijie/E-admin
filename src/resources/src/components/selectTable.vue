@@ -1,7 +1,10 @@
 <template>
-    <div class="flex">
-        <render v-if="custom" :data="customRender"></render>
-        <el-select v-else style="flex: 1" v-bind="$attrs" v-model="value" :multiple="multiple" @focus="focus" @click="focus" ref="select" value-key="id" v-loading="selectLoading">
+    <div v-if="custom">
+      <el-button icon="el-icon-plus" type="primary" size="small" plain style="margin-bottom: 10px;" @click="open" :disabled="$attrs.disabled">{{ trans('selectTable.select') }}</el-button>
+      <render :data="customRender"></render>
+    </div>
+    <div class="flex" v-else>
+        <el-select style="flex: 1" v-bind="$attrs" v-model="value" :multiple="multiple" @focus="focus" @click="focus" ref="select" value-key="id" v-loading="selectLoading">
             <el-option
                     v-for="item in options"
                     :key="item.id"
