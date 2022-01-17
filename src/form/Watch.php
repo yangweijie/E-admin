@@ -69,7 +69,9 @@ class Watch implements ArrayAccess
 	 */
 	public function get($field = '')
 	{
+
 		if (empty($field)) {
+          
 			return $this->data;
 		} else {
 			return Arr::get($this->data,$field);

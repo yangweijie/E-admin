@@ -39,7 +39,9 @@ trait WatchForm
             $value = Arr::get($this->data,$field);
             call_user_func_array($closure, [$value, $watch,$value]);
         }
-        $this->data = $watch->get();
+
+        $this->data = array_merge($this->data,$watch->get());
+
     }
     /**
      * 监听数据回调
