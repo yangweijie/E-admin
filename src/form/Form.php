@@ -1032,6 +1032,7 @@ class Form extends Component
         }
         $field = $this->bindAttr('model');
         $this->data = array_merge($this->callMethod, $this->data);
+
         $this->attr('callMethod', $this->callMethod);
         //主键值
         if ($this->isEdit) {

@@ -183,7 +183,7 @@
     import {useHttp} from '@/hooks'
     import request from '@/utils/axios'
     import {store,action} from '@/store'
-    import {forEach, unique, deleteArr, buildURL, debounce,treeMap,empty,findTree,offsetTop,trans,getPopupEl} from '@/utils'
+    import {forEach, unique, deleteArr, buildURL, debounce,treeMap,empty,findTree,offsetTop,trans,getPopupEl,formatNumber} from '@/utils'
     import {ElMessageBox,ElMessage} from 'element-plus'
     import Sortable from 'sortablejs'
     import {useRoute} from 'vue-router'
@@ -303,12 +303,13 @@
                     size: size,
                 }
                 const filterData = JSON.parse(JSON.stringify(proxyData[props.filterField] || ''))
+
                 forEach(filterData,function (val,key) {
                     if(props.filterExceptField.indexOf(key) > -1){
                         delete filterData[key]
                     }
                 })
-                requestParams = Object.assign(requestParams, filterData,{quickSearch:quickSearchValue.value,eadminFilterField:props.filterField},route.query,props.params,props.addParams,sortableParams)
+                requestParams = Object.assign(requestParams,{quickSearch:quickSearchValue.value,eadminFilterField:props.filterField},props.params,props.addParams,sortableParams,filterData)
                 if(trashed.value){
                     requestParams = Object.assign(requestParams ,{eadmin_deleted:true})
                 }
@@ -316,6 +317,7 @@
             }
 
             onMounted(()=>{
+                initFilterData()
                 if(!props.static){
                   if(!props.initLoad){
                     initLoad = false
@@ -336,6 +338,16 @@
 
                   })
                 }
+
+                if(props.filterField && props.filter.attribute.hideAction){
+                  const filterDebounce = debounce(()=>{
+                    loading.value = true
+                  },300)
+                  watch(()=>proxyData[props.filterField], (value) => {
+                    filterDebounce('','eadmin_grid_filter')
+                  },{deep:true})
+                }
+
             })
             onUnmounted((e)=>{
                 sortable.destroy()
@@ -371,13 +383,15 @@
                     loadData()
                 }
             })
-            if(props.filterField && props.filter.attribute.hideAction){
-                const filterDebounce = debounce(()=>{
-                    loading.value = true
-                },300)
-                watch(()=>proxyData[props.filterField], (value) => {
-                    filterDebounce('','eadmin_grid_filter')
-                },{deep:true})
+            //默认值赋值给筛选表单
+            function initFilterData(){
+              if(props.filterField){
+                for(let field in props.params){
+                  if(proxyData[props.filterField].hasOwnProperty(field) && props.filterExceptField.indexOf(field) === -1){
+                    proxyData[props.filterField][field] = formatNumber(props.params[field])
+                  }
+                }
+              }
             }
             //动态控制列显示隐藏
             const checkboxColumn = ref(props.columns.map(item => {

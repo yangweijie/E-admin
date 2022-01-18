@@ -381,3 +381,10 @@ export function loadScript(src){
         }
     })
 }
+export function formatNumber(val){
+    if (parseFloat(val).toString() == "NaN") {
+        return val;
+    } else {
+        return parseFloat(val);
+    }
+}

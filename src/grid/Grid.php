@@ -42,8 +42,8 @@ use think\Model;
  * @method $this size(string $size)    表格大小 default | middle | small
  * @method $this tableLayout(string $value) auto / fixed
  * @method $this scroll(array $height) {
-x: number | true, y: number
-}
+ * x: number | true, y: number
+ * }
  * @method $this bordered(bool $bool = true) 是否展示外边框和列边框
  * @method $this quickSearch(bool $bool = true) 快捷搜索
  * @method $this quickSearchText(string $string) 快捷提示文本内容
@@ -73,6 +73,7 @@ x: number | true, y: number
 class Grid extends Component
 {
     use CallProvide;
+
     protected $name = 'EadminGrid';
 
     protected $column = [];
@@ -89,6 +90,7 @@ class Grid extends Component
     protected $hideAddButton = false;
     //查询过滤
     protected $filter = null;
+    protected $filterClosure = null;
 
     //是否开启树形表格
     protected $isTree = false;
@@ -184,9 +186,11 @@ class Grid extends Component
      * 设置高度
      * @param int $height 高度
      */
-    public function height($height){
-        $this->scroll(['x' => 'max-content','y'=>$height]);
+    public function height($height)
+    {
+        $this->scroll(['x' => 'max-content', 'y' => $height]);
     }
+
     /**
      * 表格模式
      */
@@ -284,12 +288,13 @@ class Grid extends Component
 
     /**
      * 查询过滤
-     * @param mixed $callback
+     * @param \Closure $callback
      */
-    public function filter($callback)
+    public function filter(\Closure $callback)
     {
         if ($callback instanceof \Closure) {
-            call_user_func($callback, $this->getFilter());
+            $this->filterClosure = $callback;
+            $this->getFilter();
         }
     }
 
@@ -308,6 +313,7 @@ class Grid extends Component
             call_user_func_array($closure, $params);
         });
     }
+
     //更新后回调
     public function updated(\Closure $closure)
     {
@@ -324,6 +330,7 @@ class Grid extends Component
             call_user_func_array($closure, [$id, $trueDelete]);
         });
     }
+
     //删除后回调
     public function deleted(\Closure $closure)
     {
@@ -332,6 +339,7 @@ class Grid extends Component
             call_user_func_array($closure, [$id, $trueDelete]);
         });
     }
+
     /**
      * 删除
      * @param int $id 删除的id
@@ -341,7 +349,7 @@ class Grid extends Component
     {
         $this->exec();
         Event::until(Deling::class, $id);
-        $result =  $this->drive->destroy($id);
+        $result = $this->drive->destroy($id);
         Event::until(Deleted::class, $id);
         return $result;
     }
@@ -370,7 +378,7 @@ class Grid extends Component
      * 开启导出
      * @param string $fileName 导出文件名
      */
-    public function export($fileName = '',$format='csv')
+    public function export($fileName = '', $format = 'csv')
     {
         $this->attr('export', true);
         $this->attr('exportType', $format);
@@ -461,7 +469,7 @@ class Grid extends Component
             }
         } elseif ($tools instanceof Component) {
             $this->tools[] = $tools;
-        }else{
+        } else {
             $this->tools[] = Html::create()->content($tools);
         }
         return $this;
@@ -518,15 +526,18 @@ class Grid extends Component
             $column = new Column($field, $label, $this);
             $this->drive->realiton($field);
         }
-        $class = $this->callClass.'\\'.$this->callFunction;
-        if(Admin::checkFieldAuth($class,$field)){
+        $class = $this->callClass . '\\' . $this->callFunction;
+        if (Admin::checkFieldAuth($class, $field)) {
             $this->column[] = $column;
         }
         return $column;
     }
-    public function getColumns(){
+
+    public function getColumns()
+    {
         return $this->column;
     }
+
     public function collectColumns(\Closure $closure)
     {
         $offset = count($this->column);
@@ -638,9 +649,9 @@ class Grid extends Component
                 $columnTitle[$field] = $label;
             }
         }
-        if($this->attr('exportType') == 'csv'){
+        if ($this->attr('exportType') == 'csv') {
             $excel = new Csv();
-        }else{
+        } else {
             $excel = new Excel();
         }
         $excel->file(date('YmdHis'));
@@ -736,23 +747,44 @@ class Grid extends Component
         $this->attr('tools', $this->tools);
         //快捷搜索
         $keyword = Request::get('quickSearch', '', ['trim']);
-
         $this->drive->quickFilter($keyword, $this->column);
+        //params
+        $params = (array)$this->attr('params');
+        $this->params(array_merge($this->get, request()->get(), ['eadmin_grid' => $this->attr('eadmin_grid')], $this->getCallMethod(), $params));
         //查询视图
         if (!is_null($this->filter)) {
+            if (!is_null($this->filterClosure)) {
+                //获取form默认参数
+                $initFilter = new Filter($this->drive->db());
+                call_user_func($this->filterClosure, $initFilter);
+                $form = $initFilter->form();
+                json_encode($form);
+                $filterData = $form->bind($form->bindAttr('model'));
+                $get = $this->attr('params');
+                foreach ($filterData as $field=>$value){
+                    if(!isset($get[$field])){
+                        $get[$field] = $value;
+                    }
+                }
+                Request::withGet($get);
+                //执行筛选
+                call_user_func($this->filterClosure, $this->filter);
+            }
             $form = $this->filter->render();
             $form->eventSuccess([$this->bindAttr('modelValue') => true]);
             //排除筛选多余字段
-            $this->attr('formFilter',$this->filter->filterShow());
+            $this->attr('formFilter', $this->filter->filterShow());
             $this->attr('filterExceptField', $form->attr('exceptField'));
             $this->attr('filter', $form);
             $this->attr('filterField', $form->bindAttr('model'));
+
         }
+
         //添加操作列
         if (!$this->hideAction) {
             $this->column[] = $this->actionColumn->column();
         }
-        if(request()->isAjax() && !$this->attr('initLoad')){
+        if (request()->isAjax() && !$this->attr('initLoad')) {
             $this->attr('data', $this->parseData());
         }
         //是否分页
@@ -768,8 +800,6 @@ class Grid extends Component
                 'total' => $this->pagination->attr('total')
             ];
         } else {
-            $params = (array)$this->attr('params');
-            $this->params(array_merge($this->get, request()->get(),['eadmin_grid'=>$this->attr('eadmin_grid')], $this->getCallMethod(), $params));
             $this->attr('columns', array_column($this->column, 'attribute'));
             return parent::jsonSerialize(); // TODO: Change the autogenerated stub
         }

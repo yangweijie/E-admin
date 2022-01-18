@@ -64,6 +64,9 @@ class Filter
         if ($this->db) {
             $this->tableFields = $this->db->getTableFields();
         }
+        $this->initForm();
+    }
+    protected function initForm(){
         $this->form = new Form([]);
         $this->form->inline()
             ->removeAttr('labelWidth')
@@ -71,7 +74,6 @@ class Filter
             ->size('small');
         $this->form->actions()->hide();
     }
-
     /**
      * 占列
      * @param int $span
@@ -443,6 +445,7 @@ class Filter
                 $options[$value] = $text . " ($count)";
             }
         }
+
         $item = $this->form->popItem();
         $field = $item->attr('prop');
         $label = $item->attr('label');
@@ -886,7 +889,7 @@ class Filter
         } else {
             $this->form->push($actions);
         }
-
+        $this->form->except(['eadmin_class','eadmin_function','eadmin_app']);
         return $this->form;
     }
 }
