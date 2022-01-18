@@ -68,6 +68,7 @@ use think\Model;
  * @method $this loadDataUrl(string $value) 设置加载数据url
  * @method $this params(array $value) 加载数据附加参数
  * @method $this selectionType(string $value) 多选checkbox 单选radio
+ * @method $this sumText(string $value) 合计行第一列的文本
  * @property Filter $filter
  */
 class Grid extends Component
@@ -162,26 +163,33 @@ class Grid extends Component
     {
         return $this->bind('eadmin_title', $title);
     }
-
-    /**
-     * 头部
-     * @param $header
-     */
-    public function header($header)
-    {
-        if ($header instanceof Component || is_string($header)) {
-            $header = [$header];
+    protected function componentContent($content){
+        if ($content instanceof Component || is_string($content)) {
+            $content = [$content];
         }
-        foreach ($header as &$item) {
+        foreach ($content as &$item) {
             if (!($item instanceof Component)) {
                 $item = Html::create($item);
             }
         }
-
-        //头部
-        $this->attr('header', $header);
+        return $content;
+    }
+    /**
+     * 头部
+     * @param $content
+     */
+    public function header($content)
+    {
+        $this->attr('header', $this->componentContent($content));
     }
 
+    /**
+     * 表格尾部
+     * @param $content
+     */
+    public function footer(){
+        $this->attr('footer', $this->componentContent($content));
+    }
     /**
      * 设置高度
      * @param int $height 高度
@@ -606,11 +614,13 @@ class Grid extends Component
             $tableData[] = $row;
         }
         $isTotal = false;
-        $row = ['eadmin_id' => -1];
-        foreach ($this->column as $column) {
+        $row = ['eadmin_id' => 0];
+        foreach ($this->column as $index=>$column) {
             $total = $column->getTotal();
             $field = $column->attr('prop');
-            if ($total === false) {
+            if($index==0){
+                $row[$field] = Html::create($this->attr('sumText') ?? '合计');
+            }elseif ($total === false) {
                 $row[$field] = '';
             } else {
                 $isTotal = true;
@@ -618,6 +628,7 @@ class Grid extends Component
             }
         }
         if ($isTotal && !$export) {
+            $row['eadmin_total_row'] = true;
             $tableData[] = $row;
         }
         return $tableData;

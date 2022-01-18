@@ -106,13 +106,16 @@
                      :data-source="tableData"
                      :expanded-row-keys="expandedRowKeys"
                      :pagination="false" :loading="loading"
-                     :rowClassName="(record, index) => (index % 2 === 1 && stripe ? 'table-striped' : null)"
+                     :rowClassName="rowClassNameHandel"
                      v-bind="$attrs"
                      row-key="eadmin_id"
                      ref="dragTable"
                      class="eadmin_table">
                 <template #title v-if="header">
                     <div class="header"><render v-for="item in header" :data="item" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params"  :slot-props="grid"></render></div>
+                </template>
+                <template #footer v-if="footer">
+                  <render v-for="item in footer" :data="item" :ids="selectIds" :add-params="{eadmin_ids:selectIds}" :grid-params="params"  :slot-props="grid"></render>
                 </template>
                 <template v-for="column in columnHeader" v-slot:[column.slots.title]>
                     <render  :data="column.header" :slot-props="grid"></render>
@@ -142,14 +145,16 @@
                 </template>
 
                 <template #sortDrag="{ text , record , index }">
-                    <div style="display: flex;flex-direction: column">
+                    <div style="display: flex;flex-direction: column" v-if="record.eadmin_id">
                         <el-tooltip  effect="dark" :content="trans('grid.sortTop')" placement="right-start"><i @click="sortTop(index,record)" class="el-icon-caret-top" style="cursor: pointer"></i></el-tooltip>
                         <el-tooltip effect="dark" :content="trans('grid.sortDrag')" placement="right-start"><i class="el-icon-rank sortHandel" style="font-weight:bold;cursor: grab"></i></el-tooltip>
                         <el-tooltip  effect="dark" :content="trans('grid.sortBottom')" placement="right-start"><i @click="sortBottom(index,record)" class="el-icon-caret-bottom" style="cursor: pointer"></i></el-tooltip>
                     </div>
+                    <render v-else :data="text" :slot-props="grid"></render>
                 </template>
                 <template #sortInput="{ text , record , index }">
-                    <el-input v-model="text.content.default[0]" @change="sortInput(record.eadmin_id,text.content.default[0])"></el-input>
+                    <el-input v-if="record.eadmin_id" v-model="text.content.default[0]" @change="sortInput(record.eadmin_id,text.content.default[0])"></el-input>
+                    <render v-else :data="text" :slot-props="grid"></render>
                 </template>
             </a-table>
 
@@ -235,6 +240,7 @@
             formFilter: Boolean,
             filter: [Object, Boolean],
             header: [Object, Boolean],
+            footer: [Object, Boolean],
             expandFilter: Boolean,
             addButton: [Object, Boolean],
             filterField:String,
@@ -837,6 +843,12 @@
                     proxyData[props.filterField][field] = ''
                 }
             }
+            function rowClassNameHandel(record, index){
+              if(record.eadmin_total_row){
+                return 'eadmin-summary-row';
+              }
+              return index % 2 === 1 && props.stripe ? 'table-striped' : null
+            }
             return {
                 trans,
                 isMobile,
@@ -846,6 +858,7 @@
                 page,
                 size,
                 total,
+                rowClassNameHandel,
                 handleFilter,
                 tableColumns,
                 checkboxColumn,
@@ -940,5 +953,11 @@
     }
     /deep/.table-striped td {
       background-color: #fafafa;
+    }
+    /deep/.eadmin-summary-row td{
+      background-color: #fafafa;
+    }
+    /deep/.eadmin-summary-row .ant-table-selection-column span{
+      display: none;
     }
 </style>
