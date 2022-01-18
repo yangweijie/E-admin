@@ -166,13 +166,16 @@ class FileService extends Service
         if (!empty($upType)) {
             $this->upType = $upType;
         }
-
-        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+		if (is_null($fileName)) {
+			$ext = pathinfo($file->getOriginalName(), PATHINFO_EXTENSION);
+		} else {
+			$ext = pathinfo($fileName, PATHINFO_EXTENSION);
+		}
         if(in_array($ext,$this->disableExt)){
             return false;
         }
         if ($isUniqidmd5) {
-            $fileName = md5((string)microtime(true)) . '.' . $ext;;
+            $fileName = md5((string)microtime(true)) . '.' . $ext;
         } elseif (empty($fileName)) {
             $fileName = $file->getOriginalName();
         }
