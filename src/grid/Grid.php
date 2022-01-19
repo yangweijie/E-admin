@@ -627,7 +627,7 @@ class Grid extends Component
                 $row[$field] = Html::create($total);
             }
         }
-        if ($isTotal && !$export) {
+        if ($isTotal && !$export && count($tableData) > 0) {
             $row['eadmin_total_row'] = true;
             $tableData[] = $row;
         }

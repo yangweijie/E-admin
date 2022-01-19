@@ -1,7 +1,9 @@
 import app from  './app'
 import { defineAsyncComponent } from 'vue'
 import render from './components/render.vue'
+import EadminSidebarGrid from './components/grid/sidebarGrid.vue'
 app.component(render.name,render)
+app.component(EadminSidebarGrid.name,EadminSidebarGrid)
 const form = defineAsyncComponent(() =>
     import('./components/form/form.vue')
 )
@@ -103,9 +105,7 @@ const EadminStep = defineAsyncComponent(() =>
 const EadminCheckTag = defineAsyncComponent(() =>
     import('./components/EadminCheckTag.vue')
 )
-const EadminSidebarGrid = defineAsyncComponent(() =>
-    import('./components/grid/sidebarGrid.vue')
-)
+
 const EadminQueue = defineAsyncComponent(() =>
     import('./components/queue.vue')
 )

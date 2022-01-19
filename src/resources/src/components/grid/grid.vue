@@ -315,7 +315,7 @@
                         delete filterData[key]
                     }
                 })
-                requestParams = Object.assign(requestParams,{quickSearch:quickSearchValue.value,eadminFilterField:props.filterField},props.params,props.addParams,sortableParams,filterData)
+                requestParams = Object.assign(requestParams,{quickSearch:quickSearchValue.value,eadminFilterField:props.filterField},props.params,sortableParams,filterData,props.addParams)
                 if(trashed.value){
                     requestParams = Object.assign(requestParams ,{eadmin_deleted:true})
                 }
@@ -335,12 +335,13 @@
                          tableData.value = props.data
                        }
                        initLoad = true
-                       ctx.emit('update:initLoad',initLoad)
+
                        tableAutoWidth()
                        if(!props.initLoad){
                           loading.value = false
                        }
-                     })
+                       ctx.emit('update:initLoad',initLoad)
+                    })
 
                   })
                 }
@@ -955,7 +956,7 @@
       background-color: #fafafa;
     }
     /deep/.eadmin-summary-row td{
-      background-color: #fafafa;
+      background: linear-gradient(to top, #fafafa, white);
     }
     /deep/.eadmin-summary-row .ant-table-selection-column span{
       display: none;
