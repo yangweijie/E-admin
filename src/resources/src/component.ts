@@ -110,7 +110,6 @@ const EadminQueue = defineAsyncComponent(() =>
     import('./components/queue.vue')
 )
 app.component('EadminQueue',EadminQueue)
-app.component('EadminSidebarGrid',EadminSidebarGrid)
 app.component('EadminCheckTag',EadminCheckTag)
 app.component('EadminStep',EadminStep)
 app.component('EadminCheckboxGroup',EadminCheckboxGroup)

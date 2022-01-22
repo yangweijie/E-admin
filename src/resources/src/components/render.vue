@@ -1,23 +1,23 @@
 <script>
-import {
-  defineComponent,
-  watch,
-  toRaw,
-  h,
-  reactive,
-  resolveComponent,
-  isProxy,
-  resolveDirective,
-  withDirectives,
-  getCurrentInstance,
-  onBeforeUnmount,
-  inject
-} from 'vue'
-    import {splitCode} from '@/utils/splitCode'
-    import {setObjectValue,getObjectValue,findArrKey,isNumber} from '@/utils'
-    import dayjs from 'dayjs'
-    import request from '@/utils/axios'
-    import { store,action} from '@/store'
+    import {
+      defineComponent,
+      watch,
+      toRaw,
+      h,
+      reactive,
+      resolveComponent,
+      isProxy,
+      resolveDirective,
+      withDirectives,
+      getCurrentInstance,
+      onBeforeUnmount,
+      inject
+    } from 'vue'
+        import {splitCode} from '@/utils/splitCode'
+        import {setObjectValue,getObjectValue,findArrKey,isNumber} from '@/utils'
+        import dayjs from 'dayjs'
+        import request from '@/utils/axios'
+        import { store,action} from '@/store'
     export default defineComponent({
         name: "render",
         props: {
@@ -47,9 +47,14 @@ import {
                 return null
             }
         },
+
         setup(props) {
+            const componentKey = []
             const modelValue = reactive(props.proxyData)
             onBeforeUnmount(()=>{
+                componentKey.forEach(key=>{
+                  delete getCurrentInstance().appContext.components[key]
+                })
                 if(props.data){
                     setProxyData(props.data,0)
                 }
@@ -252,6 +257,7 @@ import {
                     if(attribute['data-tag'] === 'component'){
                         if(resolveComponent(attribute.key) === attribute.key){
                             getCurrentInstance().appContext.app.component(attribute.key,splitCode(data.content.default[0]))
+                            componentKey.push(attribute.key)
                         }
                         return h(resolveComponent(attribute.key),attribute)
                     }else{
@@ -362,36 +368,28 @@ import {
                         if (item && typeof (item) == 'object') {
                             return renderComponent(item, scope)
                         } else {
-                            if(item && typeof(item) == 'string' &&item.indexOf('#') !== 0){
-                                return h({
-                                            setup() {
-                                                return {
-                                                    ...modelValue
-                                                }
-                                            },
-                                            template: `${item}`,
-                                })
-                                // if(checkHtml(item) || checkTemplate(item)){
-                                //     return h({
-                                //         setup() {
-                                //             return {
-                                //                 ...modelValue
-                                //             }
-                                //         },
-                                //         template: `${item}`,
-                                //     })
-                                // }else{
-                                //     return h({
-                                //         setup() {
-                                //             return {
-                                //                 ...modelValue
-                                //             }
-                                //         },
-                                //         render() {
-                                //             return item
-                                //         }
-                                //     })
-                                // }
+                            if(item && typeof(item) == 'string' && item.indexOf('#') !== 0){
+                                if(checkHtml(item) || checkTemplate(item)){
+                                    return h({
+                                        setup() {
+                                            return {
+                                                ...modelValue
+                                            }
+                                        },
+                                        template: `${item}`,
+                                    })
+                                }else{
+                                  return h({
+                                    setup() {
+                                      return {
+                                        ...modelValue
+                                      }
+                                    },
+                                    render() {
+                                      return item
+                                    }
+                                  })
+                                }
                             }else{
                                 return item
                             }
