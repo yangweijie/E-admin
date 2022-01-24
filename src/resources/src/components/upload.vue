@@ -400,9 +400,10 @@ export default defineComponent({
     })
     // 单个文件上传成功
     uploader.on('fileSuccess', function(rootFile, file, message,chunk) {
+
       try {
         const res = JSON.parse(message)
-        if (res.code == 200) {
+        if (res.code == 200 || res.code == 201) {
           uploader.removeFile(file)
           setTimeout(()=>{
             state.progressShow = false
@@ -476,6 +477,15 @@ export default defineComponent({
       }
     })
     uploader.on('fileProgress', function(rootFile, file, chunk) {
+      if(chunk.offset + 1 < file.chunks.length){
+        try {
+          const res = JSON.parse(chunk.xhr.response)
+          if(res.code == 201){
+
+            uploader._trigger('fileSuccess', file.getRoot(), file, chunk.xhr.response, chunk)
+          }
+        } catch (e) {}
+      }
       state.progressShow = true
       state.percentage = parseInt(uploader.progress() * 100)
       props.onProgress(state.percentage)

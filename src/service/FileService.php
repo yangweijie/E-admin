@@ -466,7 +466,7 @@ class FileService extends Service
                 } elseif ($res !== true) {
                     return json(['code' => 200, 'data' => $res], 200);
                 } elseif ($res === true) {
-                    return json(['code' => 201, 'message' => '分片上传成功'], 201);
+                    return json(['code' => 202, 'message' => '分片上传成功'], 202);
                 }
             } else {
 
@@ -475,7 +475,7 @@ class FileService extends Service
                 } elseif ($res === true) {
                     return json(['code' => 202, 'data' => $res, 'message' => '分片秒传成功'], 202);
                 } elseif ($res) {
-                    return json(['code' => 200, 'data' => $res, 'message' => '秒传成功'], 200);
+                    return json(['code' => 201, 'data' => $res, 'message' => '秒传成功'], 201);
                 } else {
                     return json(['code' => 203, 'message' => '请重新上传分片'], 203);
                 }
