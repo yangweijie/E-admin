@@ -41,7 +41,7 @@ class FileSystem extends Controller
         $data = $model->pages()
             ->select()->map(function ($item) {
                 $item['dir'] = false;
-                $item['size'] = FileService::instance()->getSize($item['file_size']);
+                $item['size'] = Admin::file()->getSize($item['file_size']);
                 $model =  config(Admin::getAppName().'.database.user_model');
                 $item['author'] = $model::where('id',$item['admin_id'])->value('nickname');
                 $item['update_time'] = $item['create_time'];

@@ -19,6 +19,7 @@ use Eadmin\controller\Plug;
 use Eadmin\controller\Queue;
 use Eadmin\controller\ResourceController;
 use Eadmin\service\AuthService;
+use Eadmin\service\FileService;
 use Eadmin\service\MenuService;
 use Eadmin\service\NodeService;
 use Eadmin\plugin\PlugService;
@@ -276,7 +277,14 @@ class Admin
     {
         return app('admin.node');
     }
-
+    /**
+     * 文件
+     * @return FileService
+     */
+    public static function file()
+    {
+        return app('admin.file');
+    }
     /**
      * 树形
      * @param array $data 数据

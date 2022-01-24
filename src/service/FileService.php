@@ -51,8 +51,10 @@ class FileService extends Service
         $names = str_split(md5($filename), 16);
         $chunkSaveDir = $names[0];
         if (is_null($file)) {
+
             if ($totalChunks == 1) {
                 $res = $this->fileExist($upType, $saveDir . $filename, $totalSize);
+
                 if ($res === true) {
                     return $this->url($saveDir . $filename);
                 } else {
@@ -60,6 +62,7 @@ class FileService extends Service
                 }
             } elseif ($isUniqidmd5 == false) {
                 $res = $this->fileExist($upType, $saveDir . $filename, $totalSize);
+
                 if ($res === true) {
                     return $this->url($saveDir . $filename);
                 } elseif ($res == -1) {
@@ -68,6 +71,7 @@ class FileService extends Service
                     return $this->checkChunkExtis($filename, $chunkSaveDir, $chunkNumber, $chunkSize, $totalSize);
                 }
             } else {
+
                 return $this->checkChunkExtis($filename, $chunkSaveDir, $chunkNumber, $chunkSize, $totalSize);
             }
         } else {
@@ -154,12 +158,23 @@ class FileService extends Service
      * @param bool $isUniqidmd5 是否使用MD5文件名
      * @return  bool|string
      */
-    public function upload($file, $fileName = null, $saveDir = '/', $upType = '', bool $isUniqidmd5 = false)
+    public function upload($file, $fileName = null, $saveDir = '/', $upType = null, bool $isUniqidmd5 = false)
     {
         //存储上传驱动类型
         if (!empty($upType)) {
             $this->upType = $upType;
         }
+        //获取文件名后缀
+        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+        if($file instanceof File){
+            $extension = pathinfo($file->getOriginalName(), PATHINFO_EXTENSION);
+        }
+
+        //判断禁止上传文件后缀
+        if(in_array($extension,$this->disableExt)){
+            return false;
+        }
+
         //获取文件名
         if($file instanceof File && $isUniqidmd5){
             $fileName = md5_file($file->getRealPath()). '.' . $extension;
@@ -174,13 +189,6 @@ class FileService extends Service
             $real_name = $file->getOriginalName();
         }
 
-        //获取文件名后缀
-        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-
-        //判断禁止上传文件后缀
-        if(in_array($extension,$this->disableExt)){
-            return false;
-        }
         //获取上传内容
         $stream = $file;
         if ($file instanceof File) {
@@ -189,12 +197,11 @@ class FileService extends Service
         //保存路径
         $path = trim($saveDir . '/' . $fileName, '/');
         //判断是否存在
-        if(Filesystem::disk($this->upType)->has($path)){
-            return $this->url($path);
+        $result = true;
+        if(!Filesystem::disk($this->upType)->has($path)){
+            //写入文件
+            $result = Filesystem::disk($this->upType)->put($path, $stream);
         }
-        //写入文件
-        $result = Filesystem::disk($this->upType)->put($path, $stream);
-
         if ($result) {
             $filename = Filesystem::disk($this->upType)->path($path);
             $this->compressImage($filename);
@@ -444,29 +451,33 @@ class FileService extends Service
                 $isUniqidmd5 = false;
             }
             if ($this->app->request->method() == 'POST' && empty($chunk)) {
-                $res = FileService::instance()->upload($file, $filename, $saveDir . 'editor', $upType, $isUniqidmd5);
+                $res = Admin::file()->upload($file, $filename, $saveDir . 'editor', $upType, $isUniqidmd5);
                 if (!$res) {
                     return json(['code' => 999, 'message' => '上传失败'], 404);
                 } else {
                     return json(['code' => 200, 'data' => $res], 200);
                 }
             }
-            $res = FileService::instance()->chunkUpload($file, $filename, $chunk, $chunks, $chunkSize, $totalSize, $saveDir, $isUniqidmd5, $upType);
+            $res = Admin::file()->chunkUpload($file, $filename, $chunk, $chunks, $chunkSize, $totalSize, $saveDir, $isUniqidmd5, $upType);
+
             if ($this->app->request->method() == 'POST') {
                 if (!$res) {
                     return json(['code' => 999, 'message' => '上传失败'], 404);
                 } elseif ($res !== true) {
                     return json(['code' => 200, 'data' => $res], 200);
                 } elseif ($res === true) {
-                    return json(['code' => 200, 'message' => '分片上传成功'], 201);
+                    return json(['code' => 201, 'message' => '分片上传成功'], 201);
                 }
             } else {
-                if ($res == -1) {
+
+                if ($res === -1) {
                     return json(['code' => 999, 'message' => '文件名重复,请重命名文件重新上传'], 404);
+                } elseif ($res === true) {
+                    return json(['code' => 202, 'data' => $res, 'message' => '分片秒传成功'], 202);
                 } elseif ($res) {
-                    return json(['code' => 200, 'data' => $res, 'message' => '秒传成功'], 202);
+                    return json(['code' => 200, 'data' => $res, 'message' => '秒传成功'], 200);
                 } else {
-                    return json(['code' => 200, 'message' => '请重新上传分片'], 203);
+                    return json(['code' => 203, 'message' => '请重新上传分片'], 203);
                 }
             }
         });

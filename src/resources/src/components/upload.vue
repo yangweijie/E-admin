@@ -70,28 +70,28 @@
           <i class="el-icon-close" @click="fileDelete(index)" /><i class="el-icon-close-tip" />
         </div>
       </div>
-      <span :class="inputShow?'fileButtonBox':''" v-if="displayType == 'file'" v-show="showUploadBtn || foreverShow" >
+      <span :class="[inputShow?'fileButtonBox':'',progressShow?'fileMarginBottom':'']" v-if="displayType == 'file'" v-show="showUploadBtn || foreverShow" >
         <div style="margin-right: 5px;width: 100%" v-if="inputShow">
             <el-input v-model="inputValue" @change="changeInput"></el-input>
         </div>
         <span @click="handelBrowse" ref="btn">
-        <slot>
-
-          <template v-if="drag">
-             <label class="fileButton" >
-              <i class="el-icon-upload" />
-              <div class="el-upload__text">{{ trans('drag') }}<em>{{ trans('el.upload.clickUpload') }}</em></div>
-             </label>
-          </template>
-          <template v-else>
-            <el-button icon="el-icon-upload">{{ trans('el.upload.file') }}</el-button>
-          </template>
-           <el-progress v-show="progressShow" style="margin: 13px 0px" :text-inside="true" :stroke-width="15" :percentage="percentage" />
-        </slot>
-      </span>
+          <slot>
+            <template v-if="drag">
+               <label class="fileButton" >
+                <i class="el-icon-upload" />
+                <div class="el-upload__text">{{ trans('drag') }}<em>{{ trans('el.upload.clickUpload') }}</em></div>
+               </label>
+            </template>
+            <template v-else>
+              <el-button icon="el-icon-upload">{{ trans('el.upload.file') }}</el-button>
+            </template>
+            <el-progress v-show="progressShow" class="progess-file" :text-inside="true" :stroke-width="15" :percentage="percentage" />
+          </slot>
+        </span>
         <el-button icon="el-icon-menu" v-if="finder" @click="dialogVisible = true"></el-button>
       </span>
     </span>
+
     <el-dialog :title="trans('el.upload.resource')" v-model="dialogVisible" :append-to-body="true" width="70%" destroy-on-close>
       <el-row :gutter="10">
         <el-col :md="5" :sm="7" :xs="20" :span="5">
@@ -116,10 +116,9 @@
 <script>
 import Uploader from 'simple-uploader.js'
 import OSS from 'ali-oss'
-import md5 from 'js-md5'
 import * as qiniu from 'qiniu-js'
-import {fileIcon, lastName, link, refresh,trans} from '@/utils'
-import {defineComponent, reactive, watch, nextTick, toRefs, ref,getCurrentInstance} from "vue";
+import {fileIcon, lastName, link, refresh,trans,uniqidMd5} from '@/utils'
+import {defineComponent, reactive, watch, nextTick, toRefs, ref,getCurrentInstance,onBeforeUnmount} from "vue";
 import {ElMessage, ElNotification} from 'element-plus'
 import {action} from "@/store";
 import router from "@/router";
@@ -205,6 +204,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    chunkSize:{
+      type: Number,
+      default: 1
+    },
     foreverShow:Boolean,
     inputShow:Boolean,
     onProgress: {
@@ -217,7 +220,7 @@ export default defineComponent({
     },
     chunk: {
       type: Boolean,
-      default: true
+      default: false
     },
     dropElement:String,
     fileSize: {
@@ -320,10 +323,10 @@ export default defineComponent({
         })
       },
       testChunks: props.chunk,
-      chunkSize: props.chunk ? 1 * 1024 * 1024 : 500 * 1024 * 1024,
+      chunkSize: props.chunk ? props.chunkSize * 1024 * 1024 : 10240 * 1024 * 1024,
       headers: {
         Authorization: props.token
-      }
+      },
     })
     watch(()=>props.params,value=>{
       uploader.opts.query = Object.assign(uploader.opts.query,value)
@@ -343,8 +346,10 @@ export default defineComponent({
         })
       }
     })
+    onBeforeUnmount(()=>{
+      uploader.cancel()
+    })
     uploader.on('fileAdded', function(file, event) {
-
       if(props.fileSize > 0 && file.size > props.fileSize){
         ElMessage({
           type: 'error',
@@ -394,13 +399,14 @@ export default defineComponent({
       }
     })
     // 单个文件上传成功
-    uploader.on('fileSuccess', function(rootFile, file, message) {
-
+    uploader.on('fileSuccess', function(rootFile, file, message,chunk) {
       try {
         const res = JSON.parse(message)
         if (res.code == 200) {
           uploader.removeFile(file)
-          state.progressShow = false
+          setTimeout(()=>{
+            state.progressShow = false
+          })
           if (!props.multiple) {
             state.files = []
           }
@@ -509,10 +515,6 @@ export default defineComponent({
       state.files = state.files.filter(function(s) {
         return s && s.trim()
       })
-    }
-    function uniqidMd5() {
-      const rand = ('0000' + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4)
-      return md5(rand)
     }
     // 图片工具栏显示
     function showImgTool(index) {
@@ -812,6 +814,12 @@ export default defineComponent({
   .progess{
     position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
   }
+  .progess-file{
+    position: absolute;
+    bottom: -10px;
+    width: 100%;
+    left: 0
+  }
   .uploader-btn {
     background-color: #fbfdff;
     border: 1px dashed #c0ccda;
@@ -835,9 +843,13 @@ export default defineComponent({
     align-items: center;
     justify-content: space-between;
   }
+  .fileMarginBottom{
+    margin-bottom: 20px;
+  }
   .fileButtonBox{
     display: flex;
     width: 100%;
   }
+
 
 </style>

@@ -25,7 +25,8 @@ use think\helper\Str;
  * @method $this multiple(bool $id = true) 多文件上传
  * @method $this limit(int $num) 最大允许上传个数
  * @method $this finder(bool $value = true) finer文件管理
- * @method $this chunk(bool $value = true) 本地分片上传
+ * @method $this chunk(bool $value = true) 本地开启分片上传
+ * @method $this chunkSize(int $size) 分片大小单位M
  * @method $this url(string $value) 上传url
  * @method $this params(array $value) 上传参数
  * @method $this inputShow(bool $value = true) 显示输入框
@@ -38,7 +39,8 @@ class Upload extends Field
     public function __construct($field = null, string $value = '')
     {
         parent::__construct($field, $value);
-        $this->url('/eadmin/upload');
+        $this->url(request()->domain().'/eadmin/upload');
+        $this->chunk();
         $this->attr('token', Admin::token()->get());
         $uploadType = config('admin.uploadDisks');
         $this->inputShow(true);

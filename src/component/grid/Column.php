@@ -4,6 +4,7 @@
 namespace Eadmin\component\grid;
 
 
+use Eadmin\Admin;
 use Eadmin\component\basic\Button;
 use Eadmin\component\basic\DownloadFile;
 use Eadmin\component\basic\Html;
@@ -581,8 +582,13 @@ class Column extends Component
                 $vals = [$vals];
             }
             $html = Html::create()->tag('div');
+            $model = config(Admin::getAppName().'.database.file_model');
+            $names = $model::whereIn('url',$vals)->column('real_name','url');
             foreach ($vals as $val) {
                 $file = new DownloadFile();
+                if(isset($names[$val])){
+                    $file->filename($names[$val]);
+                }
                 $file->url($val);
                 $html->content($file);
             }

@@ -162,6 +162,7 @@ class ServiceProvider extends Service
             'admin.translator' => Translator::class,
             'admin.auth' => AuthService::class,
             'admin.node' => NodeService::class,
+            'admin.file' => FileService::class,
         ]);
     }
     protected function crontab(){
@@ -186,7 +187,7 @@ class ServiceProvider extends Service
                 $fileSystem->remove(app()->getRootPath().'public/upload/excel');
             })->everyDay($config['database_day']);
             Schedule::call('清理上传已删除文件',function () {
-                FileService::instance()->clear();
+                Admin::file()->clear();
             })->everyMinute();
         }catch (\Exception $exception){
 

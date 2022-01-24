@@ -1,7 +1,5 @@
 import {isExternal} from "./validate";
 import router from '@/router'
-
-
 import { store,action} from '@/store'
 import { t,use } from 'element-plus/lib/locale'
 // @ts-ignore
@@ -388,3 +386,4 @@ export function formatNumber(val){
         return parseFloat(val);
     }
 }
+
