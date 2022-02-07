@@ -195,7 +195,7 @@ class FileService extends Service
             $stream = file_get_contents($file->getRealPath());
         }
         //保存路径
-        $path = trim($saveDir . '/' . $fileName, '/');
+        $path = trim($saveDir . $fileName, '/');
         //判断是否存在
         $result = true;
         if(!Filesystem::disk($this->upType)->has($path)){
