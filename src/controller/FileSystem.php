@@ -48,6 +48,7 @@ class FileSystem extends Controller
                 return $item;
             })->toArray();
         $fileSystem = new \Eadmin\component\basic\FileSystem($data);
+        $fileSystem->attr('total',$count);
         $fileSystem->initPath(\think\facade\Filesystem::disk('local')->path('/'))
             ->attr('display','menu')
             ->uploadFinder();

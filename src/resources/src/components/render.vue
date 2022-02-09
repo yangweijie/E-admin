@@ -411,7 +411,7 @@
              * @param htmlStr
              */
             function checkTemplate(htmlStr) {
-                var  reg = /\{\{([a-zA-Z]+)\}\}/g;
+                var reg = /\{\{([\w.]+)\}\}/g;
                 return reg.test(htmlStr);
             }
             /**
