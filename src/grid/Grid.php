@@ -772,8 +772,9 @@ class Grid extends Component
                 json_encode($form);
                 $filterData = $form->bind($form->bindAttr('model'));
                 $get = $this->attr('params');
+                $exceptField = $form->attr('exceptField');
                 foreach ($filterData as $field=>$value){
-                    if(!isset($get[$field])){
+                    if(!isset($get[$field]) && !in_array($field,$exceptField)){
                         $get[$field] = $value;
                     }
                 }
