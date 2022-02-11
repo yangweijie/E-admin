@@ -309,6 +309,7 @@
                     size: size,
                 }
                 const filterData = JSON.parse(JSON.stringify(proxyData[props.filterField] || ''))
+
                 forEach(filterData,function (val,key) {
                     if(props.filterExceptField.indexOf(key) > -1){
                         delete filterData[key]

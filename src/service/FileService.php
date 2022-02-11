@@ -10,6 +10,7 @@ namespace Eadmin\service;
 
 use Eadmin\Admin;
 use Eadmin\model\SystemFile;
+use Eadmin\Query;
 use Intervention\Image\ImageManagerStatic;
 use Overtrue\Flysystem\Qiniu\Plugins\UploadToken;
 use think\App;
@@ -213,20 +214,21 @@ class FileService extends Service
         }
     }
     private function saveData($fileName,$real_name,$url,$path,$extension){
-        if(Admin::id() && request()->has('file_type')){
-            $model =  config(Admin::getAppName().'.database.file_model');
-            $model::create([
-                'name' => $fileName,
-                'real_name' => request()->param('filename',$real_name),
-                'url' => $url,
-                'path' => $path,
-                'cate_id' => request()->param('cate_id', 0),
-                'ext' => $extension,
-                'file_size' => request()->param('totalSize', 0),
-                'file_type' => request()->param('file_type', ''),
-                'uptype' => $this->upType,
-                'admin_id' => Admin::id(),
-            ]);
+        $data = [
+            'name' => $fileName,
+            'real_name' => request()->param('filename',$real_name),
+            'url' => $url,
+            'path' => $path,
+            'cate_id' => request()->param('cate_id', 0),
+            'ext' => $extension,
+            'file_size' => request()->param('totalSize', 0),
+            'file_type' => request()->param('file_type', ''),
+            'uptype' => $this->upType,
+            'admin_id' => Admin::id(),
+        ];
+        $model =  config(Admin::getAppName().'.database.file_model');
+        if($model::where($data)->count() == 0){
+            $model::create($data);
         }
     }
     /**
@@ -278,6 +280,22 @@ class FileService extends Service
         }
     }
 
+    /**
+     * 获取存储路径
+     * @param string $url 文件完整url
+     * @param string $upType 存储类型
+     * @return string|null
+     */
+    public function path($url, $upType = null){
+        $model =  config(Admin::getAppName().'.database.file_model');
+        $fileInfo = $model::where('url',$url)
+            ->when($upType,['uptype'=>$upType])
+            ->find();
+        if(empty($fileInfo)){
+            return null;
+        }
+        return Filesystem::disk($fileInfo['uptype'])->path($fileInfo['path']);
+    }
     /**
      * 获取访问路径
      * @param string $name 文件名

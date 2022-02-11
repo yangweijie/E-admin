@@ -410,7 +410,7 @@ class Admin
     public static function getAppName()
     {
         $name = app('http')->getName();
-        if (!empty($name)) {
+        if (!empty($name)  && $name != 'api') {
             $map = config('app.app_map', []);
             $mapName = array_search($name, $map);
             if ($mapName !== false) {
@@ -420,11 +420,7 @@ class Admin
             }
             return $name;
         }
-        $name = app()->request->header('multi-app', 'admin');
-        if (!empty($name)) {
-            return $name;
-        }
-        return $name;
+        return app()->request->header('multi-app', 'admin');
     }
 
     /**
