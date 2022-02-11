@@ -29,6 +29,7 @@ use Eadmin\traits\CallProvide;
 use think\db\Query;
 use think\facade\Event;
 use think\facade\Filesystem;
+use think\facade\Log;
 use think\facade\Request;
 use think\helper\Arr;
 use think\helper\Str;
@@ -200,7 +201,7 @@ class Grid extends Component
     }
 
     /**
-     * 表格模式
+     * 静态表格模式
      */
     public function tableMode()
     {
@@ -761,6 +762,8 @@ class Grid extends Component
         $this->drive->quickFilter($keyword, $this->column);
         //params
         $params = (array)$this->attr('params');
+        $eadmin_class = request()->get('eadmin_class');
+        $eadmin_function = request()->get('eadmin_function');
         $this->params(array_merge($this->get, request()->get(), ['eadmin_grid' => $this->attr('eadmin_grid')], $this->getCallMethod(), $params));
         //查询视图
         if (!is_null($this->filter)) {
@@ -773,6 +776,7 @@ class Grid extends Component
                 $filterData = $form->bind($form->bindAttr('model'));
                 $get = $this->attr('params');
                 $exceptField = $form->attr('exceptField');
+                $exceptField = array_merge($exceptField);
                 foreach ($filterData as $field=>$value){
                     if(!isset($get[$field]) && !in_array($field,$exceptField)){
                         $get[$field] = $value;
@@ -803,7 +807,8 @@ class Grid extends Component
         if (!$this->hidePage) {
             $this->attr('pagination', $this->pagination->attribute);
         }
-        if (request()->has('ajax_request_data') && request()->get('eadmin_class') == $this->callClass && !$this->attr('static')) {
+        if (request()->has('ajax_request_data') && $eadmin_class == $this->callClass && $eadmin_function == $this->callFunction && !$this->attr('static')) {
+
             return [
                 'code' => 200,
                 'data' => $this->attr('data'),
